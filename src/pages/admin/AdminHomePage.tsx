@@ -1,7 +1,9 @@
 import { Link } from 'react-router-dom';
 import { getAdminDashboardStats, getSettings } from '../../lib/api';
+import { useDocumentTitle } from '../../hooks/useDocumentTitle';
 
 export default function AdminHomePage() {
+  useDocumentTitle('관리자');
   const settings = getSettings();
   const stats = getAdminDashboardStats();
 

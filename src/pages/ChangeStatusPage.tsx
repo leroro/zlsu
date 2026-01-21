@@ -6,10 +6,12 @@ import { MemberStatus } from '../lib/types';
 import { STATUS_DESCRIPTIONS } from '../lib/constants';
 import { MemberStatusBadge } from '../components/common/StatusBadge';
 import Button from '../components/common/Button';
+import { useDocumentTitle } from '../hooks/useDocumentTitle';
 
 const availableStatuses: MemberStatus[] = ['active', 'inactive'];
 
 export default function ChangeStatusPage() {
+  useDocumentTitle('상태 변경');
   const { user } = useAuth();
   const navigate = useNavigate();
 

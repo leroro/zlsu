@@ -1,10 +1,11 @@
-import { MemberStatus, MemberRole, ApplicationStatus, StateChangeStatus, WithdrawalStatus, Gender } from './types';
+import { MemberStatus, MemberRole, ApplicationStatus, StateChangeStatus, WithdrawalStatus, Gender, SwimmingLevel } from './types';
 
 // 정원
 export const MAX_CAPACITY = 16;
 
 // 상태 라벨
 export const STATUS_LABELS: Record<MemberStatus, string> = {
+  pending: '승인대기',
   active: '활성',
   inactive: '휴면',
   withdrawn: '탈퇴',
@@ -12,6 +13,7 @@ export const STATUS_LABELS: Record<MemberStatus, string> = {
 
 // 상태 설명
 export const STATUS_DESCRIPTIONS: Record<MemberStatus, string> = {
+  pending: '가입비 납부 후 승인 대기 중인 회원입니다.',
   active: '정기적으로 모임에 참여하는 회원입니다.',
   inactive: '일시적으로 모임 참여를 쉬고 있는 회원입니다. 언제든 활성 상태로 복귀할 수 있습니다.',
   withdrawn: '모임에서 탈퇴한 회원입니다.',
@@ -62,6 +64,7 @@ export const WITHDRAWAL_STATUS_LABELS: Record<WithdrawalStatus, string> = {
 
 // 상태 뱃지 색상
 export const STATUS_COLORS: Record<MemberStatus, string> = {
+  pending: 'bg-blue-100 text-blue-800',
   active: 'bg-green-100 text-green-800',
   inactive: 'bg-yellow-100 text-yellow-800',
   withdrawn: 'bg-gray-100 text-gray-800',
@@ -95,10 +98,10 @@ export const TERMS = {
 
 // 계좌 정보
 export const BANK_ACCOUNT = {
-  bank: '카카오뱅크',
+  bank: '카카오뱅크 (모임통장)',
   accountNumber: '79421007218',
   accountHolder: '임미선',
-  fullText: '카카오뱅크 79421007218 (임미선)',
+  fullText: '카카오뱅크 (모임통장) 79421007218 (임미선)',
 };
 
 // 가입 시 확인해야 할 체크리스트 항목
@@ -152,3 +155,19 @@ export const SWIMMING_STROKES = [
   { id: 'breaststroke', label: '평영' },
   { id: 'butterfly', label: '접영' },
 ] as const;
+
+// 수영 레벨 (평소 다니는 반)
+export const SWIMMING_LEVELS: { id: SwimmingLevel; label: string }[] = [
+  { id: 'beginner', label: '초급반' },
+  { id: 'intermediate', label: '중급반' },
+  { id: 'advanced', label: '상급반' },
+  { id: 'masters', label: '마스터반' },
+];
+
+// 수영 레벨 라벨
+export const SWIMMING_LEVEL_LABELS: Record<SwimmingLevel, string> = {
+  beginner: '초급반',
+  intermediate: '중급반',
+  advanced: '상급반',
+  masters: '마스터반',
+};

@@ -1,5 +1,5 @@
-// 회원 상태 (활성/휴면/탈퇴)
-export type MemberStatus = 'active' | 'inactive' | 'withdrawn';
+// 회원 상태 (승인대기/활성/휴면/탈퇴)
+export type MemberStatus = 'pending' | 'active' | 'inactive' | 'withdrawn';
 
 // 시스템 설정
 export interface SystemSettings {
@@ -30,6 +30,9 @@ export interface SwimmingAbility {
   butterfly: boolean;   // 접영
 }
 
+// 수영 레벨 (평소 다니는 반)
+export type SwimmingLevel = 'beginner' | 'intermediate' | 'advanced' | 'masters';
+
 // 회원 인터페이스
 export interface Member {
   id: string;
@@ -41,7 +44,8 @@ export interface Member {
   gender?: Gender;  // 성별
   birthDate?: string;
   referrer?: string;  // 추천인
-  swimmingAbility?: SwimmingAbility;  // 수영 실력
+  swimmingAbility?: SwimmingAbility;  // 수영 실력 (영법)
+  swimmingLevel?: SwimmingLevel;  // 수영 레벨 (평소 다니는 반)
   motivation?: string;  // 가입 동기
   status: MemberStatus;
   role: MemberRole;
@@ -58,7 +62,8 @@ export interface Application {
   phone: string;
   birthDate?: string;
   referrer?: string;  // 추천인
-  swimmingAbility: SwimmingAbility;  // 수영 실력
+  swimmingAbility: SwimmingAbility;  // 수영 실력 (영법)
+  swimmingLevel?: SwimmingLevel;  // 수영 레벨 (평소 다니는 반)
   motivation: string;
   agreedToTerms: boolean;  // 이용약관 동의
   agreedToPrivacy: boolean;  // 개인정보수집 동의

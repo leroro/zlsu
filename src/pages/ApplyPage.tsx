@@ -1,11 +1,12 @@
 import { useState, useRef, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { createApplication, getMemberByEmail, getApplications, getActiveChecklistItems, getActiveAndInactiveMemberCount, getSettings } from '../lib/api';
-import { SwimmingAbility, ChecklistItem } from '../lib/types';
-import { SWIMMING_STROKES, TERMS } from '../lib/constants';
+import { createPendingMember, getMemberByEmail, getActiveChecklistItems, getActiveAndInactiveMemberCount, getSettings, getMembers } from '../lib/api';
+import { SwimmingAbility, SwimmingLevel, ChecklistItem, Member } from '../lib/types';
+import { SWIMMING_STROKES, SWIMMING_LEVELS, TERMS, BANK_ACCOUNT } from '../lib/constants';
 import Button from '../components/common/Button';
+import { useDocumentTitle } from '../hooks/useDocumentTitle';
 
 // 스텝 타입
 type Step = 1 | 2 | 3;
@@ -62,12 +63,21 @@ function StepIndicator({ currentStep }: { currentStep: Step }) {
 }
 
 export default function ApplyPage() {
+  useDocumentTitle('가입 신청');
+  const [searchParams] = useSearchParams();
+
+  // 개발용: URL 파라미터로 단계 지정 (?step=1,2,3,complete,full)
+  const devStep = searchParams.get('step');
+  const isDevMode = devStep !== null;
+
   // 정원 체크
   const stats = getActiveAndInactiveMemberCount();
   const settings = getSettings();
-  const isFull = stats.capacityCount >= settings.maxCapacity;
+  const isFull = devStep === 'full' ? true : stats.capacityCount >= settings.maxCapacity;
 
-  const [currentStep, setCurrentStep] = useState<Step>(1);
+  const [currentStep, setCurrentStep] = useState<Step>(
+    devStep === '2' ? 2 : devStep === '3' ? 3 : 1
+  );
   const [hasScrolledToBottom, setHasScrolledToBottom] = useState(false);
   const rulesRef = useRef<HTMLDivElement>(null);
 
@@ -78,7 +88,10 @@ export default function ApplyPage() {
   // 체크리스트 항목 (동적으로 불러옴)
   const [checklistItems, setChecklistItems] = useState<ChecklistItem[]>([]);
 
-  // 운영규정 및 체크리스트 불러오기
+  // 추천인 선택용 회원 목록 (활성/휴면 회원만)
+  const [memberList, setMemberList] = useState<Member[]>([]);
+
+  // 운영규정, 체크리스트, 회원목록 불러오기
   useEffect(() => {
     // 운영규정 불러오기
     fetch(`${import.meta.env.BASE_URL}${TERMS.RULES.slice(1)}`)
@@ -96,6 +109,10 @@ export default function ApplyPage() {
     const items = getActiveChecklistItems();
     setChecklistItems(items);
     setChecklist(items.reduce((acc, item) => ({ ...acc, [item.id]: false }), {}));
+
+    // 추천인 선택용 회원 목록 불러오기 (활성/휴면 회원만)
+    const members = getMembers().filter(m => m.status === 'active' || m.status === 'inactive');
+    setMemberList(members.sort((a, b) => a.name.localeCompare(b.name)));
   }, []);
 
   // 1단계: 체크리스트 상태
@@ -113,7 +130,7 @@ export default function ApplyPage() {
 
   // 3단계: 부가 정보
   const [additionalInfo, setAdditionalInfo] = useState({
-    referrer: '',
+    referrer: isDevMode ? '홍길동' : '',
     motivation: '',
   });
 
@@ -124,8 +141,10 @@ export default function ApplyPage() {
     butterfly: false,
   });
 
+  const [swimmingLevel, setSwimmingLevel] = useState<SwimmingLevel | ''>('');
+
   const [error, setError] = useState('');
-  const [success, setSuccess] = useState(false);
+  const [success, setSuccess] = useState(devStep === 'complete');
   const [isLoading, setIsLoading] = useState(false);
 
   // 스크롤 감지
@@ -196,18 +215,14 @@ export default function ApplyPage() {
       return false;
     }
 
-    // 이메일 중복 체크
+    // 이메일 중복 체크 (기존 회원 및 승인대기 회원 포함)
     const existingMember = getMemberByEmail(basicInfo.email);
     if (existingMember) {
-      setError('이미 가입된 이메일입니다.');
-      return false;
-    }
-
-    const existingApplication = getApplications().find(
-      (a) => a.email === basicInfo.email && a.status === 'pending'
-    );
-    if (existingApplication) {
-      setError('이미 가입 신청이 진행 중입니다.');
+      if (existingMember.status === 'pending') {
+        setError('이미 가입 신청이 진행 중입니다. 로그인하여 진행 상황을 확인하세요.');
+      } else {
+        setError('이미 가입된 이메일입니다.');
+      }
       return false;
     }
 
@@ -216,7 +231,7 @@ export default function ApplyPage() {
 
   // 3단계 입력 핸들러
   const handleAdditionalInfoChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
     setAdditionalInfo((prev) => ({ ...prev, [name]: value }));
@@ -228,13 +243,17 @@ export default function ApplyPage() {
 
   // 3단계 유효성 검사
   const validateStep3 = (): boolean => {
-    if (!additionalInfo.referrer.trim()) {
-      setError('추천인을 입력해주세요. (없으면 "없음"으로 입력)');
+    if (!additionalInfo.referrer) {
+      setError('추천인을 선택해주세요.');
+      return false;
+    }
+    if (!swimmingLevel) {
+      setError('평소 다니는 반을 선택해주세요.');
       return false;
     }
     const hasAnyStroke = Object.values(swimmingAbility).some((v) => v);
     if (!hasAnyStroke) {
-      setError('수영 실력을 1개 이상 선택해주세요.');
+      setError('할 수 있는 영법을 1개 이상 선택해주세요.');
       return false;
     }
     if (!additionalInfo.motivation.trim()) {
@@ -278,7 +297,8 @@ export default function ApplyPage() {
     setIsLoading(true);
 
     try {
-      createApplication({
+      // 바로 pending 상태의 Member로 등록
+      createPendingMember({
         name: basicInfo.name,
         email: basicInfo.email,
         password: basicInfo.password,
@@ -286,9 +306,8 @@ export default function ApplyPage() {
         birthDate: basicInfo.birthDate,
         referrer: additionalInfo.referrer,
         swimmingAbility,
+        swimmingLevel: swimmingLevel || undefined,
         motivation: additionalInfo.motivation,
-        agreedToTerms: true,
-        agreedToPrivacy: true,
       });
 
       setSuccess(true);
@@ -297,6 +316,14 @@ export default function ApplyPage() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // 계좌번호 복사
+  const [copied, setCopied] = useState(false);
+  const handleCopyAccount = () => {
+    navigator.clipboard.writeText(BANK_ACCOUNT.accountNumber);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   // 성공 화면
@@ -309,61 +336,85 @@ export default function ApplyPage() {
             <h1 className="text-2xl font-bold text-gray-900">가입 신청이 완료되었어요!</h1>
           </div>
 
-          <div className="text-gray-600 mb-6">
-            {additionalInfo.referrer && additionalInfo.referrer !== '없음' ? (
-              <p className="mb-4">
-                <span className="font-medium text-gray-900">{additionalInfo.referrer}</span>님의 추천으로 신청해주셨네요.
-                <br />
-                총무가 가입 조건을 확인한 후 승인 절차를 진행할 예정이에요.
-              </p>
-            ) : (
-              <p className="mb-4">
-                총무가 가입 조건을 확인한 후 승인 절차를 진행할 예정이에요.
-              </p>
-            )}
+          {/* 가입비 납부 안내 */}
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+            <h2 className="font-semibold text-blue-900 mb-3 flex items-center gap-2">
+              <span>💰</span> 가입비를 납부해주세요
+            </h2>
+            <div className="text-sm text-blue-800 space-y-2">
+              <p>첫 달 회비 2만원 + 수모 2만원 = <span className="font-bold">총 4만원</span></p>
+              <div className="bg-white rounded-lg p-3 mt-3">
+                <p className="text-gray-600 text-xs mb-1">{BANK_ACCOUNT.bank}</p>
+                <p className="font-mono font-bold text-lg text-gray-900">{BANK_ACCOUNT.accountNumber}</p>
+                <p className="text-gray-600 text-xs">예금주: {BANK_ACCOUNT.accountHolder}</p>
+              </div>
+              <button
+                onClick={handleCopyAccount}
+                className="w-full mt-2 py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2"
+              >
+                {copied ? (
+                  <>
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    복사 완료!
+                  </>
+                ) : (
+                  <>
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                    </svg>
+                    계좌번호 복사
+                  </>
+                )}
+              </button>
+            </div>
           </div>
 
+          {/* 진행 순서 안내 */}
           <div className="bg-gray-50 rounded-lg p-4 mb-6">
             <h2 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-              <span>📋</span> 앞으로의 진행 순서
+              <span>📋</span> 입금 후 진행 순서
             </h2>
             <ol className="text-sm text-gray-600 space-y-2">
               <li className="flex gap-2">
                 <span className="font-medium text-primary-600">1.</span>
-                <span>총무가 가입 승인 (조건 확인 후)</span>
+                <span>총무가 입금 확인 후 승인</span>
               </li>
               <li className="flex gap-2">
                 <span className="font-medium text-primary-600">2.</span>
-                <span>가입비 납부 안내 연락 (첫 달 회비 + 수모 구입비)</span>
+                <span>카카오톡 단톡방 + 모임통장 초대</span>
               </li>
               <li className="flex gap-2">
                 <span className="font-medium text-primary-600">3.</span>
-                <span>입금 확인 후 카카오톡 단톡방 초대</span>
+                <span>추천인에게 수모 수령</span>
               </li>
               <li className="flex gap-2">
                 <span className="font-medium text-primary-600">4.</span>
-                <span>카카오뱅크 모임통장 초대</span>
-              </li>
-              <li className="flex gap-2">
-                <span className="font-medium text-primary-600">5.</span>
-                <span>수모 수령 후 토요일 수영장에서 만나요! 🏊</span>
+                <span>토요일 수영장에서 만나요! 🏊</span>
               </li>
             </ol>
           </div>
 
-          <div className="text-xs text-gray-500 space-y-1 mb-6">
-            <p>※ 가입비 관련 정보는 회칙을 참고해주세요.</p>
-            <p>※ 문의사항은 추천인 또는 총무에게 연락해주세요.</p>
+          {/* 문의 안내 - 추천인 강조 */}
+          <div className="text-sm text-gray-600 mb-6 p-3 bg-gray-50 rounded-lg">
+            {additionalInfo.referrer && additionalInfo.referrer !== '없음' ? (
+              <p>
+                문의사항은 <span className="font-bold text-primary-600">{additionalInfo.referrer}</span>님(추천인)에게 연락해주세요.
+              </p>
+            ) : (
+              <p>문의사항은 총무에게 연락해주세요.</p>
+            )}
           </div>
 
-          <div className="flex gap-3">
-            <Link to="/rules" className="flex-1">
-              <Button variant="secondary" className="w-full">회칙 확인하기</Button>
-            </Link>
-            <Link to="/" className="flex-1">
-              <Button className="w-full">홈으로 돌아가기</Button>
-            </Link>
+          {/* 로그인 안내 */}
+          <div className="text-xs text-gray-500 text-center mb-4">
+            ※ 이제 로그인하여 승인 상태를 확인할 수 있어요.
           </div>
+
+          <Link to="/login">
+            <Button className="w-full">로그인하기</Button>
+          </Link>
         </div>
       </div>
     );
@@ -386,11 +437,11 @@ export default function ApplyPage() {
               현재 인원: {stats.capacityCount}/{settings.maxCapacity}명
             </span>
           </p>
-          <div className="space-y-3">
-            <Link to="/">
+          <div className="flex flex-col gap-3">
+            <Link to="/" className="block">
               <Button variant="primary" className="w-full">홈으로 돌아가기</Button>
             </Link>
-            <Link to="/rules">
+            <Link to="/rules" className="block">
               <Button variant="secondary" className="w-full">회칙 확인하기</Button>
             </Link>
           </div>
@@ -418,7 +469,7 @@ export default function ApplyPage() {
               <div
                 ref={rulesRef}
                 onScroll={handleScroll}
-                className="h-64 overflow-y-auto border border-gray-200 rounded-lg p-4 bg-gray-50 prose prose-sm prose-gray max-w-none prose-headings:text-gray-900 prose-p:text-gray-700 prose-li:text-gray-700 prose-strong:text-gray-900 prose-table:text-gray-700"
+                className="h-52 overflow-y-auto border border-gray-200 rounded-lg p-4 bg-gray-50 prose prose-sm prose-gray max-w-none prose-headings:text-gray-900 prose-headings:font-semibold prose-h1:text-base prose-h2:text-sm prose-h3:text-sm prose-p:text-gray-700 prose-li:text-gray-700 prose-strong:text-gray-900 prose-table:text-gray-700"
               >
                 {isLoadingRules ? (
                   '로딩 중...'
@@ -621,21 +672,55 @@ export default function ApplyPage() {
               <label htmlFor="referrer" className="block text-sm font-medium text-gray-700 mb-1">
                 추천인 <span className="text-red-500">*</span>
               </label>
-              <input
-                type="text"
+              <select
                 id="referrer"
                 name="referrer"
                 value={additionalInfo.referrer}
                 onChange={handleAdditionalInfoChange}
                 className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                placeholder="추천해주신 분의 이름 (없으면 '없음')"
-              />
+              >
+                <option value="">추천인을 선택해주세요</option>
+                <option value="없음">없음</option>
+                {memberList.map((member) => (
+                  <option key={member.id} value={member.name}>
+                    {member.name}
+                  </option>
+                ))}
+              </select>
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                수영 실력 <span className="text-red-500">*</span>
-                <span className="text-xs text-gray-500 ml-2">(배운 영법을 선택해주세요)</span>
+                평소 다니는 반 <span className="text-red-500">*</span>
+              </label>
+              <div className="grid grid-cols-2 gap-2">
+                {SWIMMING_LEVELS.map((level) => (
+                  <label
+                    key={level.id}
+                    className={`flex items-center p-3 border rounded-lg cursor-pointer transition-colors ${
+                      swimmingLevel === level.id
+                        ? 'border-primary-500 bg-primary-50'
+                        : 'border-gray-200 hover:border-gray-300'
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="swimmingLevel"
+                      value={level.id}
+                      checked={swimmingLevel === level.id}
+                      onChange={(e) => setSwimmingLevel(e.target.value as SwimmingLevel)}
+                      className="mr-2 h-4 w-4 border-gray-300 text-primary-600 focus:ring-primary-500"
+                    />
+                    <span className="text-sm">{level.label}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                할 수 있는 영법 <span className="text-red-500">*</span>
+                <span className="text-xs text-gray-500 ml-2">(복수 선택 가능)</span>
               </label>
               <div className="grid grid-cols-2 gap-2">
                 {SWIMMING_STROKES.map((stroke) => (

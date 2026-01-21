@@ -1,36 +1,35 @@
 import { useState, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { TERMS } from '../lib/constants';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
 
-export default function RulesPage() {
-  useDocumentTitle('회칙');
+export default function OperationsGuidePage() {
+  useDocumentTitle('운영 가이드');
   const [content, setContent] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
 
   useEffect(() => {
-    const loadRules = async () => {
+    const loadGuide = async () => {
       setIsLoading(true);
       setError('');
 
       try {
         const basePath = import.meta.env.BASE_URL;
-        const response = await fetch(`${basePath}${TERMS.RULES.slice(1)}`);
+        const response = await fetch(`${basePath}rules/operations-guide.md`);
         if (!response.ok) {
-          throw new Error('회칙을 불러올 수 없습니다.');
+          throw new Error('운영 가이드를 불러올 수 없습니다.');
         }
         const text = await response.text();
         setContent(text);
       } catch {
-        setError('회칙을 불러오는 중 오류가 발생했습니다.');
+        setError('운영 가이드를 불러오는 중 오류가 발생했습니다.');
       } finally {
         setIsLoading(false);
       }
     };
 
-    loadRules();
+    loadGuide();
   }, []);
 
   if (isLoading) {

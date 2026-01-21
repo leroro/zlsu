@@ -4,8 +4,10 @@ import { useAuth } from '../contexts/AuthContext';
 import { updateMember, getWithdrawalRequests, changePassword } from '../lib/api';
 import { ROLE_LABELS } from '../lib/constants';
 import Button from '../components/common/Button';
+import { useDocumentTitle } from '../hooks/useDocumentTitle';
 
 export default function MyPage() {
+  useDocumentTitle('내 정보');
   const { user, refreshUser } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [showPasswordChange, setShowPasswordChange] = useState(false);

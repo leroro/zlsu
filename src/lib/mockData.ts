@@ -260,6 +260,24 @@ export const initialMembers: Member[] = [
     joinedAt: '2025-03-15',
     updatedAt: '2026-01-19',  // 최근 휴면 전환
   },
+  // 승인 대기 테스트 회원
+  {
+    id: 'pending1',
+    email: 'pending@test.com',
+    password: 'test123',
+    name: '김대기',
+    phone: '010-9999-0001',
+    gender: 'male',
+    birthDate: '1995-05-15',
+    referrer: '한선우',
+    swimmingAbility: { freestyle: true, backstroke: false, breaststroke: true, butterfly: false },
+    swimmingLevel: 'beginner',
+    motivation: '수영을 배우고 싶어서 가입 신청합니다.',
+    status: 'pending',
+    role: 'member',
+    joinedAt: '2026-01-20',
+    updatedAt: '2026-01-20',
+  },
 ];
 
 // 초기 가입 신청 데이터

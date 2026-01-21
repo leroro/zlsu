@@ -2,11 +2,13 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import Button from '../components/common/Button';
+import { useDocumentTitle } from '../hooks/useDocumentTitle';
 
 // 시스템 관리용 아이디 (이메일 형식이 아니어도 허용)
 const SYSTEM_IDS = ['admin'];
 
 export default function LoginPage() {
+  useDocumentTitle('로그인');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');

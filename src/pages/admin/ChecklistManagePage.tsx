@@ -3,8 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { getChecklistItems, saveChecklistItems } from '../../lib/api';
 import { ChecklistItem } from '../../lib/types';
 import Button from '../../components/common/Button';
+import { useDocumentTitle } from '../../hooks/useDocumentTitle';
 
 export default function ChecklistManagePage() {
+  useDocumentTitle('체크리스트 관리');
   const navigate = useNavigate();
 
   // 원본 데이터와 수정 중인 데이터를 분리

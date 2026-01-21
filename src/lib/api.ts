@@ -212,6 +212,7 @@ export function approveApplication(id: string, processedBy: string): boolean {
     birthDate: application.birthDate,
     referrer: application.referrer,
     swimmingAbility: application.swimmingAbility,
+    swimmingLevel: application.swimmingLevel,
     motivation: application.motivation,
     status: 'active',
     role: 'member',
@@ -238,6 +239,64 @@ export function rejectApplication(id: string, processedBy: string, rejectReason:
   };
   setStorageData(STORAGE_KEYS.APPLICATIONS, applications);
   return true;
+}
+
+// ============ 신규 가입 (pending 상태로 바로 회원 등록) ============
+
+// 가입 신청 시 바로 pending 상태의 Member로 등록
+export function createPendingMember(data: {
+  name: string;
+  email: string;
+  password: string;
+  phone: string;
+  birthDate?: string;
+  referrer?: string;
+  swimmingAbility?: Member['swimmingAbility'];
+  swimmingLevel?: Member['swimmingLevel'];
+  motivation?: string;
+}): Member {
+  const members = getMembers();
+  const newMember: Member = {
+    id: generateId(),
+    email: data.email,
+    password: data.password,
+    name: data.name,
+    phone: data.phone,
+    birthDate: data.birthDate,
+    referrer: data.referrer,
+    swimmingAbility: data.swimmingAbility,
+    swimmingLevel: data.swimmingLevel,
+    motivation: data.motivation,
+    status: 'pending',
+    role: 'member',
+    joinedAt: getCurrentDate(),
+    updatedAt: getCurrentDate(),
+  };
+  members.push(newMember);
+  setStorageData(STORAGE_KEYS.MEMBERS, members);
+  return newMember;
+}
+
+// pending 상태 회원 목록 조회
+export function getPendingMembers(): Member[] {
+  return getMembers().filter(m => m.status === 'pending');
+}
+
+// pending 회원 승인 (active로 변경)
+export function approvePendingMember(id: string): boolean {
+  const member = getMemberById(id);
+  if (!member || member.status !== 'pending') return false;
+
+  updateMember(id, { status: 'active' });
+  return true;
+}
+
+// pending 회원 반려 (삭제)
+export function rejectPendingMember(id: string): boolean {
+  const member = getMemberById(id);
+  if (!member || member.status !== 'pending') return false;
+
+  return deleteMember(id);
 }
 
 // ============ 상태 변경 신청 API ============
@@ -371,12 +430,14 @@ export function rejectWithdrawalRequest(id: string, processedBy: string, rejectR
 
 export function getAdminDashboardStats() {
   const pendingApplications = getPendingApplications().length;
+  const pendingMembersCount = getPendingMembers().length;
   const pendingStateChanges = getPendingStateChanges().length;
   const pendingWithdrawals = getPendingWithdrawalRequests().length;
   const memberStats = getActiveAndInactiveMemberCount();
 
   return {
     pendingApplications,
+    pendingMembers: pendingMembersCount,
     pendingStateChanges,
     pendingWithdrawals,
     ...memberStats,

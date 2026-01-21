@@ -4,8 +4,10 @@ import { getMemberById, updateMember, deleteMember } from '../../lib/api';
 import { Member, MemberStatus, MemberRole } from '../../lib/types';
 import { STATUS_LABELS, ROLE_LABELS, POSITION_OPTIONS } from '../../lib/constants';
 import Button from '../../components/common/Button';
+import { useDocumentTitle } from '../../hooks/useDocumentTitle';
 
 export default function MemberEditPage() {
+  useDocumentTitle('회원 수정');
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 

@@ -1,13 +1,23 @@
 import { useState, useMemo } from 'react';
+import { Navigate } from 'react-router-dom';
 import { getMembers, getStateChanges, getWithdrawalRequests } from '../lib/api';
 import { MemberStatus } from '../lib/types';
 import { STATUS_LABELS, GENDER_LABELS } from '../lib/constants';
 import { MemberStatusBadge } from '../components/common/StatusBadge';
 import Button from '../components/common/Button';
+import { useDocumentTitle } from '../hooks/useDocumentTitle';
+import { useAuth } from '../contexts/AuthContext';
 
 type FilterStatus = MemberStatus | 'all';
 
 export default function MembersPage() {
+  useDocumentTitle('회원 명단');
+  const { user } = useAuth();
+
+  // pending 회원은 접근 불가
+  if (user?.status === 'pending') {
+    return <Navigate to="/" replace />;
+  }
   const [filter, setFilter] = useState<FilterStatus>('all');
   const members = getMembers();
   const stateChanges = getStateChanges();
@@ -37,11 +47,11 @@ export default function MembersPage() {
   const filteredMembers = useMemo(() => {
     return members
       .filter((m) => m.role !== 'admin') // 관리자 전용 계정 제외
-      .filter((m) => m.status !== 'withdrawn')
+      .filter((m) => m.status !== 'withdrawn' && m.status !== 'pending') // 탈퇴/승인대기 제외
       .filter((m) => filter === 'all' || m.status === filter)
       .sort((a, b) => {
         // 활성 > 휴면 순으로 정렬
-        const statusOrder: Record<MemberStatus, number> = { active: 0, inactive: 1, withdrawn: 2 };
+        const statusOrder: Record<MemberStatus, number> = { pending: 0, active: 1, inactive: 2, withdrawn: 3 };
         return statusOrder[a.status] - statusOrder[b.status];
       });
   }, [members, filter]);
@@ -49,7 +59,8 @@ export default function MembersPage() {
   const statusCounts = useMemo(() => {
     const regularMembers = members.filter((m) => m.role !== 'admin');
     const counts: Record<FilterStatus, number> = {
-      all: regularMembers.filter((m) => m.status !== 'withdrawn').length,
+      all: regularMembers.filter((m) => m.status !== 'withdrawn' && m.status !== 'pending').length,
+      pending: 0, // 일반 회원 목록에서는 표시 안 함
       active: regularMembers.filter((m) => m.status === 'active').length,
       inactive: regularMembers.filter((m) => m.status === 'inactive').length,
       withdrawn: 0,
@@ -60,7 +71,7 @@ export default function MembersPage() {
   return (
     <div className="space-y-6">
       <div className="bg-white md:rounded-lg md:shadow p-6">
-        <h1 className="text-2xl font-bold text-gray-900 mb-6">회원 목록</h1>
+        <h1 className="text-2xl font-bold text-gray-900 mb-6">회원 명단</h1>
 
         {/* 필터 버튼 */}
         <div className="flex flex-wrap gap-2 mb-6">

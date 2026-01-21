@@ -21,10 +21,12 @@ import {
   WithdrawalStatusBadge,
 } from '../../components/common/StatusBadge';
 import Button from '../../components/common/Button';
+import { useDocumentTitle } from '../../hooks/useDocumentTitle';
 
 type TabType = 'applications' | 'stateChanges' | 'withdrawals';
 
 export default function RequestsPage() {
+  useDocumentTitle('신청 관리');
   const { user } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
   const [refreshKey, setRefreshKey] = useState(0);

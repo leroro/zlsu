@@ -2,8 +2,10 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getSettings, updateSettings } from '../../lib/api';
 import Button from '../../components/common/Button';
+import { useDocumentTitle } from '../../hooks/useDocumentTitle';
 
 export default function SettingsPage() {
+  useDocumentTitle('시스템 설정');
   const navigate = useNavigate();
   const [settings, setSettings] = useState(getSettings);
   const [message, setMessage] = useState({ type: '', text: '' });

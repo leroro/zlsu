@@ -5,10 +5,12 @@ import { MemberStatus } from '../../lib/types';
 import { STATUS_LABELS } from '../../lib/constants';
 import { MemberStatusBadge } from '../../components/common/StatusBadge';
 import Button from '../../components/common/Button';
+import { useDocumentTitle } from '../../hooks/useDocumentTitle';
 
 type FilterStatus = MemberStatus | 'all';
 
 export default function MembersManagePage() {
+  useDocumentTitle('회원 관리');
   const [filter, setFilter] = useState<FilterStatus>('all');
 
   const allMembers = getMembers();
@@ -18,7 +20,7 @@ export default function MembersManagePage() {
     return members
       .filter((m) => filter === 'all' || m.status === filter)
       .sort((a, b) => {
-        const statusOrder: Record<MemberStatus, number> = { active: 0, inactive: 1, withdrawn: 2 };
+        const statusOrder: Record<MemberStatus, number> = { pending: 0, active: 1, inactive: 2, withdrawn: 3 };
         return statusOrder[a.status] - statusOrder[b.status];
       });
   }, [members, filter]);
@@ -26,6 +28,7 @@ export default function MembersManagePage() {
   const statusCounts = useMemo(() => {
     return {
       all: members.length,
+      pending: members.filter((m) => m.status === 'pending').length,
       active: members.filter((m) => m.status === 'active').length,
       inactive: members.filter((m) => m.status === 'inactive').length,
       withdrawn: members.filter((m) => m.status === 'withdrawn').length,
@@ -39,7 +42,7 @@ export default function MembersManagePage() {
 
         {/* 필터 */}
         <div className="flex flex-wrap gap-2 mb-6">
-          {(['all', 'active', 'inactive', 'withdrawn'] as FilterStatus[]).map(
+          {(['all', 'pending', 'active', 'inactive', 'withdrawn'] as FilterStatus[]).map(
             (status) => (
               <Button
                 key={status}

@@ -3,8 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { createWithdrawalRequest, getWithdrawalRequests } from '../lib/api';
 import Button from '../components/common/Button';
+import { useDocumentTitle } from '../hooks/useDocumentTitle';
 
 export default function WithdrawPage() {
+  useDocumentTitle('탈퇴 신청');
   const { user } = useAuth();
   const navigate = useNavigate();
 

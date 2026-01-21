@@ -4,6 +4,9 @@ import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import ApplyPage from './pages/ApplyPage';
 import RulesPage from './pages/RulesPage';
+import AboutPage from './pages/AboutPage';
+import DevGuidePage from './pages/DevGuidePage';
+import OperationsGuidePage from './pages/OperationsGuidePage';
 import MyPage from './pages/MyPage';
 import MembersPage from './pages/MembersPage';
 import ChangeStatusPage from './pages/ChangeStatusPage';
@@ -24,8 +27,10 @@ export const router = createHashRouter([
         // 비로그인 페이지
         { index: true, element: <HomePage /> },
         { path: 'login', element: <LoginPage /> },
+        { path: 'about', element: <AboutPage /> },
         { path: 'apply', element: <ApplyPage /> },
         { path: 'rules', element: <RulesPage /> },
+        { path: 'dev-guide', element: <DevGuidePage /> },
 
         // 로그인 필요 페이지
         {
@@ -41,6 +46,14 @@ export const router = createHashRouter([
           element: (
             <ProtectedRoute>
               <MembersPage />
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: 'operations',
+          element: (
+            <ProtectedRoute>
+              <OperationsGuidePage />
             </ProtectedRoute>
           ),
         },

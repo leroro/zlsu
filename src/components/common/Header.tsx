@@ -65,8 +65,13 @@ export default function Header() {
                 </svg>
               </button>
             )}
-            <Link to="/" className="text-xl font-bold hover:text-primary-100">
-              즐수팀
+            <Link to="/" className="flex items-center gap-2 hover:opacity-90">
+              <img
+                src="./images/emblem.svg"
+                alt="즐수팀 로고"
+                className="h-7"
+              />
+              <span className="text-lg font-bold">수영을 즐겁게</span>
             </Link>
           </div>
 
@@ -102,9 +107,14 @@ export default function Header() {
                   <Link to="/my" className="hover:text-primary-100">
                     내 정보
                   </Link>
-                  <Link to="/members" className="hover:text-primary-100">
-                    회원목록
+                  <Link to="/rules" className="hover:text-primary-100">
+                    회칙
                   </Link>
+                  {user.status !== 'pending' && (
+                    <Link to="/members" className="hover:text-primary-100">
+                      회원 명단
+                    </Link>
+                  )}
                   <button
                     onClick={handleLogout}
                     className="px-3 py-1 bg-primary-700 rounded hover:bg-primary-800"
@@ -115,6 +125,9 @@ export default function Header() {
               )
             ) : (
               <>
+                <Link to="/about" className="hover:text-primary-100">
+                  소개
+                </Link>
                 {isFull ? (
                   <span className="text-primary-300 cursor-not-allowed text-sm">
                     정원 마감
@@ -240,7 +253,10 @@ export default function Header() {
                   <>
                     <div className="px-4 py-3 mb-2 bg-primary-700/50 rounded-lg">
                       <div className="flex items-center gap-3">
-                        <div className={`w-3 h-3 rounded-full ${user.status === 'active' ? 'bg-green-400' : 'bg-yellow-400'}`} />
+                        <div className={`w-3 h-3 rounded-full ${
+                          user.status === 'active' ? 'bg-green-400' :
+                          user.status === 'pending' ? 'bg-blue-400' : 'bg-yellow-400'
+                        }`} />
                         <div>
                           <div className="font-medium">{user.name}{user.position && ` (${user.position})`}</div>
                           <div className="text-xs text-primary-200">{STATUS_LABELS[user.status]} 회원</div>
@@ -259,16 +275,6 @@ export default function Header() {
                       <span>내 정보</span>
                     </Link>
                     <Link
-                      to="/members"
-                      onClick={closeMenu}
-                      className={`px-4 py-3 rounded flex items-center gap-3 ${
-                        isActive('/members') ? 'bg-primary-700' : 'hover:bg-primary-700'
-                      }`}
-                    >
-                      <span className="w-6 text-center">👥</span>
-                      <span>회원 목록</span>
-                    </Link>
-                    <Link
                       to="/rules"
                       onClick={closeMenu}
                       className={`px-4 py-3 rounded flex items-center gap-3 ${
@@ -278,6 +284,18 @@ export default function Header() {
                       <span className="w-6 text-center">📜</span>
                       <span>회칙</span>
                     </Link>
+                    {user.status !== 'pending' && (
+                      <Link
+                        to="/members"
+                        onClick={closeMenu}
+                        className={`px-4 py-3 rounded flex items-center gap-3 ${
+                          isActive('/members') ? 'bg-primary-700' : 'hover:bg-primary-700'
+                        }`}
+                      >
+                        <span className="w-6 text-center">👥</span>
+                        <span>회원 명단</span>
+                      </Link>
+                    )}
 
                     <div className="border-t border-primary-500 my-2" />
                     <button
@@ -291,6 +309,16 @@ export default function Header() {
                 )
               ) : (
                 <>
+                  <Link
+                    to="/about"
+                    onClick={closeMenu}
+                    className={`px-4 py-3 rounded flex items-center gap-3 ${
+                      isActive('/about') ? 'bg-primary-700' : 'hover:bg-primary-700'
+                    }`}
+                  >
+                    <span className="w-6 text-center">🏊</span>
+                    <span>모임 소개</span>
+                  </Link>
                   <Link
                     to="/rules"
                     onClick={closeMenu}
