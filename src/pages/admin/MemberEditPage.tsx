@@ -258,7 +258,6 @@ export default function MemberEditPage() {
 
             <Button
               variant="danger"
-              size="sm"
               onClick={handleDelete}
             >
               삭제

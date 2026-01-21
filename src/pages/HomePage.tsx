@@ -137,8 +137,8 @@ export default function HomePage() {
           </div>
         )}
 
-        {/* 상태 전환 버튼 */}
-        {!pendingStateChange && !pendingWithdrawal && (
+        {/* 상태 전환 버튼 - 관리자에게는 표시하지 않음 */}
+        {user.role !== 'admin' && !pendingStateChange && !pendingWithdrawal && (
           <div className="mt-4">
             <Link to="/change-status">
               <Button variant="secondary" className="w-full">

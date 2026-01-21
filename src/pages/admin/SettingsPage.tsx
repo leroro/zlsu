@@ -45,9 +45,9 @@ export default function SettingsPage() {
           </div>
         )}
 
-        <div className="space-y-8">
+        <div className="divide-y divide-gray-200">
           {/* 정원 설정 */}
-          <section>
+          <section className="pb-6">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">정원 설정</h2>
 
             <div className="space-y-4">
@@ -75,7 +75,7 @@ export default function SettingsPage() {
           </section>
 
           {/* 정원 계산 기준 */}
-          <section>
+          <section className="py-6">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">정원 계산 기준</h2>
 
             <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
@@ -125,7 +125,7 @@ export default function SettingsPage() {
           </section>
 
           {/* 가입 체크리스트 관리 */}
-          <section>
+          <section className="pt-6">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">가입 체크리스트</h2>
 
             <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">

@@ -303,21 +303,67 @@ export default function ApplyPage() {
   if (success) {
     return (
       <div className="max-w-md mx-auto">
-        <div className="bg-white md:rounded-lg md:shadow p-8 text-center">
-          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-            </svg>
+        <div className="bg-white md:rounded-lg md:shadow p-6 sm:p-8">
+          <div className="text-center mb-6">
+            <div className="text-5xl mb-3">🎉</div>
+            <h1 className="text-2xl font-bold text-gray-900">가입 신청이 완료되었어요!</h1>
           </div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">신청 완료</h1>
-          <p className="text-gray-600 mb-6">
-            가입 신청이 완료되었습니다.
-            <br />
-            관리자 승인 후 로그인하실 수 있습니다.
-          </p>
-          <Link to="/">
-            <Button>홈으로 돌아가기</Button>
-          </Link>
+
+          <div className="text-gray-600 mb-6">
+            {additionalInfo.referrer && additionalInfo.referrer !== '없음' ? (
+              <p className="mb-4">
+                <span className="font-medium text-gray-900">{additionalInfo.referrer}</span>님의 추천으로 신청해주셨네요.
+                <br />
+                총무가 가입 조건을 확인한 후 승인 절차를 진행할 예정이에요.
+              </p>
+            ) : (
+              <p className="mb-4">
+                총무가 가입 조건을 확인한 후 승인 절차를 진행할 예정이에요.
+              </p>
+            )}
+          </div>
+
+          <div className="bg-gray-50 rounded-lg p-4 mb-6">
+            <h2 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+              <span>📋</span> 앞으로의 진행 순서
+            </h2>
+            <ol className="text-sm text-gray-600 space-y-2">
+              <li className="flex gap-2">
+                <span className="font-medium text-primary-600">1.</span>
+                <span>총무가 가입 승인 (조건 확인 후)</span>
+              </li>
+              <li className="flex gap-2">
+                <span className="font-medium text-primary-600">2.</span>
+                <span>가입비 납부 안내 연락 (첫 달 회비 + 수모 구입비)</span>
+              </li>
+              <li className="flex gap-2">
+                <span className="font-medium text-primary-600">3.</span>
+                <span>입금 확인 후 카카오톡 단톡방 초대</span>
+              </li>
+              <li className="flex gap-2">
+                <span className="font-medium text-primary-600">4.</span>
+                <span>카카오뱅크 모임통장 초대</span>
+              </li>
+              <li className="flex gap-2">
+                <span className="font-medium text-primary-600">5.</span>
+                <span>수모 수령 후 토요일 수영장에서 만나요! 🏊</span>
+              </li>
+            </ol>
+          </div>
+
+          <div className="text-xs text-gray-500 space-y-1 mb-6">
+            <p>※ 가입비 관련 정보는 회칙을 참고해주세요.</p>
+            <p>※ 문의사항은 추천인 또는 총무에게 연락해주세요.</p>
+          </div>
+
+          <div className="flex gap-3">
+            <Link to="/rules" className="flex-1">
+              <Button variant="secondary" className="w-full">회칙 확인하기</Button>
+            </Link>
+            <Link to="/" className="flex-1">
+              <Button className="w-full">홈으로 돌아가기</Button>
+            </Link>
+          </div>
         </div>
       </div>
     );
@@ -372,7 +418,7 @@ export default function ApplyPage() {
               <div
                 ref={rulesRef}
                 onScroll={handleScroll}
-                className="h-64 overflow-y-auto border border-gray-200 rounded-lg p-4 bg-white prose prose-sm prose-gray max-w-none prose-headings:text-gray-900 prose-p:text-gray-700 prose-li:text-gray-700 prose-strong:text-gray-900 prose-table:text-gray-700"
+                className="h-64 overflow-y-auto border border-gray-200 rounded-lg p-4 bg-gray-50 prose prose-sm prose-gray max-w-none prose-headings:text-gray-900 prose-p:text-gray-700 prose-li:text-gray-700 prose-strong:text-gray-900 prose-table:text-gray-700"
               >
                 {isLoadingRules ? (
                   '로딩 중...'
