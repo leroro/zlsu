@@ -3,6 +3,9 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import Button from '../components/common/Button';
 
+// 시스템 관리용 아이디 (이메일 형식이 아니어도 허용)
+const SYSTEM_IDS = ['admin'];
+
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -12,15 +15,34 @@ export default function LoginPage() {
   const { login } = useAuth();
   const navigate = useNavigate();
 
+  // 이메일 형식 검증 (시스템 아이디 예외)
+  const isValidEmailOrSystemId = (value: string) => {
+    if (SYSTEM_IDS.includes(value)) return true;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(value);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+
+    // 이메일 형식 검증
+    if (!isValidEmailOrSystemId(email)) {
+      setError('올바른 이메일 형식을 입력해주세요.');
+      return;
+    }
+
     setIsLoading(true);
 
     try {
-      const success = await login(email, password);
-      if (success) {
-        navigate('/');
+      const loggedInUser = await login(email, password);
+      if (loggedInUser) {
+        // 역할에 따라 다른 페이지로 이동
+        if (loggedInUser.role === 'admin') {
+          navigate('/admin');
+        } else {
+          navigate('/');  // 일반 회원은 대시보드 홈으로
+        }
       } else {
         setError('이메일 또는 비밀번호가 올바르지 않습니다.');
       }
@@ -33,7 +55,7 @@ export default function LoginPage() {
 
   return (
     <div className="max-w-md mx-auto">
-      <div className="bg-white rounded-lg shadow p-8">
+      <div className="bg-white md:rounded-lg md:shadow p-8">
         <h1 className="text-2xl font-bold text-gray-900 mb-6 text-center">로그인</h1>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -48,8 +70,10 @@ export default function LoginPage() {
               이메일
             </label>
             <input
-              type="email"
+              type="text"
               id="email"
+              name="email"
+              autoComplete="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
@@ -65,6 +89,8 @@ export default function LoginPage() {
             <input
               type="password"
               id="password"
+              name="password"
+              autoComplete="current-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"

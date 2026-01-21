@@ -1,4 +1,4 @@
-import { createBrowserRouter } from 'react-router-dom';
+import { createHashRouter } from 'react-router-dom';
 import App from './App';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
@@ -7,20 +7,20 @@ import RulesPage from './pages/RulesPage';
 import MyPage from './pages/MyPage';
 import MembersPage from './pages/MembersPage';
 import ChangeStatusPage from './pages/ChangeStatusPage';
+import WithdrawPage from './pages/WithdrawPage';
 import AdminHomePage from './pages/admin/AdminHomePage';
-import ApplicationsPage from './pages/admin/ApplicationsPage';
+import RequestsPage from './pages/admin/RequestsPage';
 import MembersManagePage from './pages/admin/MembersManagePage';
 import MemberEditPage from './pages/admin/MemberEditPage';
+import SettingsPage from './pages/admin/SettingsPage';
+import ChecklistManagePage from './pages/admin/ChecklistManagePage';
 import ProtectedRoute from './components/common/ProtectedRoute';
 
-const basename = import.meta.env.BASE_URL;
-
-export const router = createBrowserRouter(
-  [
-    {
-      path: '/',
-      element: <App />,
-      children: [
+export const router = createHashRouter([
+  {
+    path: '/',
+    element: <App />,
+    children: [
         // 비로그인 페이지
         { index: true, element: <HomePage /> },
         { path: 'login', element: <LoginPage /> },
@@ -52,6 +52,14 @@ export const router = createBrowserRouter(
             </ProtectedRoute>
           ),
         },
+        {
+          path: 'withdraw',
+          element: (
+            <ProtectedRoute>
+              <WithdrawPage />
+            </ProtectedRoute>
+          ),
+        },
 
         // 관리자 페이지
         {
@@ -63,10 +71,10 @@ export const router = createBrowserRouter(
           ),
         },
         {
-          path: 'admin/applications',
+          path: 'admin/requests',
           element: (
             <ProtectedRoute requireAdmin>
-              <ApplicationsPage />
+              <RequestsPage />
             </ProtectedRoute>
           ),
         },
@@ -86,8 +94,23 @@ export const router = createBrowserRouter(
             </ProtectedRoute>
           ),
         },
+        {
+          path: 'admin/settings',
+          element: (
+            <ProtectedRoute requireAdmin>
+              <SettingsPage />
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: 'admin/checklist',
+          element: (
+            <ProtectedRoute requireAdmin>
+              <ChecklistManagePage />
+            </ProtectedRoute>
+          ),
+        },
       ],
     },
   ],
-  { basename }
 );

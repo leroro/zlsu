@@ -3,7 +3,14 @@
     "allow": [
       "Bash(npm install:*)",
       "Bash(npx tailwindcss:*)",
-      "Bash(npm run build:*)"
+      "Bash(npm run build:*)",
+      "Bash(git clean:*)",
+      "Bash(cmd.exe /c \"del \\\\\\\\?\\\\C:\\\\Users\\\\Administrator\\\\Documents\\\\zlsu\\\\nul\")",
+      "Bash(ipconfig:*)",
+      "Bash(findstr:*)",
+      "Bash(git pull:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
     ]
   }
 }

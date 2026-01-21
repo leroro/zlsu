@@ -1,10 +1,12 @@
-import { MemberStatus, ApplicationStatus, StateChangeStatus } from '../../lib/types';
+import { MemberStatus, ApplicationStatus, StateChangeStatus, WithdrawalStatus } from '../../lib/types';
 import {
   STATUS_LABELS,
   STATUS_COLORS,
   APPLICATION_STATUS_LABELS,
   APPLICATION_STATUS_COLORS,
   STATE_CHANGE_STATUS_LABELS,
+  WITHDRAWAL_STATUS_LABELS,
+  WITHDRAWAL_STATUS_COLORS,
 } from '../../lib/constants';
 
 interface MemberStatusBadgeProps {
@@ -17,6 +19,10 @@ interface ApplicationStatusBadgeProps {
 
 interface StateChangeStatusBadgeProps {
   status: StateChangeStatus;
+}
+
+interface WithdrawalStatusBadgeProps {
+  status: WithdrawalStatus;
 }
 
 export function MemberStatusBadge({ status }: MemberStatusBadgeProps) {
@@ -45,6 +51,14 @@ export function StateChangeStatusBadge({ status }: StateChangeStatusBadgeProps) 
   return (
     <span className={`px-2 py-1 rounded-full text-xs font-medium ${colors[status]}`}>
       {STATE_CHANGE_STATUS_LABELS[status]}
+    </span>
+  );
+}
+
+export function WithdrawalStatusBadge({ status }: WithdrawalStatusBadgeProps) {
+  return (
+    <span className={`px-2 py-1 rounded-full text-xs font-medium ${WITHDRAWAL_STATUS_COLORS[status]}`}>
+      {WITHDRAWAL_STATUS_LABELS[status]}
     </span>
   );
 }

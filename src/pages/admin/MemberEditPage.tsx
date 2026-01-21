@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getMemberById, updateMember, deleteMember } from '../../lib/api';
 import { Member, MemberStatus, MemberRole } from '../../lib/types';
-import { STATUS_LABELS, ROLE_LABELS } from '../../lib/constants';
+import { STATUS_LABELS, ROLE_LABELS, POSITION_OPTIONS } from '../../lib/constants';
 import Button from '../../components/common/Button';
 
 export default function MemberEditPage() {
@@ -12,7 +12,7 @@ export default function MemberEditPage() {
   const [member, setMember] = useState<Member | null>(null);
   const [formData, setFormData] = useState({
     name: '',
-    nickname: '',
+    position: '',
     email: '',
     phone: '',
     birthDate: '',
@@ -37,7 +37,7 @@ export default function MemberEditPage() {
     setMember(memberData);
     setFormData({
       name: memberData.name,
-      nickname: memberData.nickname || '',
+      position: memberData.position || '',
       email: memberData.email,
       phone: memberData.phone,
       birthDate: memberData.birthDate || '',
@@ -58,10 +58,21 @@ export default function MemberEditPage() {
     if (!member) return;
     setError('');
 
+    // 탈퇴 상태로 변경 시 추가 확인
+    if (formData.status === 'withdrawn' && member.status !== 'withdrawn') {
+      if (
+        !confirm(
+          `[상태 변경 확인]\n\n${member.name}님의 상태를 '탈퇴'로 변경하시겠습니까?\n\n⚠️ 탈퇴 처리 후에는 해당 회원이 로그인할 수 없게 됩니다.`
+        )
+      ) {
+        return;
+      }
+    }
+
     try {
       updateMember(member.id, {
         name: formData.name,
-        nickname: formData.nickname || undefined,
+        position: formData.position || undefined,
         phone: formData.phone,
         birthDate: formData.birthDate || undefined,
         status: formData.status,
@@ -78,19 +89,10 @@ export default function MemberEditPage() {
 
     if (
       confirm(
-        `정말로 ${member.name}님을 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.`
+        `[데이터 완전 삭제]\n\n${member.name}님의 모든 데이터를 삭제하시겠습니까?\n\n⚠️ 경고: 이 작업은 되돌릴 수 없습니다.\n회원 정보가 완전히 삭제되며 복구할 수 없습니다.`
       )
     ) {
       deleteMember(member.id);
-      navigate('/admin/members');
-    }
-  };
-
-  const handleWithdraw = () => {
-    if (!member) return;
-
-    if (confirm(`${member.name}님을 탈퇴 처리하시겠습니까?`)) {
-      updateMember(member.id, { status: 'withdrawn' });
       navigate('/admin/members');
     }
   };
@@ -109,7 +111,7 @@ export default function MemberEditPage() {
 
   return (
     <div className="max-w-2xl mx-auto">
-      <div className="bg-white rounded-lg shadow p-6">
+      <div className="bg-white md:rounded-lg md:shadow p-6">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold text-gray-900">회원 정보 수정</h1>
           <Button variant="secondary" size="sm" onClick={() => navigate('/admin/members')}>
@@ -139,17 +141,22 @@ export default function MemberEditPage() {
             </div>
 
             <div>
-              <label htmlFor="nickname" className="block text-sm font-medium text-gray-700 mb-1">
-                닉네임
+              <label htmlFor="position" className="block text-sm font-medium text-gray-700 mb-1">
+                담당 역할
               </label>
-              <input
-                type="text"
-                id="nickname"
-                name="nickname"
-                value={formData.nickname}
+              <select
+                id="position"
+                name="position"
+                value={formData.position}
                 onChange={handleChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
-              />
+              >
+                {POSITION_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
             </div>
 
             <div>
@@ -218,7 +225,7 @@ export default function MemberEditPage() {
 
             <div>
               <label htmlFor="role" className="block text-sm font-medium text-gray-700 mb-1">
-                역할
+                권한
               </label>
               <select
                 id="role"
@@ -241,7 +248,7 @@ export default function MemberEditPage() {
             <p>최근 수정: {member.updatedAt}</p>
           </div>
 
-          <div className="flex justify-between pt-6 border-t">
+          <div className="flex justify-between items-center pt-6 border-t">
             <div className="flex gap-2">
               <Button onClick={handleSave}>저장</Button>
               <Button variant="secondary" onClick={() => navigate('/admin/members')}>
@@ -249,20 +256,13 @@ export default function MemberEditPage() {
               </Button>
             </div>
 
-            <div className="flex gap-2">
-              {member.status !== 'withdrawn' && (
-                <Button variant="danger" onClick={handleWithdraw}>
-                  탈퇴 처리
-                </Button>
-              )}
-              <Button
-                variant="danger"
-                onClick={handleDelete}
-                className="bg-red-800 hover:bg-red-900"
-              >
-                삭제
-              </Button>
-            </div>
+            <Button
+              variant="danger"
+              size="sm"
+              onClick={handleDelete}
+            >
+              삭제
+            </Button>
           </div>
         </div>
       </div>

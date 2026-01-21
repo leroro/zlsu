@@ -5,7 +5,7 @@ function App() {
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
-      <main className="max-w-4xl mx-auto px-4 py-8">
+      <main className="max-w-4xl mx-auto md:px-4 md:py-8 py-4">
         <Outlet />
       </main>
     </div>

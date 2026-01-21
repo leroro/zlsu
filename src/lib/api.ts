@@ -1,12 +1,32 @@
-import { Member, Application, StateChange, CurrentUser, MemberStatus, ApplicationStatus, StateChangeStatus } from './types';
-import { initialMembers, initialApplications, initialStateChanges } from './mockData';
+import { Member, Application, StateChange, CurrentUser, MemberStatus, ApplicationStatus, StateChangeStatus, WithdrawalRequest, WithdrawalStatus, SystemSettings, ChecklistItem, StatusChangeHistory, StatusChangeType } from './types';
+import { initialMembers, initialApplications, initialStateChanges, initialStatusChangeHistory } from './mockData';
 
 // 로컬 스토리지 키
 const STORAGE_KEYS = {
   MEMBERS: 'zlsu_members',
   APPLICATIONS: 'zlsu_applications',
   STATE_CHANGES: 'zlsu_state_changes',
+  WITHDRAWAL_REQUESTS: 'zlsu_withdrawal_requests',
   CURRENT_USER: 'zlsu_current_user',
+  SETTINGS: 'zlsu_settings',
+  CHECKLIST_ITEMS: 'zlsu_checklist_items',
+  STATUS_CHANGE_HISTORY: 'zlsu_status_change_history',
+};
+
+// localStorage를 mockData로 강제 리셋
+export function resetToMockData(): void {
+  localStorage.setItem(STORAGE_KEYS.MEMBERS, JSON.stringify(initialMembers));
+  localStorage.setItem(STORAGE_KEYS.APPLICATIONS, JSON.stringify(initialApplications));
+  localStorage.setItem(STORAGE_KEYS.STATE_CHANGES, JSON.stringify(initialStateChanges));
+  localStorage.removeItem(STORAGE_KEYS.WITHDRAWAL_REQUESTS);
+  localStorage.removeItem(STORAGE_KEYS.CURRENT_USER);
+  localStorage.removeItem(STORAGE_KEYS.SETTINGS);
+}
+
+// 기본 설정
+const DEFAULT_SETTINGS: SystemSettings = {
+  maxCapacity: 16, // 기본 정원
+  includeInactiveInCapacity: false, // 기본값: 활성 회원만 정원에 포함
 };
 
 // 로컬 스토리지에서 데이터 가져오기
@@ -69,14 +89,40 @@ export function deleteMember(id: string): boolean {
   return true;
 }
 
-export function getActiveAndInactiveMemberCount(): { active: number; inactive: number; total: number } {
+export function getActiveAndInactiveMemberCount(): { active: number; inactive: number; total: number; capacityCount: number } {
   const members = getMembers();
-  const activeMembers = members.filter(m => m.status === 'active' || m.status === 'inactive' || m.status === 'resting');
+  const settings = getSettings();
+
+  // 관리자 전용 계정은 정원 계산에서 제외
+  const regularMembers = members.filter(m => m.role !== 'admin');
+
+  const activeCount = regularMembers.filter(m => m.status === 'active').length;
+  const inactiveCount = regularMembers.filter(m => m.status === 'inactive').length;
+
+  // 정원 계산: 설정에 따라 휴면 회원 포함 여부 결정
+  const capacityCount = settings.includeInactiveInCapacity
+    ? activeCount + inactiveCount
+    : activeCount;
+
   return {
-    active: members.filter(m => m.status === 'active').length,
-    inactive: members.filter(m => m.status === 'inactive').length,
-    total: activeMembers.length,
+    active: activeCount,
+    inactive: inactiveCount,
+    total: activeCount + inactiveCount,
+    capacityCount,
   };
+}
+
+// ============ 설정 API ============
+
+export function getSettings(): SystemSettings {
+  return getStorageData(STORAGE_KEYS.SETTINGS, DEFAULT_SETTINGS);
+}
+
+export function updateSettings(updates: Partial<SystemSettings>): SystemSettings {
+  const settings = getSettings();
+  const newSettings = { ...settings, ...updates };
+  setStorageData(STORAGE_KEYS.SETTINGS, newSettings);
+  return newSettings;
 }
 
 // ============ 인증 API ============
@@ -93,6 +139,24 @@ export function login(email: string, password: string): CurrentUser | null {
 
 export function logout(): void {
   localStorage.removeItem(STORAGE_KEYS.CURRENT_USER);
+}
+
+export function changePassword(memberId: string, currentPassword: string, newPassword: string): { success: boolean; error?: string } {
+  const member = getMemberById(memberId);
+  if (!member) {
+    return { success: false, error: '회원 정보를 찾을 수 없습니다.' };
+  }
+
+  if (member.password !== currentPassword) {
+    return { success: false, error: '현재 비밀번호가 일치하지 않습니다.' };
+  }
+
+  if (newPassword.length < 6) {
+    return { success: false, error: '새 비밀번호는 6자 이상이어야 합니다.' };
+  }
+
+  updateMember(memberId, { password: newPassword });
+  return { success: true };
 }
 
 export function getCurrentUser(): CurrentUser | null {
@@ -146,6 +210,9 @@ export function approveApplication(id: string, processedBy: string): boolean {
     name: application.name,
     phone: application.phone,
     birthDate: application.birthDate,
+    referrer: application.referrer,
+    swimmingAbility: application.swimmingAbility,
+    motivation: application.motivation,
     status: 'active',
     role: 'member',
     joinedAt: getCurrentDate(),
@@ -237,16 +304,267 @@ export function rejectStateChange(id: string, processedBy: string): boolean {
   return true;
 }
 
+// ============ 탈퇴 신청 API ============
+
+export function getWithdrawalRequests(): WithdrawalRequest[] {
+  return getStorageData(STORAGE_KEYS.WITHDRAWAL_REQUESTS, []);
+}
+
+export function getPendingWithdrawalRequests(): WithdrawalRequest[] {
+  return getWithdrawalRequests().filter(wr => wr.status === 'pending');
+}
+
+export function createWithdrawalRequest(data: {
+  memberId: string;
+  memberName: string;
+  reason: string;
+}): WithdrawalRequest {
+  const requests = getWithdrawalRequests();
+  const newRequest: WithdrawalRequest = {
+    ...data,
+    id: generateId(),
+    status: 'pending',
+    createdAt: getCurrentDate(),
+  };
+  requests.push(newRequest);
+  setStorageData(STORAGE_KEYS.WITHDRAWAL_REQUESTS, requests);
+  return newRequest;
+}
+
+export function approveWithdrawalRequest(id: string, processedBy: string): boolean {
+  const requests = getWithdrawalRequests();
+  const index = requests.findIndex(wr => wr.id === id);
+  if (index === -1) return false;
+
+  const request = requests[index];
+  requests[index] = {
+    ...request,
+    status: 'approved' as WithdrawalStatus,
+    processedAt: getCurrentDate(),
+    processedBy,
+  };
+  setStorageData(STORAGE_KEYS.WITHDRAWAL_REQUESTS, requests);
+
+  // 회원 상태를 탈퇴로 변경
+  updateMember(request.memberId, { status: 'withdrawn' });
+
+  return true;
+}
+
+export function rejectWithdrawalRequest(id: string, processedBy: string, rejectReason: string): boolean {
+  const requests = getWithdrawalRequests();
+  const index = requests.findIndex(wr => wr.id === id);
+  if (index === -1) return false;
+
+  requests[index] = {
+    ...requests[index],
+    status: 'rejected' as WithdrawalStatus,
+    processedAt: getCurrentDate(),
+    processedBy,
+    rejectReason,
+  };
+  setStorageData(STORAGE_KEYS.WITHDRAWAL_REQUESTS, requests);
+  return true;
+}
+
 // ============ 관리자 대시보드 API ============
 
 export function getAdminDashboardStats() {
   const pendingApplications = getPendingApplications().length;
   const pendingStateChanges = getPendingStateChanges().length;
+  const pendingWithdrawals = getPendingWithdrawalRequests().length;
   const memberStats = getActiveAndInactiveMemberCount();
 
   return {
     pendingApplications,
     pendingStateChanges,
+    pendingWithdrawals,
     ...memberStats,
   };
+}
+
+// ============ 체크리스트 API ============
+
+// 기본 체크리스트 항목
+const DEFAULT_CHECKLIST_ITEMS: ChecklistItem[] = [
+  {
+    id: 'time',
+    label: '매주 토요일 8시 정각 도착',
+    description: '수영장 시계 기준, 연습 레인 입수 기준입니다. (실제 58분까지 도착 필요)',
+    isActive: true,
+    order: 1,
+  },
+  {
+    id: 'lateFee',
+    label: '지각 벌금: 1분당 500원 (최대 1만원)',
+    description: '당일 즐수팀 계좌로 자진 입금합니다.',
+    isActive: true,
+    order: 2,
+  },
+  {
+    id: 'absenceFee',
+    label: '무단 불참 벌금: 1만원',
+    description: '새벽 4시 전까지 불참 알림 시 면제됩니다.',
+    isActive: true,
+    order: 3,
+  },
+  {
+    id: 'monthlyFee',
+    label: '월 회비: 2만원 (매월 1일 납부)',
+    description: '카카오뱅크 79421007218 (임미선) 계좌로 납부합니다.',
+    isActive: true,
+    order: 4,
+  },
+  {
+    id: 'noRefund',
+    label: '납부한 회비는 환불되지 않습니다',
+    description: '탈퇴 또는 휴면 전환 시에도 기 납부 회비는 반환되지 않습니다.',
+    isActive: true,
+    order: 5,
+  },
+  {
+    id: 'absenceNotice',
+    label: '불참 시 금요일 자정까지 일정에 불참 표시 필수',
+    description: '채팅이 아닌 일정 기능에서 불참 선택해야 합니다.',
+    isActive: true,
+    order: 6,
+  },
+  {
+    id: 'swimCap',
+    label: '신입 회원 수모 2장 구입 권장 (별도 입금)',
+    description: '수모 가격 - 1장 2만원, 2장 3만원(장당 1.5만원)',
+    isActive: true,
+    order: 7,
+  },
+  {
+    id: 'privacy',
+    label: '개인정보 수집 및 이용에 동의합니다',
+    description: '이름, 연락처, 이메일 등을 모임 운영 목적으로 수집합니다.',
+    isActive: true,
+    order: 8,
+  },
+];
+
+export function getChecklistItems(): ChecklistItem[] {
+  return getStorageData(STORAGE_KEYS.CHECKLIST_ITEMS, DEFAULT_CHECKLIST_ITEMS);
+}
+
+export function getActiveChecklistItems(): ChecklistItem[] {
+  return getChecklistItems()
+    .filter(item => item.isActive)
+    .sort((a, b) => a.order - b.order);
+}
+
+export function saveChecklistItems(items: ChecklistItem[]): void {
+  setStorageData(STORAGE_KEYS.CHECKLIST_ITEMS, items);
+}
+
+export function addChecklistItem(item: Omit<ChecklistItem, 'id' | 'order'>): ChecklistItem {
+  const items = getChecklistItems();
+  const maxOrder = items.length > 0 ? Math.max(...items.map(i => i.order)) : 0;
+  const newItem: ChecklistItem = {
+    ...item,
+    id: generateId(),
+    order: maxOrder + 1,
+  };
+  items.push(newItem);
+  saveChecklistItems(items);
+  return newItem;
+}
+
+export function updateChecklistItem(id: string, updates: Partial<ChecklistItem>): ChecklistItem | null {
+  const items = getChecklistItems();
+  const index = items.findIndex(i => i.id === id);
+  if (index === -1) return null;
+
+  items[index] = { ...items[index], ...updates };
+  saveChecklistItems(items);
+  return items[index];
+}
+
+export function deleteChecklistItem(id: string): boolean {
+  const items = getChecklistItems();
+  const filtered = items.filter(i => i.id !== id);
+  if (filtered.length === items.length) return false;
+
+  // 순서 재정렬
+  filtered.sort((a, b) => a.order - b.order);
+  filtered.forEach((item, index) => {
+    item.order = index + 1;
+  });
+
+  saveChecklistItems(filtered);
+  return true;
+}
+
+export function reorderChecklistItems(items: ChecklistItem[]): void {
+  // 순서 재정렬
+  items.forEach((item, index) => {
+    item.order = index + 1;
+  });
+  saveChecklistItems(items);
+}
+
+// ============ 상태 변경 이력 관리 ============
+
+// 상태 변경 이력 조회
+export function getStatusChangeHistory(): StatusChangeHistory[] {
+  return getStorageData<StatusChangeHistory[]>(STORAGE_KEYS.STATUS_CHANGE_HISTORY, initialStatusChangeHistory);
+}
+
+// 상태 변경 이력 저장
+function saveStatusChangeHistory(history: StatusChangeHistory[]): void {
+  setStorageData(STORAGE_KEYS.STATUS_CHANGE_HISTORY, history);
+}
+
+// 상태 변경 이력 추가
+export function addStatusChangeHistory(
+  memberId: string,
+  memberName: string,
+  changeType: StatusChangeType,
+  toStatus: MemberStatus,
+  fromStatus?: MemberStatus
+): StatusChangeHistory {
+  const history = getStatusChangeHistory();
+  const newEntry: StatusChangeHistory = {
+    id: generateId(),
+    memberId,
+    memberName,
+    changeType,
+    fromStatus,
+    toStatus,
+    changedAt: new Date().toISOString(),
+  };
+  history.push(newEntry);
+  saveStatusChangeHistory(history);
+  return newEntry;
+}
+
+// 최근 가입 회원 조회 (N일 이내)
+export function getRecentJoinedMembers(days: number = 30): Member[] {
+  const members = getMembers();
+  const cutoffDate = new Date();
+  cutoffDate.setDate(cutoffDate.getDate() - days);
+
+  return members
+    .filter(m => {
+      if (m.role === 'admin') return false; // 관리자 제외
+      const joinedDate = new Date(m.joinedAt);
+      return joinedDate >= cutoffDate && m.status !== 'withdrawn';
+    })
+    .sort((a, b) => new Date(b.joinedAt).getTime() - new Date(a.joinedAt).getTime());
+}
+
+// 최근 상태 변경 이력 조회 (N일 이내, 가입 제외)
+export function getRecentStatusChanges(days: number = 30): StatusChangeHistory[] {
+  const history = getStatusChangeHistory();
+  const cutoffDate = new Date();
+  cutoffDate.setDate(cutoffDate.getDate() - days);
+
+  return history
+    .filter(h => {
+      const changedDate = new Date(h.changedAt);
+      return changedDate >= cutoffDate && h.changeType !== 'joined';
+    })
+    .sort((a, b) => new Date(b.changedAt).getTime() - new Date(a.changedAt).getTime());
 }

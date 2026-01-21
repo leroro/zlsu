@@ -1,13 +1,17 @@
-// 회원 상태 (활동/비활동/탈퇴)
+// 회원 상태 (활성/휴면/탈퇴)
 export type MemberStatus = 'active' | 'inactive' | 'withdrawn';
 
 // 시스템 설정
 export interface SystemSettings {
-  includeInactiveInCapacity: boolean; // 비활동 회원 정원 포함 여부
+  maxCapacity: number; // 최대 정원
+  includeInactiveInCapacity: boolean; // 휴면 회원 정원 포함 여부
 }
 
 // 회원 역할
 export type MemberRole = 'admin' | 'member';
+
+// 성별
+export type Gender = 'male' | 'female';
 
 // 가입 신청 상태
 export type ApplicationStatus = 'pending' | 'approved' | 'rejected';
@@ -15,15 +19,30 @@ export type ApplicationStatus = 'pending' | 'approved' | 'rejected';
 // 상태 변경 신청 상태
 export type StateChangeStatus = 'pending' | 'approved' | 'rejected';
 
+// 탈퇴 신청 상태
+export type WithdrawalStatus = 'pending' | 'approved' | 'rejected';
+
+// 수영 실력 (영법별)
+export interface SwimmingAbility {
+  freestyle: boolean;   // 자유형
+  backstroke: boolean;  // 배영
+  breaststroke: boolean; // 평영
+  butterfly: boolean;   // 접영
+}
+
 // 회원 인터페이스
 export interface Member {
   id: string;
   email: string;
   password: string;
   name: string;
-  nickname?: string;
+  position?: string;  // 역할 (지도, 수모, 대회, 소통, 총무 등)
   phone: string;
+  gender?: Gender;  // 성별
   birthDate?: string;
+  referrer?: string;  // 추천인
+  swimmingAbility?: SwimmingAbility;  // 수영 실력
+  motivation?: string;  // 가입 동기
   status: MemberStatus;
   role: MemberRole;
   joinedAt: string;
@@ -38,7 +57,11 @@ export interface Application {
   password: string;
   phone: string;
   birthDate?: string;
+  referrer?: string;  // 추천인
+  swimmingAbility: SwimmingAbility;  // 수영 실력
   motivation: string;
+  agreedToTerms: boolean;  // 이용약관 동의
+  agreedToPrivacy: boolean;  // 개인정보수집 동의
   status: ApplicationStatus;
   createdAt: string;
   processedAt?: string;
@@ -60,5 +83,41 @@ export interface StateChange {
   processedBy?: string;
 }
 
+// 탈퇴 신청 인터페이스
+export interface WithdrawalRequest {
+  id: string;
+  memberId: string;
+  memberName: string;
+  reason: string;
+  status: WithdrawalStatus;
+  createdAt: string;
+  processedAt?: string;
+  processedBy?: string;
+  rejectReason?: string;
+}
+
 // 로그인 사용자 정보 (비밀번호 제외)
 export type CurrentUser = Omit<Member, 'password'>;
+
+// 가입 시 체크리스트 항목
+export interface ChecklistItem {
+  id: string;
+  label: string;        // 제목 (한 줄)
+  description: string;  // 보조 설명
+  isActive: boolean;    // 사용 여부
+  order: number;        // 순서
+}
+
+// 상태 변경 이력 타입
+export type StatusChangeType = 'joined' | 'to_inactive' | 'to_active' | 'withdrawn';
+
+// 상태 변경 이력 인터페이스
+export interface StatusChangeHistory {
+  id: string;
+  memberId: string;
+  memberName: string;
+  changeType: StatusChangeType;  // 변경 유형
+  fromStatus?: MemberStatus;     // 이전 상태 (가입 시에는 없음)
+  toStatus: MemberStatus;        // 변경된 상태
+  changedAt: string;             // 변경 일시
+}

@@ -3,7 +3,11 @@ import { createRoot } from 'react-dom/client';
 import { RouterProvider } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import { router } from './routes';
+import { resetToMockData } from './lib/api';
 import './index.css';
+
+// 앱 시작 시 mockData로 localStorage 리셋
+resetToMockData();
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

@@ -5,7 +5,7 @@ import * as api from '../lib/api';
 interface AuthContextType {
   user: CurrentUser | null;
   isLoading: boolean;
-  login: (email: string, password: string) => Promise<boolean>;
+  login: (email: string, password: string) => Promise<CurrentUser | null>;
   logout: () => void;
   refreshUser: () => void;
 }
@@ -23,13 +23,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsLoading(false);
   }, []);
 
-  const login = async (email: string, password: string): Promise<boolean> => {
+  const login = async (email: string, password: string): Promise<CurrentUser | null> => {
     const loggedInUser = api.login(email, password);
     if (loggedInUser) {
       setUser(loggedInUser);
-      return true;
+      return loggedInUser;
     }
-    return false;
+    return null;
   };
 
   const logout = () => {
