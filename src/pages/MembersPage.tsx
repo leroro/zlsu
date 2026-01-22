@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 import { Navigate, useSearchParams } from 'react-router-dom';
 import { getMembers, getStateChanges, getWithdrawalRequests, getMembersWithBirthdayByMonth } from '../lib/api';
 import { MemberStatus } from '../lib/types';
-import { STATUS_LABELS, GENDER_LABELS } from '../lib/constants';
+import { STATUS_LABELS, GENDER_LABELS, SWIMMING_LEVEL_LABELS, SWIMMING_LEVEL_EMOJIS } from '../lib/constants';
 import { MemberStatusBadge } from '../components/common/StatusBadge';
 import Button from '../components/common/Button';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
@@ -156,6 +156,10 @@ export default function MembersPage() {
           ) : (
             filteredMembers.map((member) => {
               const pendingRequest = getPendingRequest(member.id);
+              const levelEmoji = member.swimmingLevel ? SWIMMING_LEVEL_EMOJIS[member.swimmingLevel] : null;
+              const levelLabel = member.swimmingLevel ? SWIMMING_LEVEL_LABELS[member.swimmingLevel] : null;
+              // 가입일 간소화: "2024-01-15" → "24.01"
+              const shortJoinDate = member.joinedAt.slice(2, 7).replace('-', '.');
               return (
                 <div
                   key={member.id}
@@ -164,14 +168,22 @@ export default function MembersPage() {
                   }`}
                 >
                   {/* 상단: 이름, 상태 */}
-                  <div className="flex items-start justify-between mb-3">
+                  <div className="flex items-start justify-between mb-2">
                     <div className="flex items-center gap-3">
-                      <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${
-                        member.role === 'admin' ? 'bg-primary-500 text-white' : 'bg-primary-100'
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 text-lg ${
+                        member.role === 'admin'
+                          ? 'bg-primary-500'
+                          : levelEmoji
+                          ? 'bg-gray-100'
+                          : 'bg-primary-100'
                       }`}>
-                        <span className={`font-medium ${member.role === 'admin' ? '' : 'text-primary-600'}`}>
-                          {member.name.charAt(0)}
-                        </span>
+                        {member.role === 'admin' ? (
+                          <span className="text-white font-medium">{member.name.charAt(0)}</span>
+                        ) : levelEmoji ? (
+                          <span>{levelEmoji}</span>
+                        ) : (
+                          <span className="text-primary-600 font-medium">{member.name.charAt(0)}</span>
+                        )}
                       </div>
                       <div>
                         <div className="flex items-center gap-2 flex-wrap">
@@ -186,45 +198,43 @@ export default function MembersPage() {
                           )}
                         </div>
                         <div className="text-sm text-gray-500">
+                          {levelLabel && <span>{levelLabel}</span>}
+                          {levelLabel && member.gender && <span className="mx-1">·</span>}
                           {member.gender && <span>{GENDER_LABELS[member.gender]}</span>}
-                          {member.gender && <span className="mx-1">·</span>}
-                          <span>가입일 {member.joinedAt}</span>
+                          <span className="mx-1">·</span>
+                          <span>{shortJoinDate}</span>
                         </div>
                       </div>
                     </div>
-                    <div className="flex flex-col items-end gap-1">
-                      <MemberStatusBadge status={member.status} />
-                      {pendingRequest && (
-                        <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${
-                          pendingRequest.type === 'withdrawal'
-                            ? 'bg-red-100 text-red-700'
-                            : 'bg-orange-100 text-orange-700'
-                        }`}>
-                          {pendingRequest.label}
-                        </span>
-                      )}
-                    </div>
+                    <MemberStatusBadge status={member.status} />
                   </div>
 
-                  {/* 수영 실력 */}
-                  {member.swimmingAbility && (
-                    <div className="mb-2">
-                      <div className="flex flex-wrap gap-1">
-                        {member.swimmingAbility.freestyle && (
-                          <span className="px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-xs">자유형</span>
-                        )}
-                        {member.swimmingAbility.backstroke && (
-                          <span className="px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-xs">배영</span>
-                        )}
-                        {member.swimmingAbility.breaststroke && (
-                          <span className="px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-xs">평영</span>
-                        )}
-                        {member.swimmingAbility.butterfly && (
-                          <span className="px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-xs">접영</span>
-                        )}
-                      </div>
+                  {/* 수영 영법 + 신청 상태 */}
+                  <div className="flex items-center justify-between">
+                    <div className="flex flex-wrap gap-1">
+                      {member.swimmingAbility?.freestyle && (
+                        <span className="px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-xs">자유형</span>
+                      )}
+                      {member.swimmingAbility?.backstroke && (
+                        <span className="px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-xs">배영</span>
+                      )}
+                      {member.swimmingAbility?.breaststroke && (
+                        <span className="px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-xs">평영</span>
+                      )}
+                      {member.swimmingAbility?.butterfly && (
+                        <span className="px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-xs">접영</span>
+                      )}
                     </div>
-                  )}
+                    {pendingRequest && (
+                      <span className={`px-2 py-0.5 text-xs font-medium rounded-full flex-shrink-0 ${
+                        pendingRequest.type === 'withdrawal'
+                          ? 'bg-red-100 text-red-700'
+                          : 'bg-orange-100 text-orange-700'
+                      }`}>
+                        {pendingRequest.label}
+                      </span>
+                    )}
+                  </div>
 
                   {/* 가입 동기 */}
                   {member.motivation && (

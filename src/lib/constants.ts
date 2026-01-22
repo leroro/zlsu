@@ -171,3 +171,11 @@ export const SWIMMING_LEVEL_LABELS: Record<SwimmingLevel, string> = {
   advanced: '상급반',
   masters: '마스터반',
 };
+
+// 수영 레벨 이모지
+export const SWIMMING_LEVEL_EMOJIS: Record<SwimmingLevel, string> = {
+  beginner: '🐣',
+  intermediate: '🏊',
+  advanced: '🌟',
+  masters: '🏆',
+};
