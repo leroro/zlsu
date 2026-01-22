@@ -19,7 +19,7 @@ export default function AboutPage() {
             alt="즐수팀 로고"
             className="w-24 h-24 mx-auto mb-4 rounded-lg"
           />
-          <h1 className="text-2xl sm:text-3xl font-bold mb-2">
+          <h1 className="text-2xl sm:text-3xl font-bold mb-2 text-white">
             수영을 즐겁게!
           </h1>
           <p className="text-primary-200 text-sm">
