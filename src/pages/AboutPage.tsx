@@ -199,7 +199,8 @@ export default function AboutPage() {
             { step: 2, title: '가입비 입금', desc: '회비 + 수모 금액 입금' },
             { step: 3, title: '카톡방 & 모임통장 초대', desc: '총무가 연락드려요' },
             { step: 4, title: '수모 수령', desc: '담당자에게 수령' },
-            { step: 5, title: '토요일에 만나요!', desc: '수영장에서 함께해요 🏊' },
+            { step: 5, title: '캘린더에서 참석 신청', desc: '참여할 날짜에 참석 표시' },
+            { step: 6, title: '토요일에 만나요!', desc: '수영장에서 함께해요 🏊' },
           ].map((item, index, arr) => (
             <div key={item.step} className="flex gap-4">
               <div className="flex flex-col items-center">
@@ -275,11 +276,11 @@ export default function AboutPage() {
 
           <div className="border-b border-gray-100 pb-4">
             <h3 className="font-semibold text-gray-900 mb-1">
-              Q. 티타임에 참여 안 하면 회비를 안 내도 되나요?
+              Q. 티타임 불참시 회비를 안 내도 되나요?
             </h3>
             <p className="text-gray-600 text-sm">
               아니에요, 회비는 참여 여부와 관계없이 납부해요.
-              티타임에 자주 와주세요! ☕
+              그러니까 티타임에 자주 와주세요! ☕
             </p>
           </div>
 
