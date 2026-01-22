@@ -45,7 +45,7 @@ export default function AboutPage() {
             <span className="text-2xl">📍</span>
             <div>
               <h3 className="font-semibold text-gray-900">어디서?</h3>
-              <p className="text-gray-600">트윈스포츠센터</p>
+              <p className="text-gray-600">트윈스포츠센터 (끝에서 3번째 레인)</p>
             </div>
           </div>
 
@@ -54,7 +54,7 @@ export default function AboutPage() {
             <div>
               <h3 className="font-semibold text-gray-900">뭘 하나요?</h3>
               <p className="text-gray-600">
-                선우 코치님 지도하에 각자 수준에 맞게 즐겁게 수영해요.
+                수영 만렙 선우 코치님 지도하에 각자 수준에 맞게 즐겁게 수영해요.
                 <br />
                 다양한 연령대, 다양한 실력의 회원들이 편하게 배우고 즐기는 친목 모임이에요.
                 <br />
@@ -110,7 +110,6 @@ export default function AboutPage() {
             '수영 대회에 도전해보고 싶은 분',
             '주말 아침을 건강하게 시작하고 싶은 분',
             '수영 친구를 만들고 싶은 분',
-            '혼자 수영하기 심심한 분',
           ].map((item, index) => (
             <li key={index} className="flex items-center gap-2">
               <span className="text-green-500">✓</span>
@@ -195,9 +194,9 @@ export default function AboutPage() {
 
         <div className="space-y-4">
           {[
-            { step: 1, title: '가입 신청서 작성하기', desc: '기존 회원에게 링크 받아서 신청' },
+            { step: 1, title: '가입 신청서 작성하기', desc: '추천인(기존 회원)에게 링크 받아서 신청' },
             { step: 2, title: '가입비 입금하기', desc: '회비 + 수모 금액 입금' },
-            { step: 3, title: '카톡방 & 모임통장 초대받기', desc: '총무가 연락드려요' },
+            { step: 3, title: '카톡방 & 모임통장 초대받기', desc: '총무가 초대드려요' },
             { step: 4, title: '첫 수영 참석 신청하기', desc: '카톡방 일정(달력)에서 참석할 토요일에 출석체크' },
             { step: 5, title: '수모 수령하기', desc: '담당자에게 수령' },
             { step: 6, title: '토요일에 만나요!', desc: '수영장에서 함께해요 🏊' },
