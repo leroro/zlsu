@@ -469,7 +469,7 @@ export default function ApplyPage() {
               <div
                 ref={rulesRef}
                 onScroll={handleScroll}
-                className="h-52 overflow-y-auto border border-gray-200 rounded-lg p-4 bg-gray-50 prose prose-sm prose-gray max-w-none prose-headings:text-gray-900 prose-headings:font-semibold prose-h1:text-base prose-h2:text-sm prose-h3:text-sm prose-p:text-gray-700 prose-li:text-gray-700 prose-strong:text-gray-900 prose-table:text-gray-700"
+                className="h-80 sm:h-96 overflow-y-auto border-2 border-gray-300 rounded-lg p-4 bg-gray-50 prose prose-sm prose-gray max-w-none prose-headings:text-gray-900 prose-headings:font-semibold prose-h1:text-base prose-h2:text-sm prose-h3:text-sm prose-p:text-gray-700 prose-li:text-gray-700 prose-strong:text-gray-900 prose-table:text-gray-700 shadow-inner"
               >
                 {isLoadingRules ? (
                   '로딩 중...'

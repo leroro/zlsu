@@ -75,3 +75,28 @@ input[type="date"] {
     width: 100% !important;
   }
 }
+
+/* 스크롤 영역 시각적 인지 개선 #3 */
+.overflow-y-auto {
+  /* 모바일에서 스크롤바 항상 표시 */
+  scrollbar-width: thin;
+  scrollbar-color: #9ca3af #f3f4f6;
+}
+
+.overflow-y-auto::-webkit-scrollbar {
+  width: 8px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-track {
+  background: #f3f4f6;
+  border-radius: 4px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb {
+  background: #9ca3af;
+  border-radius: 4px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb:hover {
+  background: #6b7280;
+}

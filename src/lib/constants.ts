@@ -119,7 +119,7 @@ export const SIGNUP_CHECKLIST_ITEMS = [
   {
     id: 'absenceFee',
     label: '무단 불참 벌금: 1만원',
-    description: '새벽 4시 전까지 불참 알림 시 면제됩니다.',
+    description: '금요일 자정까지 불참 표시 시 면제됩니다.',
   },
   {
     id: 'monthlyFee',
