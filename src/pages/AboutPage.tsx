@@ -54,9 +54,9 @@ export default function AboutPage() {
             <div>
               <h3 className="font-semibold text-gray-900">뭘 하나요?</h3>
               <p className="text-gray-600">
-                선우 코치님과 함께 각자 수준에 맞게 즐겁게 수영해요.
+                선우 코치님 지도하에 각자 수준에 맞게 즐겁게 수영해요.
                 <br />
-                선수 출신이 아닌 일반인들이 편하게 배우고 즐기는 친목 모임이에요.
+                다양한 연령대, 다양한 실력의 회원들이 편하게 배우고 즐기는 친목 모임이에요.
                 <br />
                 수영 후에는 메가커피에서 티타임도 해요. (자율 참석)
               </p>
