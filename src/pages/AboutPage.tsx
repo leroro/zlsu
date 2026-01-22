@@ -79,6 +79,14 @@ export default function AboutPage() {
           </div>
 
           <div className="flex gap-3">
+            <span className="text-2xl">🎂</span>
+            <div>
+              <h3 className="font-semibold text-gray-900">생일 축하</h3>
+              <p className="text-gray-600">생일에 가까운 토요일 티타임에서 케이크와 함께 축하해요.</p>
+            </div>
+          </div>
+
+          <div className="flex gap-3">
             <span className="text-2xl">🏆</span>
             <div>
               <h3 className="font-semibold text-gray-900">수영 대회 단체 출전</h3>
