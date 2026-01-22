@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { getActiveAndInactiveMemberCount, getSettings, getRecentJoinedMembers, getRecentStatusChanges, getStateChanges, getWithdrawalRequests, getMembersWithBirthdayThisMonth, getMembersWithBirthdayNextMonth } from '../lib/api';
 import { StatusChangeHistory } from '../lib/types';
-import { STATUS_LABELS, BANK_ACCOUNT } from '../lib/constants';
+import { STATUS_LABELS, BANK_ACCOUNT, SWIMMING_LEVEL_EMOJIS } from '../lib/constants';
 import Button from '../components/common/Button';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
 
@@ -14,6 +14,14 @@ export default function HomePage() {
   const settings = getSettings();
   const maxCapacity = settings.maxCapacity;
   const remainingSlots = maxCapacity - stats.capacityCount;
+
+  // 계좌번호 복사 상태 (훅은 조건부 반환 전에 선언)
+  const [copied, setCopied] = useState(false);
+  const handleCopyAccount = () => {
+    navigator.clipboard.writeText(BANK_ACCOUNT.accountNumber);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   // 비로그인 사용자용 랜딩 페이지
   if (!user) {
@@ -76,14 +84,6 @@ export default function HomePage() {
       </div>
     );
   }
-
-  // 계좌번호 복사 상태
-  const [copied, setCopied] = useState(false);
-  const handleCopyAccount = () => {
-    navigator.clipboard.writeText(BANK_ACCOUNT.accountNumber);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
 
   // 승인 대기 상태(pending) 회원용 화면
   if (user && user.status === 'pending') {
@@ -219,10 +219,18 @@ export default function HomePage() {
   // 로그인 사용자용 대시보드
   const recentJoined = getRecentJoinedMembers(30);
   const recentChanges = getRecentStatusChanges(30);
-  const currentMonth = new Date().getMonth() + 1;
-  const nextMonth = currentMonth === 12 ? 1 : currentMonth + 1;
   const birthdayThisMonth = getMembersWithBirthdayThisMonth();
   const birthdayNextMonth = getMembersWithBirthdayNextMonth();
+
+  // 날짜 포맷 (MM.DD)
+  const formatDate = (dateStr: string) => {
+    const date = new Date(dateStr);
+    return `${(date.getMonth() + 1).toString().padStart(2, '0')}.${date.getDate().toString().padStart(2, '0')}`;
+  };
+
+  // 월 이름
+  const currentMonth = new Date().getMonth() + 1;
+  const nextMonth = currentMonth === 12 ? 1 : currentMonth + 1;
 
   // 대기 중인 상태 변경/탈퇴 신청 확인
   const pendingStateChange = getStateChanges().find(
@@ -235,271 +243,181 @@ export default function HomePage() {
   // 상태 변경 타입 라벨
   const getChangeTypeLabel = (history: StatusChangeHistory): string => {
     switch (history.changeType) {
-      case 'to_inactive': return '휴면 전환';
-      case 'to_active': return '활성 복귀';
+      case 'to_inactive': return '휴면';
+      case 'to_active': return '활성';
       case 'withdrawn': return '탈퇴';
       default: return '';
     }
-  };
-
-  // 날짜 포맷
-  const formatDate = (dateStr: string): string => {
-    const date = new Date(dateStr);
-    return `${date.getMonth() + 1}/${date.getDate()}`;
   };
 
   return (
     <div className="space-y-4">
       {/* 환영 + 내 상태 */}
       <section className="bg-white md:rounded-lg md:shadow p-4">
-        <div className="flex items-start justify-between gap-2">
-          <h1 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-            <span className="text-2xl">{user.status === 'active' ? '🟢' : user.status === 'inactive' ? '🟡' : '🔵'}</span>
-            <span>{user.name}님, 안녕하세요!</span>
+        <div>
+          <h1 className="text-lg font-bold text-gray-900">
+            {user.swimmingLevel && SWIMMING_LEVEL_EMOJIS[user.swimmingLevel]} {user.position && <span className="text-gray-500 font-normal">{user.position} </span>}{user.name}님, 안녕하세요!
           </h1>
-          <div className="flex items-center gap-2 flex-shrink-0">
-            {user.position && (
-              <span className="text-sm text-gray-600 bg-gray-100 px-2 py-1 rounded">
-                {user.position}
-              </span>
-            )}
-            <span className={`text-sm font-medium px-2 py-1 rounded ${
+          <div className="flex items-center gap-2 mt-1">
+            <span className={`text-xs font-medium px-2 py-0.5 rounded ${
               user.status === 'active'
                 ? 'bg-green-100 text-green-700'
                 : user.status === 'inactive'
                 ? 'bg-yellow-100 text-yellow-700'
                 : 'bg-blue-100 text-blue-700'
             }`}>
-              {STATUS_LABELS[user.status]}
+              {user.status === 'active' ? '🟢' : user.status === 'inactive' ? '🟡' : '🔵'} {STATUS_LABELS[user.status]}
             </span>
+            {/* 상태 전환 버튼 - 상태 라벨 옆에 */}
+            {user.role !== 'admin' && user.status !== 'pending' && !pendingStateChange && !pendingWithdrawal && (
+              <Link to="/change-status" className="text-xs text-gray-500 hover:text-gray-700 underline">
+                {user.status === 'active' ? '휴면 신청하기' : '활성 신청하기'}
+              </Link>
+            )}
           </div>
         </div>
 
         {/* 대기 중인 신청 표시 */}
         {pendingStateChange && (
-          <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg text-sm">
+          <div className="mt-3 p-2 bg-yellow-50 border border-yellow-200 rounded-lg text-sm">
             <span className="text-yellow-600">⏳</span>
             <span className="text-yellow-800 ml-1">
-              {STATUS_LABELS[pendingStateChange.requestedStatus]} 전환 승인 대기중
+              {STATUS_LABELS[pendingStateChange.requestedStatus]} 전환 신청 중
             </span>
           </div>
         )}
         {pendingWithdrawal && (
-          <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg text-sm">
+          <div className="mt-3 p-2 bg-red-50 border border-red-200 rounded-lg text-sm">
             <span className="text-red-600">⏳</span>
-            <span className="text-red-800 ml-1">탈퇴 승인 대기중</span>
+            <span className="text-red-800 ml-1">탈퇴 신청 중</span>
           </div>
         )}
+      </section>
 
-        {/* 카카오톡 단톡방 바로가기 - 활성/휴면 회원에게 상시 노출 */}
-        {(user.status === 'active' || user.status === 'inactive') && settings.kakaoInviteLink && (
-          <div className="mt-3">
+      {/* 자주 찾는 메뉴 */}
+      <section className="bg-white md:rounded-lg md:shadow p-4">
+        <h2 className="font-bold text-gray-900 mb-3">자주 찾는 메뉴</h2>
+        <div className="grid grid-cols-2 gap-3">
+          {/* 카카오톡 팀 카톡방 - 카카오 브랜드 컬러 + 검정 테두리 */}
+          {settings.kakaoInviteLink && (
             <a
               href={settings.kakaoInviteLink}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-between w-full p-3 bg-yellow-50 hover:bg-yellow-100 border border-yellow-200 rounded-lg transition-colors"
+              className="flex flex-col items-center justify-center p-4 rounded-xl transition-all hover:scale-105 border-2"
+              style={{ backgroundColor: '#FEE500', borderColor: '#191919' }}
             >
-              <div className="flex items-center gap-2">
-                <span className="text-xl">💬</span>
-                <span className="font-medium text-yellow-900">카카오톡 단톡방</span>
-              </div>
-              <svg className="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-              </svg>
+              <span className="text-3xl mb-1">💬</span>
+              <span className="text-sm font-bold" style={{ color: '#191919' }}>팀 카톡방</span>
             </a>
-          </div>
-        )}
-
-        {/* 상태 전환 버튼 - 관리자와 승인대기 회원에게는 표시하지 않음 */}
-        {user.role !== 'admin' && user.status !== 'pending' && !pendingStateChange && !pendingWithdrawal && (
-          <div className="mt-4">
-            <Link to="/change-status">
-              <Button variant="secondary" className="w-full">
-                {user.status === 'active' ? '휴면 전환 신청하기' : '활성 전환 신청하기'}
-              </Button>
-            </Link>
-          </div>
-        )}
+          )}
+          {/* 수모 추가 구입 */}
+          <Link
+            to="/request/swim-cap"
+            className="flex flex-col items-center justify-center p-4 bg-blue-50 hover:bg-blue-100 rounded-xl transition-all hover:scale-105"
+          >
+            <span className="text-3xl mb-1">🏊</span>
+            <span className="text-sm font-bold text-blue-900">수모 추가 구입</span>
+          </Link>
+        </div>
       </section>
 
-      {/* 정원 현황 */}
+      {/* 정원 */}
       <section className="bg-white md:rounded-lg md:shadow p-4">
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="font-bold text-gray-900">정원 현황</h2>
-          <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
-            {settings.includeInactiveInCapacity ? '활성+휴면 기준' : '활성 회원 기준'}
-          </span>
-        </div>
-
-        <div className="grid grid-cols-4 gap-2 mb-3">
-          <div className="bg-blue-50 rounded-lg text-center p-2">
-            <div className="text-lg font-bold text-blue-600">{maxCapacity}</div>
-            <div className="text-xs text-gray-600">정원</div>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span>📊</span>
+            <h2 className="font-bold text-gray-900">팀 정원</h2>
+            <span className="text-xs text-gray-400">({settings.includeInactiveInCapacity ? '활성+휴면' : '활성'} 기준)</span>
           </div>
-          <div className="bg-green-50 rounded-lg text-center p-2">
-            <div className="text-lg font-bold text-green-600">{stats.active}</div>
-            <div className="text-xs text-gray-600">활성</div>
+          <div className="flex items-center gap-2">
+            <span className="font-bold text-primary-600">{stats.capacityCount}</span>
+            <span className="text-gray-400">/ {maxCapacity}명</span>
+            <span className={`text-xs px-2 py-0.5 rounded ${remainingSlots > 0 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+              {remainingSlots > 0 ? `${remainingSlots}자리 남음` : '마감'}
+            </span>
           </div>
-          <div className="bg-yellow-50 rounded-lg text-center p-2">
-            <div className="text-lg font-bold text-yellow-600">{stats.inactive}</div>
-            <div className="text-xs text-gray-600">휴면</div>
-          </div>
-          <div className={`rounded-lg text-center p-2 ${remainingSlots > 0 ? 'bg-gray-50' : 'bg-red-50'}`}>
-            <div className={`text-lg font-bold ${remainingSlots > 0 ? 'text-gray-600' : 'text-red-600'}`}>{remainingSlots}</div>
-            <div className="text-xs text-gray-600">여석</div>
-          </div>
-        </div>
-
-        {/* 진행률 바 */}
-        <div className="w-full bg-gray-200 rounded-full h-2">
-          <div
-            className="bg-primary-600 rounded-full transition-all h-2"
-            style={{ width: `${Math.min((stats.capacityCount / maxCapacity) * 100, 100)}%` }}
-          />
-        </div>
-        <div className="text-right text-xs text-gray-500 mt-1">
-          {stats.capacityCount}/{maxCapacity}명 ({Math.round((stats.capacityCount / maxCapacity) * 100)}%)
         </div>
       </section>
 
       {/* 생일 */}
-      {(birthdayThisMonth.length > 0 || birthdayNextMonth.length > 0) && (
-        <section className="bg-white md:rounded-lg md:shadow p-4">
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="font-bold text-gray-900 flex items-center gap-2">
-              <span>🎂</span>
-              <span>생일 축하</span>
-            </h2>
-            <Link to="/members?tab=birthday" className="text-sm text-primary-600 hover:text-primary-700">
-              더보기 →
-            </Link>
+      <section className="bg-white md:rounded-lg md:shadow p-4">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <span>🎂</span>
+            <h2 className="font-bold text-gray-900">곧 생일인 회원</h2>
           </div>
-
-          <div className="space-y-3">
-            {/* 이번 달 */}
-            {birthdayThisMonth.length > 0 && (
-              <div>
-                <h3 className="text-sm font-medium text-gray-700 mb-2">{currentMonth}월</h3>
-                <div className="flex flex-wrap gap-2">
-                  {birthdayThisMonth.slice(0, 5).map((member) => {
-                    const day = parseInt(member.birthDate!.split('-')[2], 10);
-                    const isLunar = member.birthDateType === 'lunar';
-                    return (
-                      <span key={member.id} className="inline-flex items-center bg-pink-50 text-pink-700 px-2 py-1 rounded text-sm">
-                        {member.name}
-                        <span className="text-pink-400 ml-1 text-xs">{day}일</span>
-                        {isLunar && <span className="text-purple-500 ml-0.5 text-xs">(음)</span>}
-                      </span>
-                    );
-                  })}
-                  {birthdayThisMonth.length > 5 && (
-                    <span className="text-sm text-gray-400">+{birthdayThisMonth.length - 5}명</span>
-                  )}
-                </div>
+          <Link to="/members?tab=birthday" className="text-xs text-primary-600 hover:text-primary-700">
+            전체 보기
+          </Link>
+        </div>
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <div className="text-xs text-gray-500 mb-1">{currentMonth}월</div>
+            {birthdayThisMonth.length > 0 ? (
+              <div className="text-sm text-gray-800 space-y-0.5">
+                {birthdayThisMonth.map(m => (
+                  <div key={m.id}>
+                    {m.name} <span className="text-gray-400 text-xs">({m.birthDate?.split('-')[2]}일)</span>
+                  </div>
+                ))}
               </div>
-            )}
-
-            {/* 다음 달 */}
-            {birthdayNextMonth.length > 0 && (
-              <div>
-                <h3 className="text-sm font-medium text-gray-700 mb-2">{nextMonth}월</h3>
-                <div className="flex flex-wrap gap-2">
-                  {birthdayNextMonth.slice(0, 5).map((member) => {
-                    const day = parseInt(member.birthDate!.split('-')[2], 10);
-                    const isLunar = member.birthDateType === 'lunar';
-                    return (
-                      <span key={member.id} className="inline-flex items-center bg-gray-100 text-gray-700 px-2 py-1 rounded text-sm">
-                        {member.name}
-                        <span className="text-gray-400 ml-1 text-xs">{day}일</span>
-                        {isLunar && <span className="text-purple-500 ml-0.5 text-xs">(음)</span>}
-                      </span>
-                    );
-                  })}
-                  {birthdayNextMonth.length > 5 && (
-                    <span className="text-sm text-gray-400">+{birthdayNextMonth.length - 5}명</span>
-                  )}
-                </div>
-              </div>
+            ) : (
+              <div className="text-sm text-gray-400">없음</div>
             )}
           </div>
-        </section>
-      )}
-
-      {/* 최근 가입 회원 */}
-      <section className="bg-white md:rounded-lg md:shadow p-4">
-        <h2 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
-          <span>🆕</span>
-          <span>최근 가입 회원</span>
-          <span className="text-xs text-gray-400 font-normal">(1개월 이내)</span>
-        </h2>
-        {recentJoined.length > 0 ? (
-          <ul className="space-y-2">
-            {recentJoined.slice(0, 5).map((member) => (
-              <li key={member.id} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
-                <span className="text-gray-900">{member.name}</span>
-                <span className="text-sm text-gray-500">{formatDate(member.joinedAt)} 가입</span>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="text-sm text-gray-500 text-center py-4">
-            최근 1개월간 신규 가입이 없습니다
-          </p>
-        )}
+          <div>
+            <div className="text-xs text-gray-500 mb-1">{nextMonth}월</div>
+            {birthdayNextMonth.length > 0 ? (
+              <div className="text-sm text-gray-800 space-y-0.5">
+                {birthdayNextMonth.map(m => (
+                  <div key={m.id}>
+                    {m.name} <span className="text-gray-400 text-xs">({m.birthDate?.split('-')[2]}일)</span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-sm text-gray-400">없음</div>
+            )}
+          </div>
+        </div>
       </section>
 
-      {/* 최근 상태 변경 */}
+      {/* 최근 회원 근황 */}
       <section className="bg-white md:rounded-lg md:shadow p-4">
-        <h2 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
-          <span>💤</span>
-          <span>최근 상태 변경</span>
-          <span className="text-xs text-gray-400 font-normal">(1개월 이내)</span>
-        </h2>
-        {recentChanges.length > 0 ? (
-          <ul className="space-y-2">
-            {recentChanges.slice(0, 5).map((history) => (
-              <li key={history.id} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
-                <div className="flex items-center gap-2">
-                  <span className="text-gray-900">{history.memberName}</span>
-                  <span className={`text-xs px-1.5 py-0.5 rounded ${
-                    history.changeType === 'to_inactive' ? 'bg-yellow-100 text-yellow-700' :
-                    history.changeType === 'to_active' ? 'bg-green-100 text-green-700' :
-                    'bg-gray-100 text-gray-700'
-                  }`}>
-                    {getChangeTypeLabel(history)}
-                  </span>
-                </div>
-                <span className="text-sm text-gray-500">{formatDate(history.changedAt)}</span>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="text-sm text-gray-500 text-center py-4">
-            최근 1개월간 상태 변경이 없습니다
-          </p>
-        )}
-      </section>
-
-      {/* 바로가기 */}
-      <section className="bg-white md:rounded-lg md:shadow p-4">
-        <h2 className="font-bold text-gray-900 mb-3">바로가기</h2>
-        <div className="grid grid-cols-3 gap-3">
-          <Link to="/members">
-            <Button variant="secondary" className="w-full text-sm py-3">
-              👥 회원명단
-            </Button>
-          </Link>
-          <Link to="/rules">
-            <Button variant="secondary" className="w-full text-sm py-3">
-              📜 회칙
-            </Button>
-          </Link>
-          <Link to="/my">
-            <Button variant="secondary" className="w-full text-sm py-3">
-              👤 내 정보
-            </Button>
-          </Link>
+        <div className="flex items-center gap-2 mb-3">
+          <span>📋</span>
+          <h2 className="font-bold text-gray-900">최신 근황</h2>
+        </div>
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <div className="text-xs text-gray-500 mb-1">최근 가입</div>
+            {recentJoined.length > 0 ? (
+              <div className="text-sm text-gray-800 space-y-0.5">
+                {recentJoined.map(m => (
+                  <div key={m.id}>
+                    {m.name} <span className="text-gray-400 text-xs">({formatDate(m.joinedAt)})</span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-sm text-gray-400">없음</div>
+            )}
+          </div>
+          <div>
+            <div className="text-xs text-gray-500 mb-1">상태 변경</div>
+            {recentChanges.length > 0 ? (
+              <div className="text-sm text-gray-800 space-y-0.5">
+                {recentChanges.map(h => (
+                  <div key={h.id}>
+                    {h.memberName}({getChangeTypeLabel(h)}) <span className="text-gray-400 text-xs">({formatDate(h.changedAt)})</span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-sm text-gray-400">없음</div>
+            )}
+          </div>
         </div>
       </section>
     </div>

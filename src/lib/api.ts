@@ -272,6 +272,7 @@ export function createPendingMember(data: {
   referrer?: string;
   swimmingAbility?: Member['swimmingAbility'];
   swimmingLevel?: Member['swimmingLevel'];
+  competitionInterest?: Member['competitionInterest'];
   motivation?: string;
 }): Member {
   const members = getMembers();
@@ -286,6 +287,7 @@ export function createPendingMember(data: {
     referrer: data.referrer,
     swimmingAbility: data.swimmingAbility,
     swimmingLevel: data.swimmingLevel,
+    competitionInterest: data.competitionInterest,
     motivation: data.motivation,
     status: 'pending',
     role: 'member',
@@ -472,6 +474,8 @@ export function getMembersWithBirthdayByMonth(month: number): Member[] {
 
   return members
     .filter((member) => {
+      // 관리자 제외
+      if (member.role === 'admin') return false;
       // 활성 또는 휴면 회원만
       if (member.status !== 'active' && member.status !== 'inactive') return false;
       // 생년월일이 없으면 제외
@@ -680,8 +684,10 @@ export function getRecentJoinedMembers(days: number = 30): Member[] {
   return members
     .filter(m => {
       if (m.role === 'admin') return false; // 관리자 제외
+      // 승인 완료된 회원만 (pending, withdrawn 제외)
+      if (m.status === 'pending' || m.status === 'withdrawn') return false;
       const joinedDate = new Date(m.joinedAt);
-      return joinedDate >= cutoffDate && m.status !== 'withdrawn';
+      return joinedDate >= cutoffDate;
     })
     .sort((a, b) => new Date(b.joinedAt).getTime() - new Date(a.joinedAt).getTime());
 }

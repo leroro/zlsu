@@ -1,4 +1,4 @@
-import { MemberStatus, MemberRole, ApplicationStatus, StateChangeStatus, WithdrawalStatus, Gender, SwimmingLevel } from './types';
+import { MemberStatus, MemberRole, ApplicationStatus, StateChangeStatus, WithdrawalStatus, Gender, SwimmingLevel, CompetitionInterest } from './types';
 
 // 정원
 export const MAX_CAPACITY = 16;
@@ -15,7 +15,7 @@ export const STATUS_LABELS: Record<MemberStatus, string> = {
 export const STATUS_DESCRIPTIONS: Record<MemberStatus, string> = {
   pending: '가입비 납부 후 승인 대기 중인 회원입니다.',
   active: '정기적으로 모임에 참여하는 회원입니다.',
-  inactive: '일시적으로 모임 참여를 쉬고 있는 회원입니다. 언제든 활성 상태로 복귀할 수 있습니다.',
+  inactive: '일시적으로 모임 참여를 쉬고 있는 회원입니다. 정원에 여유가 있을 때 활성 신청이 가능합니다.',
   withdrawn: '모임에서 탈퇴한 회원입니다.',
 };
 
@@ -27,8 +27,8 @@ export const ROLE_LABELS: Record<MemberRole, string> = {
 
 // 성별 라벨
 export const GENDER_LABELS: Record<Gender, string> = {
-  male: '남성',
-  female: '여성',
+  male: '남',
+  female: '여',
 };
 
 // 담당 역할 옵션
@@ -148,7 +148,7 @@ export const SIGNUP_CHECKLIST_ITEMS = [
   },
 ];
 
-// 수영 영법
+// 수영 종목 (주종목 선택용)
 export const SWIMMING_STROKES = [
   { id: 'freestyle', label: '자유형' },
   { id: 'backstroke', label: '배영' },
@@ -156,26 +156,43 @@ export const SWIMMING_STROKES = [
   { id: 'butterfly', label: '접영' },
 ] as const;
 
-// 수영 레벨 (평소 다니는 반)
+// 수영 레벨
 export const SWIMMING_LEVELS: { id: SwimmingLevel; label: string }[] = [
-  { id: 'beginner', label: '초급반' },
-  { id: 'intermediate', label: '중급반' },
-  { id: 'advanced', label: '상급반' },
-  { id: 'masters', label: '마스터반' },
+  { id: 'beginner', label: '초급' },
+  { id: 'intermediate', label: '중급' },
+  { id: 'advanced', label: '상급' },
+  { id: 'masters', label: '마스터' },
+  { id: 'competition', label: '대회수상' },
 ];
 
 // 수영 레벨 라벨
 export const SWIMMING_LEVEL_LABELS: Record<SwimmingLevel, string> = {
-  beginner: '초급반',
-  intermediate: '중급반',
-  advanced: '상급반',
-  masters: '마스터반',
+  beginner: '초급',
+  intermediate: '중급',
+  advanced: '상급',
+  masters: '마스터',
+  competition: '대회수상',
 };
 
 // 수영 레벨 이모지
 export const SWIMMING_LEVEL_EMOJIS: Record<SwimmingLevel, string> = {
-  beginner: '🐣',
+  beginner: '🛟',
   intermediate: '🏊',
-  advanced: '🌟',
-  masters: '🏆',
+  advanced: '🐬',
+  masters: '🦈',
+  competition: '🏆',
+};
+
+// 대회 참가 의향 옵션
+export const COMPETITION_INTEREST_OPTIONS: { id: CompetitionInterest; label: string }[] = [
+  { id: 'none', label: '관심 없음' },
+  { id: 'interested', label: '관심 있음' },
+  { id: 'very_interested', label: '꼭 참여하고 싶음' },
+];
+
+// 대회 참가 의향 라벨
+export const COMPETITION_INTEREST_LABELS: Record<CompetitionInterest, string> = {
+  none: '관심 없음',
+  interested: '관심 있음',
+  very_interested: '꼭 참여하고 싶음',
 };

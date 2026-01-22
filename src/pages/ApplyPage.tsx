@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { createPendingMember, getMemberByEmail, getActiveChecklistItems, getActiveAndInactiveMemberCount, getSettings, getMembers } from '../lib/api';
-import { SwimmingAbility, SwimmingLevel, ChecklistItem, Member, BirthDateType } from '../lib/types';
-import { SWIMMING_STROKES, SWIMMING_LEVELS, BANK_ACCOUNT } from '../lib/constants';
+import { SwimmingAbility, SwimmingLevel, ChecklistItem, Member, BirthDateType, CompetitionInterest } from '../lib/types';
+import { SWIMMING_STROKES, SWIMMING_LEVELS, SWIMMING_LEVEL_EMOJIS, COMPETITION_INTEREST_OPTIONS, BANK_ACCOUNT } from '../lib/constants';
 import Button from '../components/common/Button';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
 
@@ -92,8 +92,10 @@ export default function ApplyPage() {
     setChecklistItems(items);
     setChecklist(items.reduce((acc, item) => ({ ...acc, [item.id]: false }), {}));
 
-    // 추천인 선택용 회원 목록 불러오기 (활성/휴면 회원만)
-    const members = getMembers().filter(m => m.status === 'active' || m.status === 'inactive');
+    // 추천인 선택용 회원 목록 불러오기 (활성 회원만, 관리자 제외)
+    const members = getMembers().filter(m =>
+      m.status === 'active' && m.role !== 'admin'
+    );
     setMemberList(members.sort((a, b) => a.name.localeCompare(b.name)));
   }, []);
 
@@ -125,6 +127,7 @@ export default function ApplyPage() {
   });
 
   const [swimmingLevel, setSwimmingLevel] = useState<SwimmingLevel | ''>('');
+  const [competitionInterest, setCompetitionInterest] = useState<CompetitionInterest | ''>('');
 
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(devStep === 'complete');
@@ -217,16 +220,16 @@ export default function ApplyPage() {
       return false;
     }
     if (!swimmingLevel) {
-      setError('평소 다니는 반을 선택해주세요.');
+      setError('수영 레벨을 선택해주세요.');
       return false;
     }
-    const hasAnyStroke = Object.values(swimmingAbility).some((v) => v);
-    if (!hasAnyStroke) {
-      setError('할 수 있는 영법을 1개 이상 선택해주세요.');
+    const selectedStrokeCount = Object.values(swimmingAbility).filter(Boolean).length;
+    if (selectedStrokeCount < 2) {
+      setError('주종목을 2개 이상 선택해주세요.');
       return false;
     }
     if (!additionalInfo.motivation.trim()) {
-      setError('가입 동기를 입력해주세요.');
+      setError('자기소개를 입력해주세요.');
       return false;
     }
     return true;
@@ -373,7 +376,7 @@ export default function ApplyPage() {
 
           {/* 문의 안내 - 추천인 강조 */}
           <div className="text-sm text-gray-600 mb-6 p-3 bg-gray-50 rounded-lg">
-            {additionalInfo.referrer && additionalInfo.referrer !== '없음' ? (
+            {additionalInfo.referrer ? (
               <p>
                 문의사항은 <span className="font-bold text-primary-600">{additionalInfo.referrer}</span>님(추천인)에게 연락해주세요.
               </p>
@@ -488,7 +491,7 @@ export default function ApplyPage() {
               disabled={!isStep1Complete}
               className="w-full"
             >
-              다음 단계
+              동의하고 다음 단계
             </Button>
           </div>
         )}
@@ -656,7 +659,6 @@ export default function ApplyPage() {
                 className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               >
                 <option value="">추천인을 선택해주세요</option>
-                <option value="없음">없음</option>
                 {memberList.map((member) => (
                   <option key={member.id} value={member.name}>
                     {member.name}
@@ -667,7 +669,7 @@ export default function ApplyPage() {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                평소 다니는 반 <span className="text-red-500">*</span>
+                수영 레벨 <span className="text-red-500">*</span>
               </label>
               <div className="grid grid-cols-2 gap-2">
                 {SWIMMING_LEVELS.map((level) => (
@@ -687,17 +689,17 @@ export default function ApplyPage() {
                       onChange={(e) => setSwimmingLevel(e.target.value as SwimmingLevel)}
                       className="mr-2 h-4 w-4 border-gray-300 text-primary-600 focus:ring-primary-500"
                     />
-                    <span className="text-sm">{level.label}</span>
+                    <span className="text-sm">{SWIMMING_LEVEL_EMOJIS[level.id]} {level.label}</span>
                   </label>
                 ))}
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                할 수 있는 영법 <span className="text-red-500">*</span>
-                <span className="text-xs text-gray-500 ml-2">(복수 선택 가능)</span>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                주종목 <span className="text-red-500">*</span>
               </label>
+              <p className="text-xs text-gray-500 mb-2">자신 있는 종목을 2개 이상 선택해 주세요. 대회 참가 시 참고됩니다.</p>
               <div className="grid grid-cols-2 gap-2">
                 {SWIMMING_STROKES.map((stroke) => (
                   <label
@@ -721,9 +723,39 @@ export default function ApplyPage() {
             </div>
 
             <div>
-              <label htmlFor="motivation" className="block text-sm font-medium text-gray-700 mb-1">
-                가입 동기 <span className="text-red-500">*</span>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                대회 참가 의향 <span className="text-red-500">*</span>
               </label>
+              <p className="text-xs text-gray-500 mb-2">단체전 등 대회 참가에 대한 관심도를 선택해 주세요.</p>
+              <div className="space-y-2">
+                {COMPETITION_INTEREST_OPTIONS.map((option) => (
+                  <label
+                    key={option.id}
+                    className={`flex items-center p-3 border rounded-lg cursor-pointer transition-colors ${
+                      competitionInterest === option.id
+                        ? 'border-primary-500 bg-primary-50'
+                        : 'border-gray-200 hover:border-gray-300'
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="competitionInterest"
+                      value={option.id}
+                      checked={competitionInterest === option.id}
+                      onChange={(e) => setCompetitionInterest(e.target.value as CompetitionInterest)}
+                      className="mr-2 h-4 w-4 border-gray-300 text-primary-600 focus:ring-primary-500"
+                    />
+                    <span className="text-sm">{option.label}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <label htmlFor="motivation" className="block text-sm font-medium text-gray-700 mb-1">
+                자기소개 <span className="text-red-500">*</span>
+              </label>
+              <p className="text-xs text-gray-500 mb-2">가입 동기나 소개를 입력해 주세요. 팀원들에게 공유됩니다.</p>
               <textarea
                 id="motivation"
                 name="motivation"
@@ -731,7 +763,7 @@ export default function ApplyPage() {
                 onChange={handleAdditionalInfoChange}
                 rows={4}
                 className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
-                placeholder="가입 이유를 적어주세요. 팀원들에게 공개됩니다."
+                placeholder="예) 수영을 좋아해서 함께 운동할 팀원을 찾고 있어요!"
               />
             </div>
 

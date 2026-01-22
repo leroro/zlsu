@@ -22,6 +22,7 @@ import {
 } from '../../components/common/StatusBadge';
 import Button from '../../components/common/Button';
 import { useDocumentTitle } from '../../hooks/useDocumentTitle';
+import { COMPETITION_INTEREST_LABELS } from '../../lib/constants';
 
 type TabType = 'applications' | 'stateChanges' | 'withdrawals';
 
@@ -228,7 +229,7 @@ export default function RequestsPage() {
                     </div>
 
                     <div className="text-sm mb-3">
-                      <span className="font-medium text-gray-700">수영 실력:</span>
+                      <span className="font-medium text-gray-700">주종목:</span>
                       <div className="flex flex-wrap gap-1 mt-1">
                         {app.swimmingAbility.freestyle && (
                           <span className="px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-xs">자유형</span>
@@ -249,8 +250,15 @@ export default function RequestsPage() {
                       </div>
                     </div>
 
+                    {app.competitionInterest && (
+                      <div className="text-sm mb-3">
+                        <span className="font-medium text-gray-700">대회 참가 의향:</span>
+                        <span className="text-gray-600 ml-2">{COMPETITION_INTEREST_LABELS[app.competitionInterest]}</span>
+                      </div>
+                    )}
+
                     <div className="text-sm mb-3">
-                      <span className="font-medium text-gray-700">가입 동기:</span>
+                      <span className="font-medium text-gray-700">자기소개:</span>
                       <p className="text-gray-600 mt-1">{app.motivation}</p>
                     </div>
 

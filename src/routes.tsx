@@ -18,6 +18,7 @@ import MemberEditPage from './pages/admin/MemberEditPage';
 import SettingsPage from './pages/admin/SettingsPage';
 import ChecklistManagePage from './pages/admin/ChecklistManagePage';
 import ProtectedRoute from './components/common/ProtectedRoute';
+import NotFoundPage from './pages/NotFoundPage';
 
 export const router = createHashRouter([
   {
@@ -123,7 +124,10 @@ export const router = createHashRouter([
             </ProtectedRoute>
           ),
         },
+
       ],
     },
+    // 404 페이지 (헤더 없이 전체 화면)
+    { path: '*', element: <NotFoundPage /> },
   ],
 );

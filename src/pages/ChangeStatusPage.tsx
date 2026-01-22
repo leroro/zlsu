@@ -1,21 +1,17 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { createStateChange, getStateChanges } from '../lib/api';
+import { createStateChange, getStateChanges, getActiveAndInactiveMemberCount, getSettings } from '../lib/api';
 import { MemberStatus } from '../lib/types';
-import { STATUS_DESCRIPTIONS } from '../lib/constants';
 import { MemberStatusBadge } from '../components/common/StatusBadge';
 import Button from '../components/common/Button';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
-
-const availableStatuses: MemberStatus[] = ['active', 'inactive'];
 
 export default function ChangeStatusPage() {
   useDocumentTitle('상태 변경');
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  const [requestedStatus, setRequestedStatus] = useState<MemberStatus | ''>('');
   const [reason, setReason] = useState('');
   const [confirmed, setConfirmed] = useState(false);
   const [error, setError] = useState('');
@@ -27,6 +23,15 @@ export default function ChangeStatusPage() {
     return null;
   }
 
+  // 현재 상태에 따라 변경할 상태 결정
+  const targetStatus: MemberStatus = user.status === 'active' ? 'inactive' : 'active';
+  const isToInactive = targetStatus === 'inactive';
+
+  // 정원 정보
+  const stats = getActiveAndInactiveMemberCount();
+  const settings = getSettings();
+  const remainingSlots = settings.maxCapacity - stats.capacityCount;
+
   // 이미 대기 중인 신청이 있는지 확인
   const pendingRequest = getStateChanges().find(
     (sc) => sc.memberId === user.id && sc.status === 'pending'
@@ -35,16 +40,6 @@ export default function ChangeStatusPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-
-    if (!requestedStatus) {
-      setError('변경할 상태를 선택해주세요.');
-      return;
-    }
-
-    if (requestedStatus === user.status) {
-      setError('현재 상태와 동일한 상태로는 변경할 수 없습니다.');
-      return;
-    }
 
     if (!reason.trim()) {
       setError('변경 사유를 입력해주세요.');
@@ -63,7 +58,7 @@ export default function ChangeStatusPage() {
         memberId: user.id,
         memberName: user.name,
         currentStatus: user.status,
-        requestedStatus,
+        requestedStatus: targetStatus,
         reason: reason.trim(),
       });
       navigate('/');
@@ -107,13 +102,58 @@ export default function ChangeStatusPage() {
   return (
     <div className="max-w-md mx-auto">
       <div className="bg-white md:rounded-lg md:shadow p-6">
-        <h1 className="text-2xl font-bold text-gray-900 mb-6">상태 변경 신청</h1>
+        <h1 className="text-2xl font-bold text-gray-900 mb-6">
+          {isToInactive ? '휴면 신청' : '활성 신청'}
+        </h1>
 
+        {/* 상태 변경 표시: 활성 → 휴면 */}
         <div className="mb-6 p-4 bg-gray-50 rounded-lg">
-          <p className="text-sm text-gray-600">
-            현재 상태: <MemberStatusBadge status={user.status} />
-          </p>
+          <div className="flex items-center justify-center gap-3">
+            <MemberStatusBadge status={user.status} />
+            <span className="text-gray-400 text-xl">→</span>
+            <MemberStatusBadge status={targetStatus} />
+          </div>
         </div>
+
+        {/* 휴면 신청 시 경고 */}
+        {isToInactive && (
+          <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+            <h3 className="font-medium text-yellow-800 mb-2 flex items-center gap-2">
+              <span>⚠️</span> 휴면 전환 시 유의사항
+            </h3>
+            <div className="text-sm text-yellow-700 space-y-1.5">
+              <div className="flex gap-2">
+                <span className="flex-shrink-0">•</span>
+                <span>휴면 상태가 되면 내 자리에 다른 회원이 가입할 수 있어요</span>
+              </div>
+              <div className="flex gap-2">
+                <span className="flex-shrink-0">•</span>
+                <span>정원이 꽉 차면 자리가 날 때까지 활성 신청을 할 수 없어요</span>
+              </div>
+              <div className="flex gap-2 text-yellow-600">
+                <span className="flex-shrink-0">•</span>
+                <span>
+                  현재 정원: {stats.capacityCount}/{settings.maxCapacity}명
+                  {remainingSlots > 0
+                    ? ` (${remainingSlots}자리 남음)`
+                    : ' (마감)'}
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* 활성 신청 시 정원 부족 경고 */}
+        {!isToInactive && remainingSlots <= 0 && (
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+            <h3 className="font-medium text-red-800 mb-2 flex items-center gap-2">
+              <span>🚫</span> 정원이 가득 찼어요
+            </h3>
+            <p className="text-sm text-red-700">
+              현재 정원이 꽉 차서 활성 신청을 할 수 없어요. 자리가 나면 다시 시도해주세요.
+            </p>
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {error && (
@@ -121,43 +161,8 @@ export default function ChangeStatusPage() {
           )}
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              변경할 상태 <span className="text-red-500">*</span>
-            </label>
-            <div className="space-y-2">
-              {availableStatuses
-                .filter((status) => status !== user.status)
-                .map((status) => (
-                  <label
-                    key={status}
-                    className={`block p-3 border rounded-lg cursor-pointer transition-colors ${
-                      requestedStatus === status
-                        ? 'border-primary-500 bg-primary-50'
-                        : 'border-gray-200 hover:border-gray-300'
-                    }`}
-                  >
-                    <div className="flex items-center">
-                      <input
-                        type="radio"
-                        name="status"
-                        value={status}
-                        checked={requestedStatus === status}
-                        onChange={(e) => setRequestedStatus(e.target.value as MemberStatus)}
-                        className="mr-3 flex-shrink-0"
-                      />
-                      <MemberStatusBadge status={status} />
-                    </div>
-                    <p className="text-sm text-gray-600 mt-2 ml-6">
-                      {STATUS_DESCRIPTIONS[status]}
-                    </p>
-                  </label>
-                ))}
-            </div>
-          </div>
-
-          <div>
             <label htmlFor="reason" className="block text-sm font-medium text-gray-700 mb-1">
-              변경 사유 <span className="text-red-500">*</span>
+              {isToInactive ? '휴면 사유' : '활성 신청 사유'} <span className="text-red-500">*</span>
             </label>
             <textarea
               id="reason"
@@ -165,7 +170,7 @@ export default function ChangeStatusPage() {
               onChange={(e) => setReason(e.target.value)}
               rows={4}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-              placeholder="상태 변경 사유를 입력해주세요"
+              placeholder={isToInactive ? '휴면 사유를 입력해주세요' : '활성 신청 사유를 입력해주세요'}
               required
             />
           </div>
@@ -179,12 +184,18 @@ export default function ChangeStatusPage() {
               className="mt-1 flex-shrink-0"
             />
             <label htmlFor="confirmed" className="text-sm text-gray-700">
-              상태 변경은 관리자 승인 후 적용되며, 승인까지 최대 일주일이 걸릴 수 있습니다.
+              {isToInactive
+                ? '위 유의사항을 확인했으며, 관리자 승인 후 휴면 전환됩니다. 휴면 시 정원이 차면 복귀가 어려울 수 있음을 이해합니다.'
+                : '관리자 승인 후 활성 전환됩니다. 승인까지 시간이 걸릴 수 있습니다.'}
             </label>
           </div>
 
           <div className="flex gap-2">
-            <Button type="submit" className="flex-1" disabled={isLoading}>
+            <Button
+              type="submit"
+              className="flex-1"
+              disabled={isLoading || (!isToInactive && remainingSlots <= 0)}
+            >
               {isLoading ? '신청 중...' : '신청하기'}
             </Button>
             <Button type="button" variant="secondary" onClick={() => navigate('/')}>

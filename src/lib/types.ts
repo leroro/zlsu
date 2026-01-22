@@ -23,7 +23,7 @@ export type StateChangeStatus = 'pending' | 'approved' | 'rejected';
 // 탈퇴 신청 상태
 export type WithdrawalStatus = 'pending' | 'approved' | 'rejected';
 
-// 수영 실력 (영법별)
+// 주종목 (최소 2개 선택)
 export interface SwimmingAbility {
   freestyle: boolean;   // 자유형
   backstroke: boolean;  // 배영
@@ -31,11 +31,14 @@ export interface SwimmingAbility {
   butterfly: boolean;   // 접영
 }
 
-// 수영 레벨 (평소 다니는 반)
-export type SwimmingLevel = 'beginner' | 'intermediate' | 'advanced' | 'masters';
+// 수영 레벨
+export type SwimmingLevel = 'beginner' | 'intermediate' | 'advanced' | 'masters' | 'competition';
 
 // 생년월일 유형 (양력/음력)
 export type BirthDateType = 'solar' | 'lunar';
+
+// 대회 참가 의향
+export type CompetitionInterest = 'none' | 'interested' | 'very_interested';
 
 // 회원 인터페이스
 export interface Member {
@@ -49,9 +52,10 @@ export interface Member {
   birthDate?: string;
   birthDateType?: BirthDateType;  // 양력/음력
   referrer?: string;  // 추천인
-  swimmingAbility?: SwimmingAbility;  // 수영 실력 (영법)
-  swimmingLevel?: SwimmingLevel;  // 수영 레벨 (평소 다니는 반)
-  motivation?: string;  // 가입 동기
+  swimmingAbility?: SwimmingAbility;  // 주종목
+  swimmingLevel?: SwimmingLevel;  // 수영 레벨
+  competitionInterest?: CompetitionInterest;  // 대회 참가 의향
+  motivation?: string;  // 자기소개
   status: MemberStatus;
   role: MemberRole;
   joinedAt: string;
@@ -68,8 +72,9 @@ export interface Application {
   birthDate?: string;
   birthDateType?: BirthDateType;  // 양력/음력
   referrer?: string;  // 추천인
-  swimmingAbility: SwimmingAbility;  // 수영 실력 (영법)
-  swimmingLevel?: SwimmingLevel;  // 수영 레벨 (평소 다니는 반)
+  swimmingAbility: SwimmingAbility;  // 주종목
+  swimmingLevel?: SwimmingLevel;  // 수영 레벨
+  competitionInterest?: CompetitionInterest;  // 대회 참가 의향
   motivation: string;
   agreedToTerms: boolean;  // 이용약관 동의
   agreedToPrivacy: boolean;  // 개인정보수집 동의

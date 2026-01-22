@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 import { Navigate, useSearchParams } from 'react-router-dom';
 import { getMembers, getStateChanges, getWithdrawalRequests, getMembersWithBirthdayByMonth } from '../lib/api';
 import { MemberStatus } from '../lib/types';
-import { STATUS_LABELS, GENDER_LABELS, SWIMMING_LEVEL_LABELS, SWIMMING_LEVEL_EMOJIS } from '../lib/constants';
+import { STATUS_LABELS, GENDER_LABELS, SWIMMING_LEVEL_EMOJIS } from '../lib/constants';
 import { MemberStatusBadge } from '../components/common/StatusBadge';
 import Button from '../components/common/Button';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
@@ -10,6 +10,12 @@ import { useAuth } from '../contexts/AuthContext';
 
 type FilterStatus = MemberStatus | 'all';
 type TabType = 'members' | 'birthday';
+
+// 날짜 형식 변환: 2024-01-05 → 2024.1.5
+const formatDate = (dateStr: string) => {
+  const [year, month, day] = dateStr.split('-');
+  return `${year}.${parseInt(month, 10)}.${parseInt(day, 10)}`;
+};
 
 export default function MembersPage() {
   useDocumentTitle('회원 명단');
@@ -157,9 +163,11 @@ export default function MembersPage() {
             filteredMembers.map((member) => {
               const pendingRequest = getPendingRequest(member.id);
               const levelEmoji = member.swimmingLevel ? SWIMMING_LEVEL_EMOJIS[member.swimmingLevel] : null;
-              const levelLabel = member.swimmingLevel ? SWIMMING_LEVEL_LABELS[member.swimmingLevel] : null;
-              // 가입일 간소화: "2024-01-15" → "24.01"
-              const shortJoinDate = member.joinedAt.slice(2, 7).replace('-', '.');
+              // 이름 옆 괄호 내용: (남) 또는 (남, 수영지도)
+              const nameInfo = [
+                member.gender ? GENDER_LABELS[member.gender] : null,
+                member.position,
+              ].filter(Boolean).join(', ');
               return (
                 <div
                   key={member.id}
@@ -186,23 +194,19 @@ export default function MembersPage() {
                         )}
                       </div>
                       <div>
-                        <div className="flex items-center gap-2 flex-wrap">
+                        <div className="flex items-center gap-1 flex-wrap">
                           <span className="font-medium text-gray-900">{member.name}</span>
-                          {member.position && (
-                            <span className="text-sm text-gray-500">({member.position})</span>
+                          {nameInfo && (
+                            <span className="text-sm text-gray-500">({nameInfo})</span>
                           )}
                           {member.role === 'admin' && (
-                            <span className="px-1.5 py-0.5 text-xs font-medium bg-primary-600 text-white rounded">
+                            <span className="px-1.5 py-0.5 text-xs font-medium bg-primary-600 text-white rounded ml-1">
                               스탭
                             </span>
                           )}
                         </div>
                         <div className="text-sm text-gray-500">
-                          {levelLabel && <span>{levelLabel}</span>}
-                          {levelLabel && member.gender && <span className="mx-1">·</span>}
-                          {member.gender && <span>{GENDER_LABELS[member.gender]}</span>}
-                          <span className="mx-1">·</span>
-                          <span>가입 {shortJoinDate}</span>
+                          가입일 {formatDate(member.joinedAt)}
                         </div>
                       </div>
                     </div>
@@ -220,8 +224,8 @@ export default function MembersPage() {
                     </div>
                   </div>
 
-                  {/* 수영 영법 */}
-                  <div className="flex flex-wrap gap-1 mt-2">
+                  {/* 주종목 */}
+                  <div className="flex flex-wrap gap-1">
                     {member.swimmingAbility?.freestyle && (
                       <span className="px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-xs">자유형</span>
                     )}
@@ -236,9 +240,9 @@ export default function MembersPage() {
                     )}
                   </div>
 
-                  {/* 가입 동기 */}
+                  {/* 자기소개 */}
                   {member.motivation && (
-                    <div className="text-sm text-gray-600 bg-white rounded p-2">
+                    <div className="text-sm text-gray-600 bg-white rounded p-2 mt-2">
                       {member.motivation}
                     </div>
                   )}
@@ -292,17 +296,20 @@ export default function MembersPage() {
                         className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
                       >
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-full bg-pink-100 flex items-center justify-center">
-                            <span className="text-pink-600 font-medium">{member.name.charAt(0)}</span>
+                          <div className={`w-10 h-10 rounded-full flex items-center justify-center text-lg ${
+                            member.swimmingLevel ? 'bg-gray-100' : 'bg-pink-100'
+                          }`}>
+                            {member.swimmingLevel ? (
+                              <span>{SWIMMING_LEVEL_EMOJIS[member.swimmingLevel]}</span>
+                            ) : (
+                              <span className="text-pink-600 font-medium">{member.name.charAt(0)}</span>
+                            )}
                           </div>
                           <div>
                             <div className="flex items-center gap-2">
                               <span className="font-medium text-gray-900">{member.name}</span>
                               <MemberStatusBadge status={member.status} />
                             </div>
-                            {member.position && (
-                              <span className="text-sm text-gray-500">{member.position}</span>
-                            )}
                           </div>
                         </div>
                         <div className="text-right">

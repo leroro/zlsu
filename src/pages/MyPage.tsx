@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { updateMember, getWithdrawalRequests, changePassword } from '../lib/api';
-import { SwimmingAbility, SwimmingLevel, BirthDateType } from '../lib/types';
-import { ROLE_LABELS, GENDER_LABELS, SWIMMING_LEVEL_LABELS, SWIMMING_LEVEL_EMOJIS, SWIMMING_STROKES } from '../lib/constants';
+import { SwimmingAbility, SwimmingLevel, BirthDateType, CompetitionInterest } from '../lib/types';
+import { ROLE_LABELS, GENDER_LABELS, SWIMMING_LEVEL_LABELS, SWIMMING_LEVEL_EMOJIS, SWIMMING_STROKES, COMPETITION_INTEREST_OPTIONS, COMPETITION_INTEREST_LABELS } from '../lib/constants';
 import Button from '../components/common/Button';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
 
@@ -18,6 +18,8 @@ export default function MyPage() {
     birthDate: user?.birthDate || '',
     birthDateType: (user?.birthDateType || 'solar') as BirthDateType,
     swimmingLevel: (user?.swimmingLevel || '') as SwimmingLevel | '',
+    competitionInterest: (user?.competitionInterest || '') as CompetitionInterest | '',
+    motivation: user?.motivation || '',
   });
 
   const [swimmingAbility, setSwimmingAbility] = useState<SwimmingAbility>(
@@ -43,7 +45,7 @@ export default function MyPage() {
     (wr) => wr.memberId === user.id && wr.status === 'pending'
   );
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
@@ -60,6 +62,8 @@ export default function MyPage() {
         birthDateType: formData.birthDateType,
         swimmingLevel: formData.swimmingLevel || undefined,
         swimmingAbility,
+        competitionInterest: formData.competitionInterest || undefined,
+        motivation: formData.motivation || undefined,
       });
       refreshUser();
       setIsEditing(false);
@@ -76,6 +80,8 @@ export default function MyPage() {
       birthDate: user.birthDate || '',
       birthDateType: user.birthDateType || 'solar',
       swimmingLevel: user.swimmingLevel || '',
+      competitionInterest: user.competitionInterest || '',
+      motivation: user.motivation || '',
     });
     setSwimmingAbility(
       user.swimmingAbility || {
@@ -127,7 +133,7 @@ export default function MyPage() {
     setShowPasswordChange(false);
   };
 
-  // 수영 영법 텍스트 생성
+  // 주종목 텍스트 생성
   const getSwimmingAbilityText = () => {
     const abilities = [];
     if (user.swimmingAbility?.freestyle) abilities.push('자유형');
@@ -305,10 +311,11 @@ export default function MyPage() {
                 className="w-32 px-2 py-1 border border-gray-300 rounded text-sm"
               >
                 <option value="">선택</option>
-                <option value="beginner">초급반</option>
-                <option value="intermediate">중급반</option>
-                <option value="advanced">상급반</option>
-                <option value="masters">마스터반</option>
+                <option value="beginner">🛟 초급</option>
+                <option value="intermediate">🏊 중급</option>
+                <option value="advanced">🐬 상급</option>
+                <option value="masters">🦈 마스터</option>
+                <option value="competition">🏆 대회수상</option>
               </select>
             ) : (
               <span className="text-gray-900 flex items-center gap-1">
@@ -324,10 +331,10 @@ export default function MyPage() {
             )}
           </div>
 
-          {/* 수영 영법 - 수정 가능 */}
+          {/* 주종목 - 수정 가능 */}
           <div className="py-2 border-b border-gray-100">
             <div className="flex justify-between items-center mb-2">
-              <span className="text-gray-500">수영 영법</span>
+              <span className="text-gray-500">주종목</span>
               {!isEditing && (
                 <span className="text-gray-900">{getSwimmingAbilityText()}</span>
               )}
@@ -356,13 +363,48 @@ export default function MyPage() {
             )}
           </div>
 
-          {/* 가입 동기 - 수정 불가 */}
-          {user.motivation && (
-            <div className="py-2">
-              <span className="text-gray-500 block mb-1">가입 동기</span>
-              <p className="text-gray-700 text-sm bg-gray-50 rounded p-3">{user.motivation}</p>
-            </div>
-          )}
+          {/* 대회 참가 의향 - 수정 가능 */}
+          <div className="flex justify-between items-center py-2 border-b border-gray-100">
+            <span className="text-gray-500">대회 참가 의향</span>
+            {isEditing ? (
+              <select
+                name="competitionInterest"
+                value={formData.competitionInterest}
+                onChange={handleChange}
+                className="w-36 px-2 py-1 border border-gray-300 rounded text-sm"
+              >
+                <option value="">선택</option>
+                {COMPETITION_INTEREST_OPTIONS.map((option) => (
+                  <option key={option.id} value={option.id}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <span className="text-gray-900">
+                {user.competitionInterest ? COMPETITION_INTEREST_LABELS[user.competitionInterest] : '-'}
+              </span>
+            )}
+          </div>
+
+          {/* 자기소개 - 수정 가능 */}
+          <div className="py-2">
+            <span className="text-gray-500 block mb-1">자기소개</span>
+            {isEditing ? (
+              <textarea
+                name="motivation"
+                value={formData.motivation}
+                onChange={handleChange}
+                rows={3}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm resize-none"
+                placeholder="가입 동기나 소개를 입력해 주세요"
+              />
+            ) : (
+              <p className="text-gray-700 text-sm bg-gray-50 rounded p-3">
+                {user.motivation || '-'}
+              </p>
+            )}
+          </div>
         </div>
       </div>
 
