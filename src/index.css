@@ -137,3 +137,21 @@ input[type="date"] {
   margin-top: 0.125rem;
   margin-bottom: 0.125rem;
 }
+
+/* 중간 타이틀(섹션 제목) 강조 - font-semibold를 더 진하게 */
+.font-semibold {
+  font-weight: 700 !important; /* 600 → 700 (Bold) */
+}
+
+/* 제목 텍스트 색상 더 진하게 */
+h1, h2, h3, h4 {
+  color: #111827; /* gray-900보다 진한 색 */
+}
+
+/* text-lg 이상 제목은 더 강조 */
+.text-lg.font-semibold,
+.text-xl.font-semibold,
+.text-2xl.font-semibold {
+  font-weight: 700 !important;
+  letter-spacing: -0.01em; /* 약간 타이트하게 */
+}
