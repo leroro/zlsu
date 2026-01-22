@@ -33,6 +33,9 @@ export interface SwimmingAbility {
 // 수영 레벨 (평소 다니는 반)
 export type SwimmingLevel = 'beginner' | 'intermediate' | 'advanced' | 'masters';
 
+// 생년월일 유형 (양력/음력)
+export type BirthDateType = 'solar' | 'lunar';
+
 // 회원 인터페이스
 export interface Member {
   id: string;
@@ -43,6 +46,7 @@ export interface Member {
   phone: string;
   gender?: Gender;  // 성별
   birthDate?: string;
+  birthDateType?: BirthDateType;  // 양력/음력
   referrer?: string;  // 추천인
   swimmingAbility?: SwimmingAbility;  // 수영 실력 (영법)
   swimmingLevel?: SwimmingLevel;  // 수영 레벨 (평소 다니는 반)
@@ -61,6 +65,7 @@ export interface Application {
   password: string;
   phone: string;
   birthDate?: string;
+  birthDateType?: BirthDateType;  // 양력/음력
   referrer?: string;  // 추천인
   swimmingAbility: SwimmingAbility;  // 수영 실력 (영법)
   swimmingLevel?: SwimmingLevel;  // 수영 레벨 (평소 다니는 반)

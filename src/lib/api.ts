@@ -250,6 +250,7 @@ export function createPendingMember(data: {
   password: string;
   phone: string;
   birthDate?: string;
+  birthDateType?: Member['birthDateType'];
   referrer?: string;
   swimmingAbility?: Member['swimmingAbility'];
   swimmingLevel?: Member['swimmingLevel'];
@@ -263,6 +264,7 @@ export function createPendingMember(data: {
     name: data.name,
     phone: data.phone,
     birthDate: data.birthDate,
+    birthDateType: data.birthDateType,
     referrer: data.referrer,
     swimmingAbility: data.swimmingAbility,
     swimmingLevel: data.swimmingLevel,
@@ -446,63 +448,88 @@ export function getAdminDashboardStats() {
 
 // ============ 체크리스트 API ============
 
-// 기본 체크리스트 항목
+// 기본 체크리스트 항목 (카테고리별 정리)
 const DEFAULT_CHECKLIST_ITEMS: ChecklistItem[] = [
+  // [활동 안내]
   {
     id: 'time',
-    label: '매주 토요일 8시 정각 도착',
-    description: '수영장 시계 기준, 연습 레인 입수 기준입니다. (실제 58분까지 도착 필요)',
+    label: '매주 토요일 8시 정각에 수영장에 도착해요 (입수 기준)',
+    description: '수영장 시계가 약 2분 빨라요. 실제 7시 58분까지 도착하세요!',
     isActive: true,
     order: 1,
   },
   {
-    id: 'lateFee',
-    label: '지각 벌금: 1분당 500원 (최대 1만원)',
-    description: '당일 즐수팀 계좌로 자진 입금합니다.',
+    id: 'teatime',
+    label: '수영 후 티타임은 자율 참석이에요',
+    description: '메가커피에서 함께 커피 마셔요. 참석은 자유예요.',
     isActive: true,
     order: 2,
   },
+  // [회비 안내]
   {
-    id: 'absenceFee',
-    label: '무단 불참 벌금: 1만원',
-    description: '새벽 4시 전까지 불참 알림 시 면제됩니다.',
+    id: 'monthlyFee',
+    label: '월 회비 2만원, 매월 1일에 납부해요',
+    description: '카카오뱅크 79421007218 (임미선) 계좌로 보내주세요.',
     isActive: true,
     order: 3,
   },
   {
-    id: 'monthlyFee',
-    label: '월 회비: 2만원 (매월 1일 납부)',
-    description: '카카오뱅크 79421007218 (임미선) 계좌로 납부합니다.',
+    id: 'swimCap',
+    label: '가입할 때 수모를 구입해요 (1장 2만원 / 2장 3만원)',
+    description: '수모는 즐수팀 회원임을 나타내요. 회비와 별도로 입금해요.',
     isActive: true,
     order: 4,
   },
   {
     id: 'noRefund',
-    label: '납부한 회비는 환불되지 않습니다',
-    description: '탈퇴 또는 휴면 전환 시에도 기 납부 회비는 반환되지 않습니다.',
+    label: '납부한 회비는 환불되지 않아요',
+    description: '탈퇴하거나 휴면으로 전환해도 기납부 회비는 돌려드리지 않아요.',
     isActive: true,
     order: 5,
   },
+  // [규정 안내]
   {
-    id: 'absenceNotice',
-    label: '불참 시 금요일 자정까지 일정에 불참 표시 필수',
-    description: '채팅이 아닌 일정 기능에서 불참 선택해야 합니다.',
+    id: 'lateFee',
+    label: '지각하면 1분당 500원 벌금이 있어요 (최대 1만원)',
+    description: '당일 즐수팀 계좌로 자진 입금해주세요.',
     isActive: true,
     order: 6,
   },
   {
-    id: 'swimCap',
-    label: '신입 회원 수모 2장 구입 권장 (별도 입금)',
-    description: '수모 가격 - 1장 2만원, 2장 3만원(장당 1.5만원)',
+    id: 'absenceFee',
+    label: '무단 불참 시 1만원이에요 (금요일 자정 전 알림 시 면제)',
+    description: '미리 불참 표시하면 벌금이 없어요.',
     isActive: true,
     order: 7,
   },
   {
-    id: 'privacy',
-    label: '개인정보 수집 및 이용에 동의합니다',
-    description: '이름, 연락처, 이메일 등을 모임 운영 목적으로 수집합니다.',
+    id: 'absenceNotice',
+    label: "불참할 땐 카톡 '일정' 기능에서 불참 표시해요",
+    description: '채팅이 아닌 일정 기능에서 불참을 선택해주세요.',
     isActive: true,
     order: 8,
+  },
+  // [동의]
+  {
+    id: 'rulesConfirm',
+    label: '회칙 전문을 확인했어요',
+    description: '회칙 보기 메뉴에서 언제든 다시 확인할 수 있어요.',
+    isActive: true,
+    order: 9,
+  },
+  {
+    id: 'agreeAll',
+    label: '위 내용을 모두 확인하고 동의해요',
+    description: '모든 규정을 숙지했음을 확인해요.',
+    isActive: true,
+    order: 10,
+  },
+  {
+    id: 'privacy',
+    label: '개인정보 수집 및 이용에 동의해요',
+    description: '이름, 연락처, 이메일 등을 모임 운영 목적으로 수집해요.',
+    isActive: true,
+    order: 11,
   },
 ];
 

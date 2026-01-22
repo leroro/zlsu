@@ -1,10 +1,8 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
 import { createPendingMember, getMemberByEmail, getActiveChecklistItems, getActiveAndInactiveMemberCount, getSettings, getMembers } from '../lib/api';
-import { SwimmingAbility, SwimmingLevel, ChecklistItem, Member } from '../lib/types';
-import { SWIMMING_STROKES, SWIMMING_LEVELS, TERMS, BANK_ACCOUNT } from '../lib/constants';
+import { SwimmingAbility, SwimmingLevel, ChecklistItem, Member, BirthDateType } from '../lib/types';
+import { SWIMMING_STROKES, SWIMMING_LEVELS, BANK_ACCOUNT } from '../lib/constants';
 import Button from '../components/common/Button';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
 
@@ -14,9 +12,9 @@ type Step = 1 | 2 | 3;
 // 스텝 인디케이터 컴포넌트
 function StepIndicator({ currentStep }: { currentStep: Step }) {
   const steps = [
-    { step: 1, label: '회칙 확인' },
-    { step: 2, label: '기본 정보' },
-    { step: 3, label: '부가 정보' },
+    { step: 1, label: '가입동의' },
+    { step: 2, label: '기본정보' },
+    { step: 3, label: '부가정보' },
   ];
 
   return (
@@ -25,7 +23,7 @@ function StepIndicator({ currentStep }: { currentStep: Step }) {
         <div key={s.step} className="flex items-center">
           <div className="flex flex-col items-center">
             <div
-              className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold transition-colors ${
+              className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-colors ${
                 currentStep === s.step
                   ? 'bg-primary-600 text-white'
                   : currentStep > s.step
@@ -34,7 +32,7 @@ function StepIndicator({ currentStep }: { currentStep: Step }) {
               }`}
             >
               {currentStep > s.step ? (
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
               ) : (
@@ -51,7 +49,7 @@ function StepIndicator({ currentStep }: { currentStep: Step }) {
           </div>
           {index < steps.length - 1 && (
             <div
-              className={`w-12 sm:w-20 h-0.5 mx-2 mb-6 ${
+              className={`w-6 sm:w-10 h-0.5 mx-1 mb-6 ${
                 currentStep > s.step ? 'bg-primary-600' : 'bg-gray-200'
               }`}
             />
@@ -64,10 +62,12 @@ function StepIndicator({ currentStep }: { currentStep: Step }) {
 
 export default function ApplyPage() {
   useDocumentTitle('가입 신청');
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  // 개발용: URL 파라미터로 단계 지정 (?step=1,2,3,complete,full)
-  const devStep = searchParams.get('step');
+  // 개발용: URL 파라미터로 단계 지정 (?step=1,2,3,4,complete,full)
+  // 프로덕션 빌드에서는 step 파라미터 무시 (보안)
+  const isDev = import.meta.env.DEV;
+  const devStep = isDev ? searchParams.get('step') : null;
   const isDevMode = devStep !== null;
 
   // 정원 체크
@@ -78,12 +78,6 @@ export default function ApplyPage() {
   const [currentStep, setCurrentStep] = useState<Step>(
     devStep === '2' ? 2 : devStep === '3' ? 3 : 1
   );
-  const [hasScrolledToBottom, setHasScrolledToBottom] = useState(false);
-  const rulesRef = useRef<HTMLDivElement>(null);
-
-  // 운영규정 내용
-  const [rulesContent, setRulesContent] = useState<string>('');
-  const [isLoadingRules, setIsLoadingRules] = useState(true);
 
   // 체크리스트 항목 (동적으로 불러옴)
   const [checklistItems, setChecklistItems] = useState<ChecklistItem[]>([]);
@@ -91,20 +85,8 @@ export default function ApplyPage() {
   // 추천인 선택용 회원 목록 (활성/휴면 회원만)
   const [memberList, setMemberList] = useState<Member[]>([]);
 
-  // 운영규정, 체크리스트, 회원목록 불러오기
+  // 체크리스트, 회원목록 불러오기
   useEffect(() => {
-    // 운영규정 불러오기
-    fetch(`${import.meta.env.BASE_URL}${TERMS.RULES.slice(1)}`)
-      .then((res) => res.text())
-      .then((text) => {
-        setRulesContent(text);
-        setIsLoadingRules(false);
-      })
-      .catch(() => {
-        setRulesContent('운영규정을 불러오는데 실패했습니다.');
-        setIsLoadingRules(false);
-      });
-
     // 체크리스트 항목 불러오기
     const items = getActiveChecklistItems();
     setChecklistItems(items);
@@ -126,6 +108,7 @@ export default function ApplyPage() {
     passwordConfirm: '',
     phone: '',
     birthDate: '',
+    birthDateType: 'solar' as BirthDateType,
   });
 
   // 3단계: 부가 정보
@@ -147,22 +130,8 @@ export default function ApplyPage() {
   const [success, setSuccess] = useState(devStep === 'complete');
   const [isLoading, setIsLoading] = useState(false);
 
-  // 스크롤 감지
-  const handleScroll = () => {
-    if (rulesRef.current) {
-      const { scrollTop, scrollHeight, clientHeight } = rulesRef.current;
-      if (scrollTop + clientHeight >= scrollHeight - 10) {
-        setHasScrolledToBottom(true);
-      }
-    }
-  };
-
   // 체크리스트 변경
   const handleChecklistChange = (id: string) => {
-    if (!hasScrolledToBottom) {
-      setError('회칙 내용을 끝까지 읽어주세요.');
-      return;
-    }
     setChecklist((prev) => ({ ...prev, [id]: !prev[id] }));
     setError('');
   };
@@ -263,6 +232,13 @@ export default function ApplyPage() {
     return true;
   };
 
+  // 단계 변경 (URL 파라미터도 업데이트)
+  const goToStep = (step: Step) => {
+    setCurrentStep(step);
+    setSearchParams({ step: String(step) }, { replace: true });
+    window.scrollTo(0, 0);
+  };
+
   // 다음 단계
   const handleNext = () => {
     setError('');
@@ -271,20 +247,18 @@ export default function ApplyPage() {
         setError('모든 항목을 확인하고 체크해주세요.');
         return;
       }
-      setCurrentStep(2);
+      goToStep(2);
     } else if (currentStep === 2) {
       if (!validateStep2()) return;
-      setCurrentStep(3);
+      goToStep(3);
     }
-    window.scrollTo(0, 0);
   };
 
   // 이전 단계
   const handlePrev = () => {
     setError('');
-    if (currentStep === 2) setCurrentStep(1);
-    else if (currentStep === 3) setCurrentStep(2);
-    window.scrollTo(0, 0);
+    if (currentStep === 2) goToStep(1);
+    else if (currentStep === 3) goToStep(2);
   };
 
   // 제출
@@ -304,6 +278,7 @@ export default function ApplyPage() {
         password: basicInfo.password,
         phone: basicInfo.phone,
         birthDate: basicInfo.birthDate,
+        birthDateType: basicInfo.birthDateType,
         referrer: additionalInfo.referrer,
         swimmingAbility,
         swimmingLevel: swimmingLevel || undefined,
@@ -458,44 +433,19 @@ export default function ApplyPage() {
 
         <StepIndicator currentStep={currentStep} />
 
-        {/* 1단계: 회칙 확인 */}
+        {/* 1단계: 가입동의 */}
         {currentStep === 1 && (
           <div className="space-y-6">
-            <div>
-              <h2 className="text-lg font-semibold text-gray-900 mb-3">회칙 및 운영규정</h2>
-              <p className="text-sm text-gray-500 mb-3">
-                아래 내용을 끝까지 스크롤하여 읽어주세요.
-              </p>
-              <div
-                ref={rulesRef}
-                onScroll={handleScroll}
-                className="h-80 sm:h-96 overflow-y-auto border-2 border-gray-300 rounded-lg p-4 bg-gray-50 prose prose-sm prose-gray max-w-none prose-headings:text-gray-900 prose-headings:font-semibold prose-h1:text-base prose-h2:text-sm prose-h3:text-sm prose-p:text-gray-700 prose-li:text-gray-700 prose-strong:text-gray-900 prose-table:text-gray-700 shadow-inner"
-              >
-                {isLoadingRules ? (
-                  '로딩 중...'
-                ) : (
-                  <ReactMarkdown remarkPlugins={[remarkGfm]}>{rulesContent}</ReactMarkdown>
-                )}
-              </div>
-              {!hasScrolledToBottom && (
-                <p className="mt-2 text-xs text-amber-600 flex items-center gap-1">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-                  </svg>
-                  스크롤하여 내용을 끝까지 확인해주세요
-                </p>
-              )}
-            </div>
-
+            {/* 체크리스트 */}
             <div>
               <h2 className="text-lg font-semibold text-gray-900 mb-3">
-                중요 사항 확인
+                가입 전 확인사항
                 <span className="text-sm font-normal text-gray-500 ml-2">
                   ({Object.values(checklist).filter((v) => v).length}/{checklistItems.length})
                 </span>
               </h2>
               <p className="text-sm text-gray-500 mb-4">
-                아래 내용을 모두 확인하고 체크해주세요.
+                아래 항목을 확인하고 동의해 주세요.
               </p>
               <div className="space-y-3">
                 {checklistItems.map((item) => (
@@ -505,9 +455,7 @@ export default function ApplyPage() {
                     className={`flex items-start gap-3 p-3 border rounded-lg transition-colors ${
                       checklist[item.id]
                         ? 'border-primary-500 bg-primary-50'
-                        : hasScrolledToBottom
-                        ? 'border-gray-200 hover:border-gray-300 cursor-pointer'
-                        : 'border-gray-200 opacity-60 cursor-not-allowed'
+                        : 'border-gray-200 hover:border-gray-300 cursor-pointer'
                     }`}
                   >
                     <div className={`mt-0.5 h-4 w-4 rounded border flex items-center justify-center flex-shrink-0 ${
@@ -644,8 +592,33 @@ export default function ApplyPage() {
                 autoComplete="bday"
                 value={basicInfo.birthDate}
                 onChange={handleBasicInfoChange}
-                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                placeholder="YYYY-MM-DD"
+                className="w-full max-w-full box-border px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-left"
               />
+              <div className="flex gap-4 mt-2">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="birthDateType"
+                    value="solar"
+                    checked={basicInfo.birthDateType === 'solar'}
+                    onChange={handleBasicInfoChange}
+                    className="h-4 w-4 border-gray-300 text-primary-600 focus:ring-primary-500"
+                  />
+                  <span className="text-sm text-gray-700">양력</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="birthDateType"
+                    value="lunar"
+                    checked={basicInfo.birthDateType === 'lunar'}
+                    onChange={handleBasicInfoChange}
+                    className="h-4 w-4 border-gray-300 text-primary-600 focus:ring-primary-500"
+                  />
+                  <span className="text-sm text-gray-700">음력</span>
+                </label>
+              </div>
             </div>
 
             {error && (
