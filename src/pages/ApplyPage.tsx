@@ -651,6 +651,18 @@ export default function ApplyPage() {
               <label htmlFor="referrer" className="block text-sm font-medium text-gray-700 mb-1">
                 추천인 <span className="text-red-500">*</span>
               </label>
+              {/* 추천인 안내 문구 */}
+              <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 mb-2">
+                <div className="flex items-start gap-2">
+                  <span className="text-amber-600 text-lg">⚠️</span>
+                  <div className="text-sm text-amber-800">
+                    <p className="font-medium mb-1">추천인 없이는 가입할 수 없습니다</p>
+                    <p className="text-xs text-amber-700">
+                      본인이 실제로 아는 회원을 선택해 주세요. 추천인이 승인해야 가입이 진행됩니다.
+                    </p>
+                  </div>
+                </div>
+              </div>
               <select
                 id="referrer"
                 name="referrer"

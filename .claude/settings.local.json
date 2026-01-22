@@ -17,7 +17,8 @@
       "WebFetch(domain:pms.inseq.co.kr)",
       "Bash(curl -k -s \"http://pms.inseq.co.kr/leroro/zlsu/issue/4\")",
       "Bash(curl:*)",
-      "Bash(tree:*)"
+      "Bash(tree:*)",
+      "Bash(cd:*)"
     ]
   }
 }

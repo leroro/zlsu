@@ -1,4 +1,4 @@
-import { Member, Application, StateChange, CurrentUser, MemberStatus, ApplicationStatus, StateChangeStatus, WithdrawalRequest, WithdrawalStatus, SystemSettings, ChecklistItem, StatusChangeHistory, StatusChangeType } from './types';
+import { Member, Application, StateChange, CurrentUser, MemberStatus, ApplicationStatus, StateChangeStatus, WithdrawalRequest, WithdrawalStatus, SystemSettings, ChecklistItem, StatusChangeHistory, StatusChangeType, ReferrerApproval, AdminApproval } from './types';
 import { initialMembers, initialApplications, initialStateChanges, initialStatusChangeHistory } from './mockData';
 
 // 로컬 스토리지 키
@@ -23,8 +23,26 @@ export function resetToMockData(): void {
   localStorage.removeItem(STORAGE_KEYS.SETTINGS);
 }
 
-// 앱 초기화 - 데이터가 없을 때만 mock 데이터로 초기화 (로그인 세션 유지)
+// 데이터 버전 (이중 승인 시스템 추가로 버전 업)
+const DATA_VERSION = 2;
+const DATA_VERSION_KEY = 'zlsu_data_version';
+
+// 앱 초기화 - 데이터가 없거나 버전이 다르면 mock 데이터로 초기화
 export function initializeAppData(): void {
+  const storedVersion = localStorage.getItem(DATA_VERSION_KEY);
+  const needsReset = storedVersion !== String(DATA_VERSION);
+
+  if (needsReset) {
+    // 버전이 다르면 전체 데이터 초기화 (로그인 세션도 초기화)
+    localStorage.setItem(STORAGE_KEYS.MEMBERS, JSON.stringify(initialMembers));
+    localStorage.setItem(STORAGE_KEYS.APPLICATIONS, JSON.stringify(initialApplications));
+    localStorage.setItem(STORAGE_KEYS.STATE_CHANGES, JSON.stringify(initialStateChanges));
+    localStorage.removeItem(STORAGE_KEYS.WITHDRAWAL_REQUESTS);
+    localStorage.removeItem(STORAGE_KEYS.CURRENT_USER);
+    localStorage.setItem(DATA_VERSION_KEY, String(DATA_VERSION));
+    return;
+  }
+
   // 회원 데이터가 없으면 초기화
   if (!localStorage.getItem(STORAGE_KEYS.MEMBERS)) {
     localStorage.setItem(STORAGE_KEYS.MEMBERS, JSON.stringify(initialMembers));
@@ -37,7 +55,6 @@ export function initializeAppData(): void {
   if (!localStorage.getItem(STORAGE_KEYS.STATE_CHANGES)) {
     localStorage.setItem(STORAGE_KEYS.STATE_CHANGES, JSON.stringify(initialStateChanges));
   }
-  // current_user는 건드리지 않음 (로그인 세션 유지)
 }
 
 // 기본 설정
@@ -293,6 +310,8 @@ export function createPendingMember(data: {
     role: 'member',
     joinedAt: getCurrentDate(),
     updatedAt: getCurrentDate(),
+    // 이중 승인 시스템: 추천인 승인 대기로 시작
+    referrerApproval: { status: 'pending' },
   };
   members.push(newMember);
   setStorageData(STORAGE_KEYS.MEMBERS, members);
@@ -704,4 +723,146 @@ export function getRecentStatusChanges(days: number = 30): StatusChangeHistory[]
       return changedDate >= cutoffDate && h.changeType !== 'joined';
     })
     .sort((a, b) => new Date(b.changedAt).getTime() - new Date(a.changedAt).getTime());
+}
+
+// ============ 이중 승인 시스템 API ============
+
+// 특정 추천인의 승인 대기 회원 목록 조회
+export function getPendingMembersForReferrer(referrerName: string): Member[] {
+  return getMembers().filter(m =>
+    m.status === 'pending' &&
+    m.referrer === referrerName &&
+    m.referrerApproval?.status === 'pending'
+  );
+}
+
+// 추천인 동의
+export function referrerApproveMember(
+  memberId: string,
+  agreedToSuitability: boolean,
+  agreedToMentoring: boolean,
+  agreedToProvideCap: boolean
+): boolean {
+  const member = getMemberById(memberId);
+  if (!member || member.status !== 'pending') return false;
+  if (member.referrerApproval?.status !== 'pending') return false;
+
+  const referrerApproval: ReferrerApproval = {
+    status: 'approved',
+    processedAt: getCurrentDate(),
+    agreedToSuitability,
+    agreedToMentoring,
+    agreedToProvideCap,
+  };
+
+  // 추천인 승인 후 관리자 승인 대기 상태로 전환
+  const adminApproval: AdminApproval = { status: 'pending' };
+
+  updateMember(memberId, { referrerApproval, adminApproval });
+  return true;
+}
+
+// 추천인 반려
+export function referrerRejectMember(memberId: string, rejectReason: string): boolean {
+  const member = getMemberById(memberId);
+  if (!member || member.status !== 'pending') return false;
+  if (member.referrerApproval?.status !== 'pending') return false;
+
+  const referrerApproval: ReferrerApproval = {
+    status: 'rejected',
+    processedAt: getCurrentDate(),
+    rejectReason,
+  };
+
+  updateMember(memberId, { referrerApproval });
+  return true;
+}
+
+// 관리자 승인 대기 회원 목록 조회 (추천인 승인 완료된 건만)
+export function getMembersAwaitingAdminApproval(): Member[] {
+  return getMembers().filter(m =>
+    m.status === 'pending' &&
+    m.referrerApproval?.status === 'approved' &&
+    m.adminApproval?.status === 'pending'
+  );
+}
+
+// 관리자 승인 (추천인 승인 후에만 가능)
+export function adminApprovePendingMember(memberId: string, processedBy: string): boolean {
+  const member = getMemberById(memberId);
+  if (!member || member.status !== 'pending') return false;
+  if (member.referrerApproval?.status !== 'approved') return false;
+  if (member.adminApproval?.status !== 'pending') return false;
+
+  const adminApproval: AdminApproval = {
+    status: 'approved',
+    processedAt: getCurrentDate(),
+    processedBy,
+  };
+
+  // 회원 상태를 active로 변경
+  updateMember(memberId, {
+    adminApproval,
+    status: 'active',
+    joinedAt: getCurrentDate(),
+  });
+
+  // 가입 이력 추가
+  addStatusChangeHistory(memberId, member.name, 'joined', 'active');
+
+  return true;
+}
+
+// 관리자 반려
+export function adminRejectPendingMember(
+  memberId: string,
+  processedBy: string,
+  rejectReason: string
+): boolean {
+  const member = getMemberById(memberId);
+  if (!member || member.status !== 'pending') return false;
+  if (member.referrerApproval?.status !== 'approved') return false;
+  if (member.adminApproval?.status !== 'pending') return false;
+
+  const adminApproval: AdminApproval = {
+    status: 'rejected',
+    processedAt: getCurrentDate(),
+    processedBy,
+    rejectReason,
+  };
+
+  updateMember(memberId, { adminApproval });
+  return true;
+}
+
+// 반려 후 재신청 (승인 상태 초기화)
+export function reapplyMember(memberId: string, updates?: Partial<Member>): boolean {
+  const member = getMemberById(memberId);
+  if (!member || member.status !== 'pending') return false;
+
+  // 추천인 또는 관리자에게 반려된 상태인지 확인
+  const isReferrerRejected = member.referrerApproval?.status === 'rejected';
+  const isAdminRejected = member.adminApproval?.status === 'rejected';
+
+  if (!isReferrerRejected && !isAdminRejected) return false;
+
+  // 승인 상태 초기화 (다시 추천인 승인 대기부터 시작)
+  const referrerApproval: ReferrerApproval = { status: 'pending' };
+
+  updateMember(memberId, {
+    ...updates,
+    referrerApproval,
+    adminApproval: undefined,
+    updatedAt: getCurrentDate(),
+  });
+
+  return true;
+}
+
+// 가입 포기 (신청 데이터 삭제)
+export function withdrawApplication(memberId: string): boolean {
+  const member = getMemberById(memberId);
+  if (!member || member.status !== 'pending') return false;
+
+  return deleteMember(memberId);
 }

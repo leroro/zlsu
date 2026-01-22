@@ -11,6 +11,7 @@ import MyPage from './pages/MyPage';
 import MembersPage from './pages/MembersPage';
 import ChangeStatusPage from './pages/ChangeStatusPage';
 import WithdrawPage from './pages/WithdrawPage';
+import ReferrerApprovalPage from './pages/ReferrerApprovalPage';
 import AdminHomePage from './pages/admin/AdminHomePage';
 import RequestsPage from './pages/admin/RequestsPage';
 import MembersManagePage from './pages/admin/MembersManagePage';
@@ -19,6 +20,7 @@ import SettingsPage from './pages/admin/SettingsPage';
 import ChecklistManagePage from './pages/admin/ChecklistManagePage';
 import ProtectedRoute from './components/common/ProtectedRoute';
 import NotFoundPage from './pages/NotFoundPage';
+import SwimCapGuidePage from './pages/SwimCapGuidePage';
 
 export const router = createHashRouter([
   {
@@ -71,6 +73,22 @@ export const router = createHashRouter([
           element: (
             <ProtectedRoute>
               <WithdrawPage />
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: 'referrer-approval/:id',
+          element: (
+            <ProtectedRoute>
+              <ReferrerApprovalPage />
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: 'request/swim-cap',
+          element: (
+            <ProtectedRoute>
+              <SwimCapGuidePage />
             </ProtectedRoute>
           ),
         },

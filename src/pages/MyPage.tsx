@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { updateMember, getWithdrawalRequests, changePassword } from '../lib/api';
 import { SwimmingAbility, SwimmingLevel, BirthDateType, CompetitionInterest } from '../lib/types';
-import { ROLE_LABELS, GENDER_LABELS, SWIMMING_LEVEL_LABELS, SWIMMING_LEVEL_EMOJIS, SWIMMING_STROKES, COMPETITION_INTEREST_OPTIONS, COMPETITION_INTEREST_LABELS } from '../lib/constants';
+import { GENDER_LABELS, SWIMMING_LEVEL_LABELS, SWIMMING_LEVEL_EMOJIS, SWIMMING_STROKES, COMPETITION_INTEREST_OPTIONS, COMPETITION_INTEREST_LABELS } from '../lib/constants';
 import Button from '../components/common/Button';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
 
@@ -143,12 +143,20 @@ export default function MyPage() {
     return abilities.length > 0 ? abilities.join(', ') : '-';
   };
 
+  // 정보 행 컴포넌트
+  const InfoRow = ({ label, value, children }: { label: string; value?: React.ReactNode; children?: React.ReactNode }) => (
+    <div className="flex justify-between items-center py-3 border-b border-gray-100 last:border-b-0">
+      <span className="text-gray-500 text-sm">{label}</span>
+      {children || <span className="text-gray-900">{value || '-'}</span>}
+    </div>
+  );
+
   return (
-    <div className="space-y-4">
+    <div className="max-w-lg mx-auto">
       {/* 메시지 */}
       {message.text && (
         <div
-          className={`p-3 rounded-md text-sm ${
+          className={`mb-4 p-3 rounded-lg text-sm ${
             message.type === 'success' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'
           }`}
         >
@@ -156,315 +164,278 @@ export default function MyPage() {
         </div>
       )}
 
-      {/* 기본 정보 */}
-      <div className="bg-white md:rounded-lg md:shadow p-4">
-        <div className="flex justify-between items-center mb-4">
-          <h1 className="text-xl font-bold text-gray-900">내 정보</h1>
-          {!isEditing && (
-            <Button onClick={() => setIsEditing(true)} variant="secondary" size="sm">
-              수정
-            </Button>
-          )}
-        </div>
-
-        <div className="space-y-3">
-          {/* 이름 - 수정 불가 */}
-          <div className="flex justify-between py-2 border-b border-gray-100">
-            <span className="text-gray-500">이름</span>
-            <span className="text-gray-900 font-medium">{user.name}</span>
-          </div>
-
-          {/* 담당 - 수정 불가 (관리자만 변경 가능) */}
-          {user.position && (
-            <div className="flex justify-between py-2 border-b border-gray-100">
-              <span className="text-gray-500">담당</span>
-              <span className="text-gray-900">{user.position}</span>
-            </div>
-          )}
-
-          {/* 이메일 - 수정 불가 */}
-          <div className="flex justify-between py-2 border-b border-gray-100">
-            <span className="text-gray-500">이메일</span>
-            <span className="text-gray-900">{user.email}</span>
-          </div>
-
-          {/* 연락처 - 수정 가능 */}
-          <div className="flex justify-between items-center py-2 border-b border-gray-100">
-            <span className="text-gray-500">연락처</span>
-            {isEditing ? (
-              <input
-                type="tel"
-                name="phone"
-                value={formData.phone}
-                onChange={handleChange}
-                className="w-36 px-2 py-1 border border-gray-300 rounded text-sm text-right"
-                placeholder="010-0000-0000"
-              />
-            ) : (
-              <span className="text-gray-900">{user.phone || '-'}</span>
-            )}
-          </div>
-
-          {/* 성별 - 수정 불가 */}
-          <div className="flex justify-between py-2 border-b border-gray-100">
-            <span className="text-gray-500">성별</span>
-            <span className="text-gray-900">{user.gender ? GENDER_LABELS[user.gender] : '-'}</span>
-          </div>
-
-          {/* 생년월일 - 수정 가능 */}
-          <div className="flex justify-between items-center py-2 border-b border-gray-100">
-            <span className="text-gray-500">생년월일</span>
-            {isEditing ? (
-              <div className="flex items-center gap-2">
-                <input
-                  type="date"
-                  name="birthDate"
-                  value={formData.birthDate}
-                  onChange={handleChange}
-                  className="w-36 px-2 py-1 border border-gray-300 rounded text-sm"
-                />
-              </div>
-            ) : (
-              <span className="text-gray-900">
-                {user.birthDate || '-'}
-                {user.birthDate && user.birthDateType === 'lunar' && (
-                  <span className="text-purple-600 text-sm ml-1">(음력)</span>
-                )}
-              </span>
-            )}
-          </div>
-
-          {/* 양력/음력 - 수정 가능 (생년월일 입력 시) */}
-          {isEditing && formData.birthDate && (
-            <div className="flex justify-between items-center py-2 border-b border-gray-100">
-              <span className="text-gray-500">양력/음력</span>
-              <div className="flex gap-3">
-                <label className="flex items-center gap-1 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="birthDateType"
-                    value="solar"
-                    checked={formData.birthDateType === 'solar'}
-                    onChange={handleChange}
-                    className="h-4 w-4"
-                  />
-                  <span className="text-sm">양력</span>
-                </label>
-                <label className="flex items-center gap-1 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="birthDateType"
-                    value="lunar"
-                    checked={formData.birthDateType === 'lunar'}
-                    onChange={handleChange}
-                    className="h-4 w-4"
-                  />
-                  <span className="text-sm">음력</span>
-                </label>
-              </div>
-            </div>
-          )}
-
-          {/* 추천인 - 수정 불가 */}
-          {user.referrer && (
-            <div className="flex justify-between py-2 border-b border-gray-100">
-              <span className="text-gray-500">추천인</span>
-              <span className="text-gray-900">{user.referrer}</span>
-            </div>
-          )}
-
-          {/* 가입일 - 수정 불가 */}
-          <div className="flex justify-between py-2 border-b border-gray-100">
-            <span className="text-gray-500">가입일</span>
-            <span className="text-gray-900">{user.joinedAt}</span>
-          </div>
-
-          {user.role === 'admin' && (
-            <div className="flex justify-between py-2 border-b border-gray-100">
-              <span className="text-gray-500">권한</span>
-              <span className="text-gray-900">{ROLE_LABELS[user.role]}</span>
-            </div>
-          )}
-        </div>
-
-        {isEditing && (
-          <div className="flex gap-2 mt-4">
-            <Button onClick={handleSave} size="sm">저장</Button>
-            <Button onClick={handleCancel} variant="secondary" size="sm">취소</Button>
-          </div>
-        )}
-      </div>
-
-      {/* 수영 정보 */}
-      <div className="bg-white md:rounded-lg md:shadow p-4">
-        <h2 className="font-bold text-gray-900 mb-4">수영 정보</h2>
-
-        <div className="space-y-3">
-          {/* 수영 레벨 - 수정 가능 */}
-          <div className="flex justify-between items-center py-2 border-b border-gray-100">
-            <span className="text-gray-500">수영 레벨</span>
-            {isEditing ? (
-              <select
-                name="swimmingLevel"
-                value={formData.swimmingLevel}
-                onChange={handleChange}
-                className="w-32 px-2 py-1 border border-gray-300 rounded text-sm"
+      <div className="bg-white md:rounded-lg md:shadow">
+        {/* 헤더 */}
+        <div className="px-5 py-4 border-b border-gray-100">
+          <div className="flex justify-between items-center">
+            <h1 className="text-xl font-bold text-gray-900">내 정보</h1>
+            {!isEditing ? (
+              <button
+                onClick={() => setIsEditing(true)}
+                className="text-sm text-primary-600 hover:text-primary-700 font-medium"
               >
-                <option value="">선택</option>
-                <option value="beginner">🛟 초급</option>
-                <option value="intermediate">🏊 중급</option>
-                <option value="advanced">🐬 상급</option>
-                <option value="masters">🦈 마스터</option>
-                <option value="competition">🏆 대회수상</option>
-              </select>
+                수정
+              </button>
             ) : (
-              <span className="text-gray-900 flex items-center gap-1">
-                {user.swimmingLevel ? (
-                  <>
-                    <span>{SWIMMING_LEVEL_EMOJIS[user.swimmingLevel]}</span>
-                    <span>{SWIMMING_LEVEL_LABELS[user.swimmingLevel]}</span>
-                  </>
-                ) : (
-                  '-'
-                )}
-              </span>
+              <div className="flex gap-2">
+                <button
+                  onClick={handleSave}
+                  className="text-sm text-primary-600 hover:text-primary-700 font-medium"
+                >
+                  저장
+                </button>
+                <button
+                  onClick={handleCancel}
+                  className="text-sm text-gray-500 hover:text-gray-600"
+                >
+                  취소
+                </button>
+              </div>
             )}
           </div>
+        </div>
 
-          {/* 주종목 - 수정 가능 */}
-          <div className="py-2 border-b border-gray-100">
-            <div className="flex justify-between items-center mb-2">
-              <span className="text-gray-500">주종목</span>
-              {!isEditing && (
-                <span className="text-gray-900">{getSwimmingAbilityText()}</span>
+        {/* 기본 정보 */}
+        <div className="px-5 py-4">
+          <h2 className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-3">기본 정보</h2>
+          <div className="space-y-0">
+            <InfoRow label="이름" value={user.name} />
+            {user.position && <InfoRow label="담당" value={user.position} />}
+            <InfoRow label="이메일" value={user.email} />
+            <InfoRow label="연락처">
+              {isEditing ? (
+                <input
+                  type="tel"
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleChange}
+                  className="w-40 px-2 py-1 border border-gray-300 rounded text-sm text-right focus:outline-none focus:ring-1 focus:ring-primary-500"
+                  placeholder="010-0000-0000"
+                />
+              ) : (
+                <span className="text-gray-900">{user.phone || '-'}</span>
+              )}
+            </InfoRow>
+            <InfoRow label="성별" value={user.gender ? GENDER_LABELS[user.gender] : '-'} />
+            <InfoRow label="생년월일">
+              {isEditing ? (
+                <div className="flex items-center gap-2">
+                  <input
+                    type="date"
+                    name="birthDate"
+                    value={formData.birthDate}
+                    onChange={handleChange}
+                    className="w-36 px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-primary-500"
+                  />
+                  {formData.birthDate && (
+                    <select
+                      name="birthDateType"
+                      value={formData.birthDateType}
+                      onChange={handleChange}
+                      className="px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-primary-500"
+                    >
+                      <option value="solar">양력</option>
+                      <option value="lunar">음력</option>
+                    </select>
+                  )}
+                </div>
+              ) : (
+                <span className="text-gray-900">
+                  {user.birthDate || '-'}
+                  {user.birthDate && user.birthDateType === 'lunar' && (
+                    <span className="text-purple-600 text-sm ml-1">(음력)</span>
+                  )}
+                </span>
+              )}
+            </InfoRow>
+            {user.referrer && <InfoRow label="추천인" value={user.referrer} />}
+            <InfoRow label="가입일" value={user.joinedAt} />
+          </div>
+        </div>
+
+        {/* 구분선 */}
+        <div className="border-t border-gray-100" />
+
+        {/* 수영 정보 */}
+        <div className="px-5 py-4">
+          <h2 className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-3">수영 정보</h2>
+          <div className="space-y-0">
+            <InfoRow label="수영 레벨">
+              {isEditing ? (
+                <select
+                  name="swimmingLevel"
+                  value={formData.swimmingLevel}
+                  onChange={handleChange}
+                  className="w-32 px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-primary-500"
+                >
+                  <option value="">선택</option>
+                  <option value="beginner">초급</option>
+                  <option value="intermediate">중급</option>
+                  <option value="advanced">상급</option>
+                  <option value="masters">마스터</option>
+                  <option value="competition">대회수상</option>
+                </select>
+              ) : (
+                <span className="text-gray-900 flex items-center gap-1">
+                  {user.swimmingLevel ? (
+                    <>
+                      <span>{SWIMMING_LEVEL_EMOJIS[user.swimmingLevel]}</span>
+                      <span>{SWIMMING_LEVEL_LABELS[user.swimmingLevel]}</span>
+                    </>
+                  ) : (
+                    '-'
+                  )}
+                </span>
+              )}
+            </InfoRow>
+
+            {/* 주종목 */}
+            <div className="py-3 border-b border-gray-100">
+              <div className="flex justify-between items-center">
+                <span className="text-gray-500 text-sm">주종목</span>
+                {!isEditing && <span className="text-gray-900">{getSwimmingAbilityText()}</span>}
+              </div>
+              {isEditing && (
+                <div className="flex flex-wrap gap-2 mt-3">
+                  {SWIMMING_STROKES.map((stroke) => (
+                    <button
+                      key={stroke.id}
+                      type="button"
+                      onClick={() => handleSwimmingAbilityChange(stroke.id as keyof SwimmingAbility)}
+                      className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                        swimmingAbility[stroke.id as keyof SwimmingAbility]
+                          ? 'bg-primary-100 text-primary-700 border border-primary-300'
+                          : 'bg-gray-100 text-gray-600 border border-gray-200'
+                      }`}
+                    >
+                      {stroke.label}
+                    </button>
+                  ))}
+                </div>
               )}
             </div>
-            {isEditing && (
-              <div className="flex flex-wrap gap-2 mt-2">
-                {SWIMMING_STROKES.map((stroke) => (
-                  <label
-                    key={stroke.id}
-                    className={`flex items-center gap-2 px-3 py-2 rounded-lg border cursor-pointer transition-colors ${
-                      swimmingAbility[stroke.id as keyof SwimmingAbility]
-                        ? 'bg-blue-50 border-blue-300 text-blue-700'
-                        : 'bg-gray-50 border-gray-200 text-gray-600'
-                    }`}
-                  >
-                    <input
-                      type="checkbox"
-                      checked={swimmingAbility[stroke.id as keyof SwimmingAbility]}
-                      onChange={() => handleSwimmingAbilityChange(stroke.id as keyof SwimmingAbility)}
-                      className="sr-only"
-                    />
-                    <span className="text-sm">{stroke.label}</span>
-                  </label>
-                ))}
+
+            <InfoRow label="대회 참가 의향">
+              {isEditing ? (
+                <select
+                  name="competitionInterest"
+                  value={formData.competitionInterest}
+                  onChange={handleChange}
+                  className="w-36 px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-primary-500"
+                >
+                  <option value="">선택</option>
+                  {COMPETITION_INTEREST_OPTIONS.map((option) => (
+                    <option key={option.id} value={option.id}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <span className="text-gray-900">
+                  {user.competitionInterest ? COMPETITION_INTEREST_LABELS[user.competitionInterest] : '-'}
+                </span>
+              )}
+            </InfoRow>
+
+            {/* 자기소개 */}
+            <div className="py-3">
+              <span className="text-gray-500 text-sm block mb-2">자기소개</span>
+              {isEditing ? (
+                <textarea
+                  name="motivation"
+                  value={formData.motivation}
+                  onChange={handleChange}
+                  rows={3}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm resize-none focus:outline-none focus:ring-1 focus:ring-primary-500"
+                  placeholder="가입 동기나 소개를 입력해 주세요"
+                />
+              ) : (
+                <p className="text-gray-700 text-sm bg-gray-50 rounded-lg p-3">
+                  {user.motivation || '-'}
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* 구분선 */}
+        <div className="border-t border-gray-100" />
+
+        {/* 계정 설정 */}
+        <div className="px-5 py-4">
+          <h2 className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-3">계정 설정</h2>
+
+          {/* 비밀번호 변경 */}
+          <div className="py-3 border-b border-gray-100">
+            <button
+              onClick={() => setShowPasswordChange(!showPasswordChange)}
+              className="flex justify-between items-center w-full text-left"
+            >
+              <span className="text-gray-900">비밀번호 변경</span>
+              <svg
+                className={`w-5 h-5 text-gray-400 transition-transform ${showPasswordChange ? 'rotate-180' : ''}`}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+
+            {showPasswordChange && (
+              <div className="mt-4 space-y-3">
+                <input
+                  type="password"
+                  name="currentPassword"
+                  value={passwordData.currentPassword}
+                  onChange={handlePasswordChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-primary-500"
+                  placeholder="현재 비밀번호"
+                />
+                <input
+                  type="password"
+                  name="newPassword"
+                  value={passwordData.newPassword}
+                  onChange={handlePasswordChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-primary-500"
+                  placeholder="새 비밀번호 (6자 이상)"
+                />
+                <input
+                  type="password"
+                  name="confirmPassword"
+                  value={passwordData.confirmPassword}
+                  onChange={handlePasswordChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-primary-500"
+                  placeholder="새 비밀번호 확인"
+                />
+                <div className="flex gap-2">
+                  <Button onClick={handlePasswordSubmit} size="sm">변경</Button>
+                  <Button onClick={handlePasswordCancel} variant="secondary" size="sm">취소</Button>
+                </div>
               </div>
             )}
           </div>
 
-          {/* 대회 참가 의향 - 수정 가능 */}
-          <div className="flex justify-between items-center py-2 border-b border-gray-100">
-            <span className="text-gray-500">대회 참가 의향</span>
-            {isEditing ? (
-              <select
-                name="competitionInterest"
-                value={formData.competitionInterest}
-                onChange={handleChange}
-                className="w-36 px-2 py-1 border border-gray-300 rounded text-sm"
+          {/* 탈퇴 */}
+          <div className="py-3">
+            {pendingWithdrawal ? (
+              <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm">
+                <span className="text-red-600">탈퇴 신청 대기중</span>
+                <span className="text-red-500 ml-2">({pendingWithdrawal.createdAt})</span>
+              </div>
+            ) : (
+              <Link
+                to="/withdraw"
+                className="flex justify-between items-center text-gray-500 hover:text-red-600 transition-colors"
               >
-                <option value="">선택</option>
-                {COMPETITION_INTEREST_OPTIONS.map((option) => (
-                  <option key={option.id} value={option.id}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-            ) : (
-              <span className="text-gray-900">
-                {user.competitionInterest ? COMPETITION_INTEREST_LABELS[user.competitionInterest] : '-'}
-              </span>
-            )}
-          </div>
-
-          {/* 자기소개 - 수정 가능 */}
-          <div className="py-2">
-            <span className="text-gray-500 block mb-1">자기소개</span>
-            {isEditing ? (
-              <textarea
-                name="motivation"
-                value={formData.motivation}
-                onChange={handleChange}
-                rows={3}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm resize-none"
-                placeholder="가입 동기나 소개를 입력해 주세요"
-              />
-            ) : (
-              <p className="text-gray-700 text-sm bg-gray-50 rounded p-3">
-                {user.motivation || '-'}
-              </p>
+                <span>탈퇴 신청</span>
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </Link>
             )}
           </div>
         </div>
-      </div>
-
-      {/* 비밀번호 변경 */}
-      <div className="bg-white md:rounded-lg md:shadow p-4">
-        <button
-          onClick={() => setShowPasswordChange(!showPasswordChange)}
-          className="flex justify-between items-center w-full text-left"
-        >
-          <h2 className="font-bold text-gray-900">비밀번호 변경</h2>
-          <span className="text-gray-400 text-sm">{showPasswordChange ? '닫기' : '열기'}</span>
-        </button>
-
-        {showPasswordChange && (
-          <div className="mt-4 space-y-3">
-            <input
-              type="password"
-              name="currentPassword"
-              value={passwordData.currentPassword}
-              onChange={handlePasswordChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
-              placeholder="현재 비밀번호"
-            />
-            <input
-              type="password"
-              name="newPassword"
-              value={passwordData.newPassword}
-              onChange={handlePasswordChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
-              placeholder="새 비밀번호 (6자 이상)"
-            />
-            <input
-              type="password"
-              name="confirmPassword"
-              value={passwordData.confirmPassword}
-              onChange={handlePasswordChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
-              placeholder="새 비밀번호 확인"
-            />
-            <div className="flex gap-2">
-              <Button onClick={handlePasswordSubmit} size="sm">변경</Button>
-              <Button onClick={handlePasswordCancel} variant="secondary" size="sm">취소</Button>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* 탈퇴 */}
-      <div className="bg-white md:rounded-lg md:shadow p-4">
-        {pendingWithdrawal ? (
-          <div className="p-3 bg-red-50 border border-red-200 rounded text-sm">
-            <span className="text-red-600">⏳</span>{' '}
-            <span className="text-red-800">탈퇴 승인 대기중</span>
-            <span className="text-red-700 ml-2">({pendingWithdrawal.createdAt})</span>
-          </div>
-        ) : (
-          <Link to="/withdraw" className="text-sm text-gray-500 hover:text-red-600">
-            탈퇴 신청 →
-          </Link>
-        )}
       </div>
     </div>
   );

@@ -276,7 +276,9 @@ export const initialMembers: Member[] = [
     joinedAt: '2025-03-15',
     updatedAt: '2026-01-19',  // 최근 휴면 전환
   },
-  // 승인 대기 테스트 회원
+  // ============ 이중 승인 테스트 회원 ============
+
+  // 테스트 케이스 1: 추천인 승인 대기 중
   {
     id: 'pending1',
     email: 'pending@test.com',
@@ -293,6 +295,77 @@ export const initialMembers: Member[] = [
     role: 'member',
     joinedAt: '2026-01-20',
     updatedAt: '2026-01-20',
+    referrerApproval: { status: 'pending' },
+  },
+
+  // 테스트 케이스 2: 추천인 승인 완료, 관리자 승인 대기 중
+  {
+    id: 'pending2',
+    email: 'pending2@test.com',
+    password: 'test123',
+    name: '이승인',
+    phone: '010-9999-0002',
+    gender: 'female',
+    birthDate: '1998-08-20',
+    referrer: '임미선',
+    swimmingAbility: { freestyle: true, backstroke: true, breaststroke: false, butterfly: false },
+    swimmingLevel: 'intermediate',
+    motivation: '건강을 위해 수영을 시작하고 싶습니다.',
+    status: 'pending',
+    role: 'member',
+    joinedAt: '2026-01-18',
+    updatedAt: '2026-01-19',
+    referrerApproval: {
+      status: 'approved',
+      processedAt: '2026-01-19',
+      agreedToSuitability: true,
+      agreedToMentoring: true,
+    },
+    adminApproval: { status: 'pending' },
+  },
+
+  // 테스트 케이스 3: 추천인에게 반려된 회원
+  {
+    id: 'pending3',
+    email: 'pending3@test.com',
+    password: 'test123',
+    name: '박반려',
+    phone: '010-9999-0003',
+    gender: 'male',
+    birthDate: '2000-03-10',
+    referrer: '서범수',
+    swimmingAbility: { freestyle: true, backstroke: false, breaststroke: true, butterfly: false },
+    swimmingLevel: 'beginner',
+    motivation: '수영 동호회 활동을 하고 싶습니다.',
+    status: 'pending',
+    role: 'member',
+    joinedAt: '2026-01-17',
+    updatedAt: '2026-01-18',
+    referrerApproval: {
+      status: 'rejected',
+      processedAt: '2026-01-18',
+      rejectReason: '직접 만나본 적이 없어서 추천하기 어렵습니다.',
+    },
+  },
+
+  // 테스트 케이스 4: 임미선의 추천인 승인 대기 (임미선 계정 테스트용)
+  {
+    id: 'pending4',
+    email: 'pending4@test.com',
+    password: 'test123',
+    name: '최신청',
+    phone: '010-9999-0004',
+    gender: 'female',
+    birthDate: '1997-06-15',
+    referrer: '임미선',
+    swimmingAbility: { freestyle: true, backstroke: true, breaststroke: true, butterfly: false },
+    swimmingLevel: 'intermediate',
+    motivation: '임미선님 소개로 가입 신청합니다. 함께 수영하고 싶어요!',
+    status: 'pending',
+    role: 'member',
+    joinedAt: '2026-01-21',
+    updatedAt: '2026-01-21',
+    referrerApproval: { status: 'pending' },
   },
 ];
 

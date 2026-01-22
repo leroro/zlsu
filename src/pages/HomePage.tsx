@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { getActiveAndInactiveMemberCount, getSettings, getRecentJoinedMembers, getRecentStatusChanges, getStateChanges, getWithdrawalRequests, getMembersWithBirthdayThisMonth, getMembersWithBirthdayNextMonth } from '../lib/api';
+import { getActiveAndInactiveMemberCount, getSettings, getRecentJoinedMembers, getRecentStatusChanges, getStateChanges, getWithdrawalRequests, getMembersWithBirthdayThisMonth, getMembersWithBirthdayNextMonth, getPendingMembersForReferrer, getMemberById, withdrawApplication } from '../lib/api';
 import { StatusChangeHistory } from '../lib/types';
 import { STATUS_LABELS, BANK_ACCOUNT, SWIMMING_LEVEL_EMOJIS } from '../lib/constants';
 import Button from '../components/common/Button';
@@ -87,6 +87,72 @@ export default function HomePage() {
 
   // 승인 대기 상태(pending) 회원용 화면
   if (user && user.status === 'pending') {
+    // 전체 회원 정보 조회 (referrerApproval, adminApproval 포함)
+    const fullMember = getMemberById(user.id);
+    const referrerApproval = fullMember?.referrerApproval;
+    const adminApproval = fullMember?.adminApproval;
+
+    // 반려 상태 확인
+    const isReferrerRejected = referrerApproval?.status === 'rejected';
+    const isAdminRejected = adminApproval?.status === 'rejected';
+    const isRejected = isReferrerRejected || isAdminRejected;
+
+    // 반려 처리 함수
+    const handleWithdraw = () => {
+      if (confirm('정말 가입을 포기하시겠습니까?\n\n모든 신청 정보가 삭제됩니다.')) {
+        withdrawApplication(user.id);
+        window.location.href = '/';
+      }
+    };
+
+    // 반려된 경우
+    if (isRejected) {
+      const rejectReason = isReferrerRejected
+        ? referrerApproval?.rejectReason
+        : adminApproval?.rejectReason;
+      const rejectedBy = isReferrerRejected ? '추천인' : '관리자';
+
+      return (
+        <div className="max-w-md mx-auto space-y-4">
+          <section className="bg-white md:rounded-lg md:shadow p-6">
+            <div className="text-center mb-4">
+              <div className="text-4xl mb-2">😢</div>
+              <h1 className="text-xl font-bold text-red-600">가입이 반려되었습니다</h1>
+              <p className="text-sm text-gray-500 mt-1">{rejectedBy}에 의해 반려되었습니다</p>
+            </div>
+
+            {/* 반려 사유 */}
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
+              <h2 className="font-semibold text-red-900 mb-2 flex items-center gap-2">
+                <span>📝</span> 반려 사유
+              </h2>
+              <p className="text-sm text-red-800">{rejectReason || '사유가 명시되지 않았습니다.'}</p>
+            </div>
+
+            {/* 안내 */}
+            <div className="text-sm text-gray-600 mb-4">
+              <p>신청 내용을 수정하여 다시 신청하시거나, 가입을 포기할 수 있습니다.</p>
+            </div>
+
+            {/* 버튼 */}
+            <div className="flex gap-3">
+              <Button variant="secondary" className="flex-1" onClick={handleWithdraw}>
+                가입 포기
+              </Button>
+              <Link to="/my" className="flex-1">
+                <Button className="w-full">수정 후 재신청</Button>
+              </Link>
+            </div>
+          </section>
+        </div>
+      );
+    }
+
+    // 진행 중인 경우
+    const isReferrerPending = referrerApproval?.status === 'pending';
+    const isReferrerApproved = referrerApproval?.status === 'approved';
+    const isAdminPending = adminApproval?.status === 'pending';
+
     return (
       <div className="max-w-md mx-auto space-y-4">
         {/* 상태 안내 */}
@@ -94,96 +160,123 @@ export default function HomePage() {
           <div className="text-center mb-4">
             <div className="text-4xl mb-2">🏊</div>
             <h1 className="text-xl font-bold text-gray-900">{user.name}님, 가입 신청이 완료되었어요!</h1>
-            <p className="text-sm text-gray-500 mt-1">아래 계좌로 가입비를 납부해주세요.</p>
+            <p className="text-sm text-gray-500 mt-1">
+              {isReferrerPending
+                ? '추천인의 승인을 기다리고 있어요.'
+                : '관리자의 승인을 기다리고 있어요.'}
+            </p>
           </div>
 
-          {/* 가입비 납부 안내 */}
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
-            <h2 className="font-semibold text-blue-900 mb-3 flex items-center gap-2">
-              <span>💰</span> 가입비를 납부해주세요
-            </h2>
-            <div className="text-sm text-blue-800 space-y-2">
-              <p>첫 달 회비 2만원 + 수모 2만원 = <span className="font-bold">총 4만원</span></p>
-              <div className="bg-white rounded-lg p-3 mt-3">
-                <p className="text-gray-600 text-xs mb-1">{BANK_ACCOUNT.bank}</p>
-                <p className="font-mono font-bold text-lg text-gray-900">{BANK_ACCOUNT.accountNumber}</p>
-                <p className="text-gray-600 text-xs">예금주: {BANK_ACCOUNT.accountHolder}</p>
-              </div>
-              <button
-                onClick={handleCopyAccount}
-                className="w-full mt-2 py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2"
-              >
-                {copied ? (
-                  <>
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                    복사 완료!
-                  </>
-                ) : (
-                  <>
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                    </svg>
-                    계좌번호 복사
-                  </>
-                )}
-              </button>
-            </div>
-          </div>
-
-          {/* 진행 단계 표시 */}
+          {/* 진행 단계 표시 - 이중 승인 */}
           <div className="bg-gray-50 rounded-lg p-4 mb-4">
             <h2 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
               <span>📋</span> 가입 진행 현황
             </h2>
             <div className="space-y-2.5">
-              {/* 1단계: 가입 신청 - 완료 */}
+              {/* 1단계: 신청서 제출 - 완료 */}
               <div className="flex items-center gap-2.5">
-                <div className="w-5 h-5 rounded-full bg-gray-300 text-white flex items-center justify-center flex-shrink-0">
+                <div className="w-5 h-5 rounded-full bg-green-500 text-white flex items-center justify-center flex-shrink-0">
                   <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                 </div>
-                <span className="text-sm text-gray-400">가입 신청</span>
+                <span className="text-sm text-green-600 font-medium">신청서 제출 완료</span>
               </div>
 
-              {/* 2단계: 가입비 납부 & 승인 대기 - 현재 */}
+              {/* 2단계: 추천인 동의 */}
               <div className="flex items-start gap-2.5">
-                <div className="w-5 h-5 rounded-full bg-primary-600 text-white flex items-center justify-center flex-shrink-0 animate-pulse">
-                  <span className="text-xs font-bold">2</span>
-                </div>
+                {isReferrerApproved ? (
+                  <div className="w-5 h-5 rounded-full bg-green-500 text-white flex items-center justify-center flex-shrink-0">
+                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                ) : (
+                  <div className="w-5 h-5 rounded-full bg-primary-600 text-white flex items-center justify-center flex-shrink-0 animate-pulse">
+                    <span className="text-xs font-bold">2</span>
+                  </div>
+                )}
                 <div>
-                  <span className="text-sm font-semibold text-primary-600">가입비 납부 & 승인 대기</span>
-                  <p className="text-xs text-gray-500 mt-0.5">입금하셨다면 총무 확인을 기다려주세요</p>
+                  <span className={`text-sm ${isReferrerApproved ? 'text-green-600 font-medium' : 'font-semibold text-primary-600'}`}>
+                    {isReferrerApproved ? '추천인 동의 완료' : `추천인(${user.referrer || '미정'}) 동의 대기 중`}
+                  </span>
+                  {isReferrerPending && (
+                    <p className="text-xs text-gray-500 mt-0.5">추천인이 승인하면 다음 단계로 진행됩니다</p>
+                  )}
                 </div>
               </div>
 
-              {/* 3단계: 카톡방 초대 - 대기 */}
-              <div className="flex items-center gap-2.5">
-                <div className="w-5 h-5 rounded-full bg-gray-200 text-gray-400 flex items-center justify-center flex-shrink-0">
-                  <span className="text-xs font-bold">3</span>
+              {/* 3단계: 관리자 승인 */}
+              <div className="flex items-start gap-2.5">
+                {isAdminPending ? (
+                  <div className="w-5 h-5 rounded-full bg-primary-600 text-white flex items-center justify-center flex-shrink-0 animate-pulse">
+                    <span className="text-xs font-bold">3</span>
+                  </div>
+                ) : (
+                  <div className="w-5 h-5 rounded-full bg-gray-200 text-gray-400 flex items-center justify-center flex-shrink-0">
+                    <span className="text-xs font-bold">3</span>
+                  </div>
+                )}
+                <div>
+                  <span className={`text-sm ${isAdminPending ? 'font-semibold text-primary-600' : 'text-gray-400'}`}>
+                    {isAdminPending ? '관리자 승인 대기 중' : '관리자 승인 대기'}
+                  </span>
+                  {isAdminPending && (
+                    <p className="text-xs text-gray-500 mt-0.5">관리자이 승인하면 가입이 완료됩니다</p>
+                  )}
                 </div>
-                <span className="text-sm text-gray-400">카톡방 · 모임통장 초대</span>
               </div>
 
-              {/* 4단계: 수모 수령 - 대기 */}
+              {/* 4단계: 가입 완료 */}
               <div className="flex items-center gap-2.5">
                 <div className="w-5 h-5 rounded-full bg-gray-200 text-gray-400 flex items-center justify-center flex-shrink-0">
                   <span className="text-xs font-bold">4</span>
                 </div>
-                <span className="text-sm text-gray-400">수모 수령</span>
-              </div>
-
-              {/* 5단계: 토요일 수영 - 대기 */}
-              <div className="flex items-center gap-2.5">
-                <div className="w-5 h-5 rounded-full bg-gray-200 text-gray-400 flex items-center justify-center flex-shrink-0">
-                  <span className="text-xs font-bold">5</span>
-                </div>
-                <span className="text-sm text-gray-400">토요일에 만나요! 🏊</span>
+                <span className="text-sm text-gray-400">가입 완료</span>
               </div>
             </div>
           </div>
+
+          {/* 가입비 납부 안내 - 추천인 동의 완료 후에만 표시 */}
+          {isReferrerApproved && (
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+              <h2 className="font-semibold text-blue-900 mb-3 flex items-center gap-2">
+                <span>💰</span> 가입비를 납부해주세요
+              </h2>
+              <div className="text-sm text-blue-800 space-y-2">
+                <p>첫 달 회비 2만원 + 수모 2만원 = <span className="font-bold">총 4만원</span></p>
+                <div className="bg-white rounded-lg p-3 mt-3">
+                  <p className="text-gray-600 text-xs mb-1">{BANK_ACCOUNT.bank}</p>
+                  <p className="font-mono font-bold text-lg text-gray-900">{BANK_ACCOUNT.accountNumber}</p>
+                  <p className="text-gray-600 text-xs">예금주: {BANK_ACCOUNT.accountHolder}</p>
+                </div>
+                <button
+                  onClick={handleCopyAccount}
+                  className="w-full mt-2 py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2"
+                >
+                  {copied ? (
+                    <>
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      복사 완료!
+                    </>
+                  ) : (
+                    <>
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                      </svg>
+                      계좌번호 복사
+                    </>
+                  )}
+                </button>
+                <p className="text-xs text-blue-700 mt-2 pt-2 border-t border-blue-200">
+                  💡 관리자가 납부를 확인하고 승인하면 가입이 완료됩니다.<br />
+                  이미 납부하셨다면 잠시만 기다려주세요.
+                </p>
+              </div>
+            </div>
+          )}
 
           {/* 문의 안내 - 추천인 강조 */}
           <div className="text-sm text-gray-600 p-3 bg-gray-50 rounded-lg">
@@ -221,6 +314,9 @@ export default function HomePage() {
   const recentChanges = getRecentStatusChanges(30);
   const birthdayThisMonth = getMembersWithBirthdayThisMonth();
   const birthdayNextMonth = getMembersWithBirthdayNextMonth();
+
+  // 추천인 동의 대기 목록 (내가 추천인인 회원)
+  const pendingForMe = user.status === 'active' ? getPendingMembersForReferrer(user.name) : [];
 
   // 날짜 포맷 (MM.DD)
   const formatDate = (dateStr: string) => {
@@ -294,6 +390,43 @@ export default function HomePage() {
         )}
       </section>
 
+      {/* 할 일 섹션 - 추천인 동의 대기가 있을 때만 표시 */}
+      {pendingForMe.length > 0 && (
+        <section className="bg-orange-50 border-y border-orange-200 md:border md:rounded-lg md:shadow p-4">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <span className="text-lg">🔔</span>
+              <h2 className="font-bold text-orange-900">할 일</h2>
+              <span className="px-2 py-0.5 text-xs bg-orange-500 text-white rounded-full font-medium">
+                {pendingForMe.length}
+              </span>
+            </div>
+          </div>
+          <div className="space-y-2">
+            {pendingForMe.map((pending) => (
+              <Link
+                key={pending.id}
+                to={`/referrer-approval/${pending.id}`}
+                className="flex items-center justify-between p-3 bg-white border border-orange-200 rounded-lg hover:bg-orange-100 hover:border-orange-300 transition-colors"
+              >
+                <div className="flex items-center gap-2">
+                  <span>👋</span>
+                  <span className="text-sm text-gray-800">
+                    <span className="font-bold text-orange-700">{pending.name}</span>님의 추천인 동의 요청
+                  </span>
+                </div>
+                <div className="flex items-center gap-1 text-orange-600 font-medium">
+                  <span className="text-xs">확인하기</span>
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
+
       {/* 자주 찾는 메뉴 */}
       <section className="bg-white md:rounded-lg md:shadow p-4">
         <h2 className="font-bold text-gray-900 mb-3">자주 찾는 메뉴</h2>
@@ -308,7 +441,7 @@ export default function HomePage() {
               style={{ backgroundColor: '#FEE500', borderColor: '#191919' }}
             >
               <span className="text-3xl mb-1">💬</span>
-              <span className="text-sm font-bold" style={{ color: '#191919' }}>팀 카톡방</span>
+              <span className="text-sm font-bold" style={{ color: '#191919' }}>팀 카톡방 입장</span>
             </a>
           )}
           {/* 수모 추가 구입 */}
@@ -317,7 +450,7 @@ export default function HomePage() {
             className="flex flex-col items-center justify-center p-4 bg-blue-50 hover:bg-blue-100 rounded-xl transition-all hover:scale-105"
           >
             <span className="text-3xl mb-1">🏊</span>
-            <span className="text-sm font-bold text-blue-900">수모 추가 구입</span>
+            <span className="text-sm font-bold text-blue-900">수모 추가 구입 안내</span>
           </Link>
         </div>
       </section>

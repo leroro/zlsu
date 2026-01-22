@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { STATUS_LABELS } from '../../lib/constants';
 import { getActiveAndInactiveMemberCount, getSettings } from '../../lib/api';
 
 export default function Header() {
@@ -102,18 +101,23 @@ export default function Header() {
                   </button>
                 </>
               ) : (
-                // 일반 회원 메뉴
+                // 일반 회원 메뉴 (순서: 소개 → 회칙 → 운영 가이드 → 회원 명단)
                 <>
-                  <Link to="/my" className="hover:text-primary-100">
-                    내 정보
+                  <Link to="/about" className="hover:text-primary-100">
+                    소개
                   </Link>
                   <Link to="/rules" className="hover:text-primary-100">
                     회칙
                   </Link>
                   {user.status !== 'pending' && (
-                    <Link to="/members" className="hover:text-primary-100">
-                      회원 명단
-                    </Link>
+                    <>
+                      <Link to="/operations" className="hover:text-primary-100">
+                        운영 가이드
+                      </Link>
+                      <Link to="/members" className="hover:text-primary-100">
+                        회원 명단
+                      </Link>
+                    </>
                   )}
                   <button
                     onClick={handleLogout}
@@ -178,188 +182,218 @@ export default function Header() {
           </button>
         </div>
 
-        {/* 모바일 메뉴 */}
-        {isMenuOpen && (
-          <nav className="md:hidden py-4 border-t border-primary-500">
-            <div className="flex flex-col gap-1">
-              {user ? (
-                user.role === 'admin' ? (
-                  // 관리자 모바일 메뉴
-                  <>
-                    <div className="px-4 py-3 mb-2 bg-primary-700/50 rounded-lg">
-                      <div className="flex items-center gap-3">
-                        <div className="w-3 h-3 rounded-full bg-blue-400" />
-                        <div>
-                          <div className="font-medium">{user.name}</div>
-                          <div className="text-xs text-primary-200">시스템 관리자</div>
-                        </div>
-                      </div>
-                    </div>
+      </div>
 
-                    <Link
-                      to="/admin/requests"
-                      onClick={closeMenu}
-                      className={`px-4 py-3 rounded flex items-center gap-3 ${
-                        location.pathname.startsWith('/admin/requests') ? 'bg-primary-700' : 'hover:bg-primary-700'
-                      }`}
-                    >
-                      <span className="w-6 text-center">📋</span>
-                      <span>신청 관리</span>
-                    </Link>
-                    <Link
-                      to="/admin/members"
-                      onClick={closeMenu}
-                      className={`px-4 py-3 rounded flex items-center gap-3 ${
-                        isActive('/admin/members') ? 'bg-primary-700' : 'hover:bg-primary-700'
-                      }`}
-                    >
-                      <span className="w-6 text-center">👥</span>
-                      <span>회원 관리</span>
-                    </Link>
-                    <Link
-                      to="/admin/settings"
-                      onClick={closeMenu}
-                      className={`px-4 py-3 rounded flex items-center gap-3 ${
-                        isActive('/admin/settings') ? 'bg-primary-700' : 'hover:bg-primary-700'
-                      }`}
-                    >
-                      <span className="w-6 text-center">⚙️</span>
-                      <span>시스템 설정</span>
-                    </Link>
-
-                    <div className="border-t border-primary-500 my-2" />
-                    <Link
-                      to="/rules"
-                      onClick={closeMenu}
-                      className={`px-4 py-3 rounded flex items-center gap-3 ${
-                        isActive('/rules') ? 'bg-primary-700' : 'hover:bg-primary-700'
-                      }`}
-                    >
-                      <span className="w-6 text-center">📜</span>
-                      <span>회칙</span>
-                    </Link>
-
-                    <div className="border-t border-primary-500 my-2" />
-                    <button
-                      onClick={handleLogout}
-                      className="px-4 py-3 rounded text-left hover:bg-primary-700 flex items-center gap-3 text-primary-200"
-                    >
-                      <span className="w-6 text-center">🚪</span>
-                      <span>로그아웃</span>
-                    </button>
-                  </>
-                ) : (
-                  // 일반 회원 모바일 메뉴
-                  <>
-                    <div className="px-4 py-3 mb-2 bg-primary-700/50 rounded-lg">
-                      <div className="flex items-center gap-3">
-                        <div className={`w-3 h-3 rounded-full ${
-                          user.status === 'active' ? 'bg-green-400' :
-                          user.status === 'pending' ? 'bg-blue-400' : 'bg-yellow-400'
-                        }`} />
-                        <div>
-                          <div className="font-medium">{user.name}{user.position && ` (${user.position})`}</div>
-                          <div className="text-xs text-primary-200">{STATUS_LABELS[user.status]} 회원</div>
-                        </div>
-                      </div>
-                    </div>
-
-                    <Link
-                      to="/my"
-                      onClick={closeMenu}
-                      className={`px-4 py-3 rounded flex items-center gap-3 ${
-                        isActive('/my') ? 'bg-primary-700' : 'hover:bg-primary-700'
-                      }`}
-                    >
-                      <span className="w-6 text-center">🏠</span>
-                      <span>내 정보</span>
-                    </Link>
-                    <Link
-                      to="/rules"
-                      onClick={closeMenu}
-                      className={`px-4 py-3 rounded flex items-center gap-3 ${
-                        isActive('/rules') ? 'bg-primary-700' : 'hover:bg-primary-700'
-                      }`}
-                    >
-                      <span className="w-6 text-center">📜</span>
-                      <span>회칙</span>
-                    </Link>
-                    {user.status !== 'pending' && (
+      {/* 모바일 메뉴 오버레이 */}
+      {isMenuOpen && (
+        <>
+          {/* 배경 오버레이 */}
+          <div
+            className="md:hidden fixed inset-0 bg-black/50 z-40"
+            onClick={closeMenu}
+          />
+          {/* 메뉴 패널 */}
+          <nav className="md:hidden fixed top-16 left-0 right-0 bg-primary-600 z-50 shadow-lg max-h-[calc(100vh-4rem)] overflow-y-auto">
+            <div className="max-w-4xl mx-auto px-4 py-4">
+              <div className="flex flex-col gap-1">
+                {user ? (
+                  user.role === 'admin' ? (
+                    // 관리자 모바일 메뉴
+                    <>
                       <Link
-                        to="/members"
+                        to="/admin"
                         onClick={closeMenu}
                         className={`px-4 py-3 rounded flex items-center gap-3 ${
-                          isActive('/members') ? 'bg-primary-700' : 'hover:bg-primary-700'
+                          isActive('/admin') ? 'bg-primary-700' : 'hover:bg-primary-700'
+                        }`}
+                      >
+                        <span className="w-6 text-center">🏠</span>
+                        <span>홈</span>
+                      </Link>
+                      <Link
+                        to="/admin/requests"
+                        onClick={closeMenu}
+                        className={`px-4 py-3 rounded flex items-center gap-3 ${
+                          location.pathname.startsWith('/admin/requests') ? 'bg-primary-700' : 'hover:bg-primary-700'
+                        }`}
+                      >
+                        <span className="w-6 text-center">📋</span>
+                        <span>신청 관리</span>
+                      </Link>
+                      <Link
+                        to="/admin/members"
+                        onClick={closeMenu}
+                        className={`px-4 py-3 rounded flex items-center gap-3 ${
+                          isActive('/admin/members') ? 'bg-primary-700' : 'hover:bg-primary-700'
                         }`}
                       >
                         <span className="w-6 text-center">👥</span>
-                        <span>회원 명단</span>
+                        <span>회원 관리</span>
                       </Link>
-                    )}
+                      <Link
+                        to="/admin/settings"
+                        onClick={closeMenu}
+                        className={`px-4 py-3 rounded flex items-center gap-3 ${
+                          isActive('/admin/settings') ? 'bg-primary-700' : 'hover:bg-primary-700'
+                        }`}
+                      >
+                        <span className="w-6 text-center">⚙️</span>
+                        <span>시스템 설정</span>
+                      </Link>
 
-                    <div className="border-t border-primary-500 my-2" />
-                    <button
-                      onClick={handleLogout}
-                      className="px-4 py-3 rounded text-left hover:bg-primary-700 flex items-center gap-3 text-primary-200"
-                    >
-                      <span className="w-6 text-center">🚪</span>
-                      <span>로그아웃</span>
-                    </button>
-                  </>
-                )
-              ) : (
-                <>
-                  <Link
-                    to="/about"
-                    onClick={closeMenu}
-                    className={`px-4 py-3 rounded flex items-center gap-3 ${
-                      isActive('/about') ? 'bg-primary-700' : 'hover:bg-primary-700'
-                    }`}
-                  >
-                    <span className="w-6 text-center">🏊</span>
-                    <span>모임 소개</span>
-                  </Link>
-                  <Link
-                    to="/rules"
-                    onClick={closeMenu}
-                    className={`px-4 py-3 rounded flex items-center gap-3 ${
-                      isActive('/rules') ? 'bg-primary-700' : 'hover:bg-primary-700'
-                    }`}
-                  >
-                    <span className="w-6 text-center">📜</span>
-                    <span>회칙</span>
-                  </Link>
-                  {isFull ? (
-                    <div className="px-4 py-3 rounded flex items-center gap-3 text-primary-300 cursor-not-allowed">
-                      <span className="w-6 text-center">✍️</span>
-                      <span>정원 마감</span>
-                    </div>
+                      <div className="border-t border-primary-500 my-2" />
+                      <Link
+                        to="/rules"
+                        onClick={closeMenu}
+                        className={`px-4 py-3 rounded flex items-center gap-3 ${
+                          isActive('/rules') ? 'bg-primary-700' : 'hover:bg-primary-700'
+                        }`}
+                      >
+                        <span className="w-6 text-center">📜</span>
+                        <span>회칙</span>
+                      </Link>
+
+                      <div className="border-t border-primary-500 my-2" />
+                      <button
+                        onClick={handleLogout}
+                        className="px-4 py-3 rounded text-left hover:bg-primary-700 flex items-center gap-3 text-primary-200"
+                      >
+                        <span className="w-6 text-center">🚪</span>
+                        <span>로그아웃</span>
+                      </button>
+                    </>
                   ) : (
+                    // 일반 회원 모바일 메뉴 (순서: 홈 → 모임 소개 → 회칙 → 운영 가이드 → 회원 명단)
+                    <>
+                      <Link
+                        to="/"
+                        onClick={closeMenu}
+                        className={`px-4 py-3 rounded flex items-center gap-3 ${
+                          isActive('/') ? 'bg-primary-700' : 'hover:bg-primary-700'
+                        }`}
+                      >
+                        <span className="w-6 text-center">🏠</span>
+                        <span>홈</span>
+                      </Link>
+                      <Link
+                        to="/about"
+                        onClick={closeMenu}
+                        className={`px-4 py-3 rounded flex items-center gap-3 ${
+                          isActive('/about') ? 'bg-primary-700' : 'hover:bg-primary-700'
+                        }`}
+                      >
+                        <span className="w-6 text-center">🏊</span>
+                        <span>모임 소개</span>
+                      </Link>
+                      <Link
+                        to="/rules"
+                        onClick={closeMenu}
+                        className={`px-4 py-3 rounded flex items-center gap-3 ${
+                          isActive('/rules') ? 'bg-primary-700' : 'hover:bg-primary-700'
+                        }`}
+                      >
+                        <span className="w-6 text-center">📜</span>
+                        <span>회칙</span>
+                      </Link>
+                      {user.status !== 'pending' && (
+                        <>
+                          <Link
+                            to="/operations"
+                            onClick={closeMenu}
+                            className={`px-4 py-3 rounded flex items-center gap-3 ${
+                              isActive('/operations') ? 'bg-primary-700' : 'hover:bg-primary-700'
+                            }`}
+                          >
+                            <span className="w-6 text-center">📋</span>
+                            <span>운영 가이드</span>
+                          </Link>
+                          <Link
+                            to="/members"
+                            onClick={closeMenu}
+                            className={`px-4 py-3 rounded flex items-center gap-3 ${
+                              isActive('/members') ? 'bg-primary-700' : 'hover:bg-primary-700'
+                            }`}
+                          >
+                            <span className="w-6 text-center">👥</span>
+                            <span>회원 명단</span>
+                          </Link>
+                        </>
+                      )}
+
+                      <div className="border-t border-primary-500 my-2" />
+                      <button
+                        onClick={handleLogout}
+                        className="px-4 py-3 rounded text-left hover:bg-primary-700 flex items-center gap-3 text-primary-200"
+                      >
+                        <span className="w-6 text-center">🚪</span>
+                        <span>로그아웃</span>
+                      </button>
+                    </>
+                  )
+                ) : (
+                  <>
                     <Link
-                      to="/apply"
+                      to="/"
                       onClick={closeMenu}
                       className={`px-4 py-3 rounded flex items-center gap-3 ${
-                        isActive('/apply') ? 'bg-primary-700' : 'hover:bg-primary-700'
+                        isActive('/') ? 'bg-primary-700' : 'hover:bg-primary-700'
                       }`}
                     >
-                      <span className="w-6 text-center">✍️</span>
-                      <span>가입 신청</span>
+                      <span className="w-6 text-center">🏠</span>
+                      <span>홈</span>
                     </Link>
-                  )}
-                  <div className="border-t border-primary-500 my-2" />
-                  <Link
-                    to="/login"
-                    onClick={closeMenu}
-                    className="px-4 py-3 rounded bg-white text-primary-600 font-medium text-center"
-                  >
-                    로그인
-                  </Link>
-                </>
-              )}
+                    <Link
+                      to="/about"
+                      onClick={closeMenu}
+                      className={`px-4 py-3 rounded flex items-center gap-3 ${
+                        isActive('/about') ? 'bg-primary-700' : 'hover:bg-primary-700'
+                      }`}
+                    >
+                      <span className="w-6 text-center">🏊</span>
+                      <span>모임 소개</span>
+                    </Link>
+                    <Link
+                      to="/rules"
+                      onClick={closeMenu}
+                      className={`px-4 py-3 rounded flex items-center gap-3 ${
+                        isActive('/rules') ? 'bg-primary-700' : 'hover:bg-primary-700'
+                      }`}
+                    >
+                      <span className="w-6 text-center">📜</span>
+                      <span>회칙</span>
+                    </Link>
+                    {isFull ? (
+                      <div className="px-4 py-3 rounded flex items-center gap-3 text-primary-300 cursor-not-allowed">
+                        <span className="w-6 text-center">✍️</span>
+                        <span>정원 마감</span>
+                      </div>
+                    ) : (
+                      <Link
+                        to="/apply"
+                        onClick={closeMenu}
+                        className={`px-4 py-3 rounded flex items-center gap-3 ${
+                          isActive('/apply') ? 'bg-primary-700' : 'hover:bg-primary-700'
+                        }`}
+                      >
+                        <span className="w-6 text-center">✍️</span>
+                        <span>가입 신청</span>
+                      </Link>
+                    )}
+                    <div className="border-t border-primary-500 my-2" />
+                    <Link
+                      to="/login"
+                      onClick={closeMenu}
+                      className="px-4 py-3 rounded bg-white text-primary-600 font-medium text-center"
+                    >
+                      로그인
+                    </Link>
+                  </>
+                )}
+              </div>
             </div>
           </nav>
-        )}
-      </div>
+        </>
+      )}
     </header>
   );
 }

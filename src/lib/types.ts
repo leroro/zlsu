@@ -60,6 +60,9 @@ export interface Member {
   role: MemberRole;
   joinedAt: string;
   updatedAt: string;
+  // 이중 승인 시스템
+  referrerApproval?: ReferrerApproval;
+  adminApproval?: AdminApproval;
 }
 
 // 가입 신청 인터페이스
@@ -136,4 +139,27 @@ export interface StatusChangeHistory {
   fromStatus?: MemberStatus;     // 이전 상태 (가입 시에는 없음)
   toStatus: MemberStatus;        // 변경된 상태
   changedAt: string;             // 변경 일시
+}
+
+// ============ 이중 승인 시스템 ============
+
+// 승인 단계 상태
+export type ApprovalStepStatus = 'pending' | 'approved' | 'rejected';
+
+// 추천인 승인 정보
+export interface ReferrerApproval {
+  status: ApprovalStepStatus;
+  processedAt?: string;
+  agreedToSuitability?: boolean;  // 체크박스1: 적합성 추천
+  agreedToMentoring?: boolean;    // 체크박스2: 멘토링 약속
+  agreedToProvideCap?: boolean;   // 체크박스3: 수모 지급 약속
+  rejectReason?: string;
+}
+
+// 관리자 승인 정보
+export interface AdminApproval {
+  status: ApprovalStepStatus;
+  processedAt?: string;
+  processedBy?: string;
+  rejectReason?: string;
 }
