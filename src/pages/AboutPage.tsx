@@ -63,6 +63,41 @@ export default function AboutPage() {
         </div>
       </section>
 
+      {/* 이벤트 및 대외 활동 */}
+      <section className="bg-white md:rounded-lg md:shadow p-6 mb-4">
+        <h2 className="text-xl font-bold text-gray-900 mb-4">이벤트 및 대외 활동</h2>
+
+        <div className="space-y-4">
+          <div className="flex gap-3">
+            <span className="text-2xl">🎉</span>
+            <div>
+              <h3 className="font-semibold text-gray-900">오프라인 친목 행사</h3>
+              <p className="text-gray-600">연말 송년회 등 회원들과 함께하는 친목 행사를 진행해요.</p>
+            </div>
+          </div>
+
+          <div className="flex gap-3">
+            <span className="text-2xl">🏆</span>
+            <div>
+              <h3 className="font-semibold text-gray-900">수영 대회 단체 출전</h3>
+              <p className="text-gray-600">연중 수영 대회 개최 시 희망자에 한해 단체로 출전해요.</p>
+            </div>
+          </div>
+
+          <div className="flex gap-3">
+            <span className="text-2xl">🤝</span>
+            <div>
+              <h3 className="font-semibold text-gray-900">단체전 대회 참여</h3>
+              <p className="text-gray-600">단체전 형태의 계영 대회 등에 함께 참여한 경험이 있어요.</p>
+            </div>
+          </div>
+        </div>
+
+        <p className="text-sm text-gray-500 mt-4 bg-gray-50 rounded-lg p-3">
+          💡 모든 대회 및 행사는 <strong>자율 참여</strong>예요. 부담 없이 원하는 활동에만 참여하세요!
+        </p>
+      </section>
+
       {/* 이런 분께 추천 */}
       <section className="bg-white md:rounded-lg md:shadow p-6 mb-4">
         <h2 className="text-xl font-bold text-gray-900 mb-4">이런 분께 추천해요</h2>
