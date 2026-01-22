@@ -448,11 +448,9 @@ export function getAdminDashboardStats() {
 
 // ============ 생일 API ============
 
-// 이번 달 생일인 회원 조회 (활성/휴면 회원만)
-export function getMembersWithBirthdayThisMonth(): Member[] {
+// 특정 월의 생일 회원 조회 (활성/휴면 회원만)
+export function getMembersWithBirthdayByMonth(month: number): Member[] {
   const members = getMembers();
-  const now = new Date();
-  const currentMonth = now.getMonth() + 1; // 1-12
 
   return members
     .filter((member) => {
@@ -463,7 +461,7 @@ export function getMembersWithBirthdayThisMonth(): Member[] {
 
       // 생년월일에서 월 추출 (YYYY-MM-DD 형식)
       const birthMonth = parseInt(member.birthDate.split('-')[1], 10);
-      return birthMonth === currentMonth;
+      return birthMonth === month;
     })
     .sort((a, b) => {
       // 일자 기준 정렬
@@ -473,60 +471,74 @@ export function getMembersWithBirthdayThisMonth(): Member[] {
     });
 }
 
+// 이번 달 생일인 회원 조회
+export function getMembersWithBirthdayThisMonth(): Member[] {
+  const currentMonth = new Date().getMonth() + 1;
+  return getMembersWithBirthdayByMonth(currentMonth);
+}
+
+// 다음 달 생일인 회원 조회
+export function getMembersWithBirthdayNextMonth(): Member[] {
+  const currentMonth = new Date().getMonth() + 1;
+  const nextMonth = currentMonth === 12 ? 1 : currentMonth + 1;
+  return getMembersWithBirthdayByMonth(nextMonth);
+}
+
 // ============ 체크리스트 API ============
 
 // 기본 체크리스트 항목 (신규 회원 인지 순서대로 정리)
+// label: 명사형 제목, description: ~요 문장
 const DEFAULT_CHECKLIST_ITEMS: ChecklistItem[] = [
-  // [1. 활동 소개 - 먼저 뭘 하는지]
+  // [1. 활동 소개]
   {
     id: 'activity',
-    label: '매주 토요일 8시, 함께 수영해요',
+    label: '매주 토요일 8시 수영',
     description: '8시 정각 입수 기준이에요. 수영 후 티타임은 자율 참석!',
     isActive: true,
     order: 1,
   },
-  // [2. 가입 비용 - 가장 궁금한 것]
+  // [2. 가입 비용]
   {
     id: 'joinFee',
-    label: '첫 가입 시 4만원이에요 (회비 2만 + 수모 2만)',
-    description: '수모 2장 구매 시 5만원이에요. 가입 승인 후 바로 입금해주세요.',
+    label: '첫 달 4만원 (회비 2만 + 수모 2만)',
+    description: '첫 달 회비가 포함된 금액이에요. 수모 2장은 5만원. 가입 승인 후 입금해주세요.',
     isActive: true,
     order: 2,
   },
   {
     id: 'monthlyFee',
-    label: '매월 1일에 회비 2만원을 납부해요',
+    label: '다음 달부터 월 회비 2만원 (매월 1일 납부)',
     description: '납부한 회비는 환불되지 않아요.',
     isActive: true,
     order: 3,
   },
-  // [3. 출석 방법 - 어떻게 참여하나]
+  // [3. 출석 체크]
   {
     id: 'attendance',
-    label: "못 가는 날은 금요일 자정까지 카톡 '일정'에 표시해요",
-    description: '채팅이 아닌 일정 기능을 이용해주세요. 미표시 시 참석으로 간주돼요.',
+    label: "매주 금요일 자정까지 카톡 '일정'에 출석 체크",
+    description: '참석/불참 여부를 표시해주세요. 미표시 후 불참 시 무단불참으로 벌금이 발생해요.',
     isActive: true,
     order: 4,
   },
-  // [4. 벌금 규정 - 규정 위반 시]
+  // [4. 벌금 규정]
   {
     id: 'penalty',
-    label: '지각·무단불참 시 벌금이 있어요',
-    description: '지각 1분당 500원(최대 1만원), 무단불참 1만원. 사전 표시하면 면제!',
+    label: '지각·무단불참 시 벌금',
+    description: '지각 1분당 500원(최대 1만원), 무단불참 1만원이에요. 사전 표시 시 면제!',
     isActive: true,
     order: 5,
   },
-  // [5. 동의 - 마무리]
+  // [5. 동의]
   {
     id: 'rulesConfirm',
-    label: '회칙을 확인했어요',
+    label: '회칙 숙지',
     description: '회칙 보기 메뉴에서 전문을 확인할 수 있어요.',
     isActive: true,
     order: 6,
   },
   {
     id: 'agreeAll',
-    label: '위 내용에 동의하고, 개인정보 수집·이용에 동의해요',
+    label: '위 내용 및 개인정보 수집·이용 동의',
     description: '이름, 연락처, 이메일 등을 모임 운영 목적으로 수집해요.',
     isActive: true,
     order: 7,
@@ -534,7 +546,7 @@ const DEFAULT_CHECKLIST_ITEMS: ChecklistItem[] = [
 ];
 
 // 체크리스트 버전 (항목 변경 시 증가시키면 자동 초기화됨)
-const CHECKLIST_VERSION = 3;
+const CHECKLIST_VERSION = 7;
 
 export function getChecklistItems(): ChecklistItem[] {
   const versionKey = 'zlsu_checklist_version';

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { getActiveAndInactiveMemberCount, getSettings, getRecentJoinedMembers, getRecentStatusChanges, getStateChanges, getWithdrawalRequests, getMembersWithBirthdayThisMonth } from '../lib/api';
+import { getActiveAndInactiveMemberCount, getSettings, getRecentJoinedMembers, getRecentStatusChanges, getStateChanges, getWithdrawalRequests, getMembersWithBirthdayThisMonth, getMembersWithBirthdayNextMonth } from '../lib/api';
 import { StatusChangeHistory } from '../lib/types';
 import { STATUS_LABELS, BANK_ACCOUNT } from '../lib/constants';
 import Button from '../components/common/Button';
@@ -219,8 +219,10 @@ export default function HomePage() {
   // 로그인 사용자용 대시보드
   const recentJoined = getRecentJoinedMembers(30);
   const recentChanges = getRecentStatusChanges(30);
-  const birthdayMembers = getMembersWithBirthdayThisMonth();
   const currentMonth = new Date().getMonth() + 1;
+  const nextMonth = currentMonth === 12 ? 1 : currentMonth + 1;
+  const birthdayThisMonth = getMembersWithBirthdayThisMonth();
+  const birthdayNextMonth = getMembersWithBirthdayNextMonth();
 
   // 대기 중인 상태 변경/탈퇴 신청 확인
   const pendingStateChange = getStateChanges().find(
@@ -301,32 +303,6 @@ export default function HomePage() {
         )}
       </section>
 
-      {/* 이번 달 생일 */}
-      {birthdayMembers.length > 0 && (
-        <section className="bg-white md:rounded-lg md:shadow p-4">
-          <h2 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
-            <span>🎂</span>
-            <span>{currentMonth}월 생일</span>
-            <span className="text-xs text-gray-400 font-normal">({birthdayMembers.length}명)</span>
-          </h2>
-          <ul className="space-y-2">
-            {birthdayMembers.map((member) => {
-              const day = parseInt(member.birthDate!.split('-')[2], 10);
-              const isLunar = member.birthDateType === 'lunar';
-              return (
-                <li key={member.id} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
-                  <span className="text-gray-900">{member.name}</span>
-                  <span className="text-sm text-gray-500">
-                    {currentMonth}/{day}
-                    {isLunar && <span className="text-xs text-purple-500 ml-1">(음력)</span>}
-                  </span>
-                </li>
-              );
-            })}
-          </ul>
-        </section>
-      )}
-
       {/* 정원 현황 */}
       <section className="bg-white md:rounded-lg md:shadow p-4">
         <div className="flex items-center justify-between mb-3">
@@ -366,6 +342,69 @@ export default function HomePage() {
           {stats.capacityCount}/{maxCapacity}명 ({Math.round((stats.capacityCount / maxCapacity) * 100)}%)
         </div>
       </section>
+
+      {/* 생일 */}
+      {(birthdayThisMonth.length > 0 || birthdayNextMonth.length > 0) && (
+        <section className="bg-white md:rounded-lg md:shadow p-4">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="font-bold text-gray-900 flex items-center gap-2">
+              <span>🎂</span>
+              <span>생일 축하</span>
+            </h2>
+            <Link to="/members?tab=birthday" className="text-sm text-primary-600 hover:text-primary-700">
+              더보기 →
+            </Link>
+          </div>
+
+          <div className="space-y-3">
+            {/* 이번 달 */}
+            {birthdayThisMonth.length > 0 && (
+              <div>
+                <h3 className="text-sm font-medium text-gray-700 mb-2">{currentMonth}월</h3>
+                <div className="flex flex-wrap gap-2">
+                  {birthdayThisMonth.slice(0, 5).map((member) => {
+                    const day = parseInt(member.birthDate!.split('-')[2], 10);
+                    const isLunar = member.birthDateType === 'lunar';
+                    return (
+                      <span key={member.id} className="inline-flex items-center bg-pink-50 text-pink-700 px-2 py-1 rounded text-sm">
+                        {member.name}
+                        <span className="text-pink-400 ml-1 text-xs">{day}일</span>
+                        {isLunar && <span className="text-purple-500 ml-0.5 text-xs">(음)</span>}
+                      </span>
+                    );
+                  })}
+                  {birthdayThisMonth.length > 5 && (
+                    <span className="text-sm text-gray-400">+{birthdayThisMonth.length - 5}명</span>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* 다음 달 */}
+            {birthdayNextMonth.length > 0 && (
+              <div>
+                <h3 className="text-sm font-medium text-gray-700 mb-2">{nextMonth}월</h3>
+                <div className="flex flex-wrap gap-2">
+                  {birthdayNextMonth.slice(0, 5).map((member) => {
+                    const day = parseInt(member.birthDate!.split('-')[2], 10);
+                    const isLunar = member.birthDateType === 'lunar';
+                    return (
+                      <span key={member.id} className="inline-flex items-center bg-gray-100 text-gray-700 px-2 py-1 rounded text-sm">
+                        {member.name}
+                        <span className="text-gray-400 ml-1 text-xs">{day}일</span>
+                        {isLunar && <span className="text-purple-500 ml-0.5 text-xs">(음)</span>}
+                      </span>
+                    );
+                  })}
+                  {birthdayNextMonth.length > 5 && (
+                    <span className="text-sm text-gray-400">+{birthdayNextMonth.length - 5}명</span>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+        </section>
+      )}
 
       {/* 최근 가입 회원 */}
       <section className="bg-white md:rounded-lg md:shadow p-4">
