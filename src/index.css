@@ -124,9 +124,11 @@ input[type="date"] {
   margin-bottom: 0.5rem;
 }
 
-.prose h1, .prose h2, .prose h3 {
+.prose h1, .prose h2, .prose h3, .prose h4 {
   margin-top: 1rem;
   margin-bottom: 0.5rem;
+  font-weight: 700 !important; /* Bold로 강조 */
+  color: #111827;
 }
 
 .prose-sm ul, .prose-sm ol {
