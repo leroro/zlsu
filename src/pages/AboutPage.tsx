@@ -23,7 +23,7 @@ export default function AboutPage() {
             수영을 즐겁게!
           </h1>
           <p className="text-primary-200 text-sm">
-            매주 토요일 아침, 함께 즐겁게 수영하는 사람들
+            빡센 훈련보다 즐거운 수영! 친목 중심의 토요일 아침 수영 모임
           </p>
         </div>
       </section>
@@ -54,9 +54,11 @@ export default function AboutPage() {
             <div>
               <h3 className="font-semibold text-gray-900">뭘 하나요?</h3>
               <p className="text-gray-600">
-                수영 만렙 선우 코치님 지도하에 경기 연습 위주로 진행해요.
+                선우 코치님과 함께 각자 수준에 맞게 즐겁게 수영해요.
                 <br />
-                수영 후에는 메가커피에서 티타임도 해요! (자율 참석)
+                빡센 훈련이 아니라 편하게 배우고 즐기는 분위기예요!
+                <br />
+                수영 후에는 메가커피에서 티타임도 해요. (자율 참석)
               </p>
             </div>
           </div>
@@ -104,8 +106,8 @@ export default function AboutPage() {
 
         <ul className="space-y-3">
           {[
-            '영법을 더 정확하게 배우고 싶은 분',
-            '수영 대회에 도전해보고 싶은 분',
+            '빡세게 말고 즐겁게 수영하고 싶은 분',
+            '영법을 편하게 배우고 싶은 분',
             '주말 아침을 건강하게 시작하고 싶은 분',
             '수영 친구를 만들고 싶은 분',
             '혼자 수영하기 심심한 분',
@@ -227,8 +229,8 @@ export default function AboutPage() {
               Q. 수영 초보도 가입할 수 있나요?
             </h3>
             <p className="text-gray-600 text-sm">
-              초급반부터 마스터반까지 다양한 레벨의 회원이 있어요.
-              코치님이 수준에 맞게 지도해주세요.
+              네! 선수 출신이 아닌 일반인들이 대부분이에요.
+              빡세게 훈련하는 게 아니라 각자 수준에 맞게 즐겁게 배워요.
             </p>
           </div>
 
