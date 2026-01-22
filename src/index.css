@@ -14,16 +14,16 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* 최소 폰트 크기 보장 - text-xs(12px)를 14px로 상향 */
+/* 최소 폰트 크기 14px 보장 - 40~50대 가독성 기준 */
 @layer base {
-  /* 작은 텍스트(text-xs, text-sm)의 최소 크기 보장 */
+  /* 가장 작은 텍스트도 14px 이상 */
   .text-xs {
-    font-size: 0.8125rem; /* 13px */
+    font-size: 0.875rem !important; /* 14px - 최소 크기 */
     line-height: 1.5;
   }
 
   .text-sm {
-    font-size: 0.9375rem; /* 15px */
+    font-size: 0.9375rem !important; /* 15px */
     line-height: 1.6;
   }
 
@@ -35,12 +35,12 @@ body {
 
   /* prose 스타일 가독성 개선 */
   .prose {
-    font-size: 0.9375rem; /* 15px */
-    line-height: 1.7;
+    font-size: 1rem; /* 16px */
+    line-height: 1.8;
   }
 
   .prose-sm {
-    font-size: 0.875rem; /* 14px */
+    font-size: 0.9375rem; /* 15px */
     line-height: 1.7;
   }
 }
