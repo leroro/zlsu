@@ -100,3 +100,40 @@ input[type="date"] {
 .overflow-y-auto::-webkit-scrollbar-thumb:hover {
   background: #6b7280;
 }
+
+/* 회칙/운영규정 목록 스타일 - 간격 축소 및 들여쓰기 조정 */
+.prose ul, .prose ol {
+  padding-left: 1.25rem; /* 들여쓰기 축소 (기본 1.625rem) */
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.prose li {
+  margin-top: 0.25rem; /* 목록 항목 간격 축소 (기본 0.5rem) */
+  margin-bottom: 0.25rem;
+  padding-left: 0.25rem;
+}
+
+.prose li > ul, .prose li > ol {
+  margin-top: 0.25rem;
+  margin-bottom: 0.25rem;
+}
+
+.prose p {
+  margin-top: 0.5rem; /* 문단 간격 축소 (기본 1.25rem) */
+  margin-bottom: 0.5rem;
+}
+
+.prose h1, .prose h2, .prose h3 {
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.prose-sm ul, .prose-sm ol {
+  padding-left: 1rem;
+}
+
+.prose-sm li {
+  margin-top: 0.125rem;
+  margin-bottom: 0.125rem;
+}
