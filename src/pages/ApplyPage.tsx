@@ -585,6 +585,9 @@ export default function ApplyPage() {
               <label htmlFor="birthDate" className="block text-sm font-medium text-gray-700 mb-1">
                 생년월일 <span className="text-red-500">*</span>
               </label>
+              <p className="text-sm text-gray-500 mb-2">
+                회원분들의 생일을 축하해 드리기 위해 수집해요 🎂
+              </p>
               <input
                 type="date"
                 id="birthDate"
