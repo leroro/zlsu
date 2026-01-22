@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { getActiveAndInactiveMemberCount, getSettings, getRecentJoinedMembers, getRecentStatusChanges, getStateChanges, getWithdrawalRequests } from '../lib/api';
+import { getActiveAndInactiveMemberCount, getSettings, getRecentJoinedMembers, getRecentStatusChanges, getStateChanges, getWithdrawalRequests, getMembersWithBirthdayThisMonth } from '../lib/api';
 import { StatusChangeHistory } from '../lib/types';
 import { STATUS_LABELS, BANK_ACCOUNT } from '../lib/constants';
 import Button from '../components/common/Button';
@@ -219,6 +219,8 @@ export default function HomePage() {
   // 로그인 사용자용 대시보드
   const recentJoined = getRecentJoinedMembers(30);
   const recentChanges = getRecentStatusChanges(30);
+  const birthdayMembers = getMembersWithBirthdayThisMonth();
+  const currentMonth = new Date().getMonth() + 1;
 
   // 대기 중인 상태 변경/탈퇴 신청 확인
   const pendingStateChange = getStateChanges().find(
@@ -298,6 +300,32 @@ export default function HomePage() {
           </div>
         )}
       </section>
+
+      {/* 이번 달 생일 */}
+      {birthdayMembers.length > 0 && (
+        <section className="bg-white md:rounded-lg md:shadow p-4">
+          <h2 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
+            <span>🎂</span>
+            <span>{currentMonth}월 생일</span>
+            <span className="text-xs text-gray-400 font-normal">({birthdayMembers.length}명)</span>
+          </h2>
+          <ul className="space-y-2">
+            {birthdayMembers.map((member) => {
+              const day = parseInt(member.birthDate!.split('-')[2], 10);
+              const isLunar = member.birthDateType === 'lunar';
+              return (
+                <li key={member.id} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
+                  <span className="text-gray-900">{member.name}</span>
+                  <span className="text-sm text-gray-500">
+                    {currentMonth}/{day}
+                    {isLunar && <span className="text-xs text-purple-500 ml-1">(음력)</span>}
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      )}
 
       {/* 정원 현황 */}
       <section className="bg-white md:rounded-lg md:shadow p-4">
