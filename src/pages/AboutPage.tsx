@@ -263,6 +263,16 @@ export default function AboutPage() {
             </p>
           </div>
 
+          <div className="border-b border-gray-100 pb-4">
+            <h3 className="font-semibold text-gray-900 mb-1">
+              Q. 회비는 어디에 쓰이나요?
+            </h3>
+            <p className="text-gray-600 text-sm">
+              대부분 수영 후 티타임 커피값으로 사용해요.
+              그 외 송년회 등 이벤트, 수모 제작 등 모임 운영에 활용돼요.
+            </p>
+          </div>
+
           <div>
             <h3 className="font-semibold text-gray-900 mb-1">
               Q. 수모는 꼭 사야 하나요?
