@@ -279,7 +279,7 @@ export default function AboutPage() {
             </h3>
             <p className="text-gray-600 text-sm">
               아니에요, 회비는 참여 여부와 관계없이 납부해요.
-              티타임에 많이 안 나오시면 손해니까 자주 와주세요! ☕
+              티타임에 자주 와주세요! ☕
             </p>
           </div>
 
