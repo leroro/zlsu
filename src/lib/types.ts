@@ -5,6 +5,7 @@ export type MemberStatus = 'pending' | 'active' | 'inactive' | 'withdrawn';
 export interface SystemSettings {
   maxCapacity: number; // 최대 정원
   includeInactiveInCapacity: boolean; // 휴면 회원 정원 포함 여부
+  kakaoInviteLink?: string; // 카카오톡 단톡방 초대 링크
 }
 
 // 회원 역할

@@ -13,7 +13,7 @@ const STORAGE_KEYS = {
   STATUS_CHANGE_HISTORY: 'zlsu_status_change_history',
 };
 
-// localStorage를 mockData로 강제 리셋
+// localStorage를 mockData로 강제 리셋 (개발용 - 전체 초기화)
 export function resetToMockData(): void {
   localStorage.setItem(STORAGE_KEYS.MEMBERS, JSON.stringify(initialMembers));
   localStorage.setItem(STORAGE_KEYS.APPLICATIONS, JSON.stringify(initialApplications));
@@ -23,10 +23,28 @@ export function resetToMockData(): void {
   localStorage.removeItem(STORAGE_KEYS.SETTINGS);
 }
 
+// 앱 초기화 - 데이터가 없을 때만 mock 데이터로 초기화 (로그인 세션 유지)
+export function initializeAppData(): void {
+  // 회원 데이터가 없으면 초기화
+  if (!localStorage.getItem(STORAGE_KEYS.MEMBERS)) {
+    localStorage.setItem(STORAGE_KEYS.MEMBERS, JSON.stringify(initialMembers));
+  }
+  // 신청 데이터가 없으면 초기화
+  if (!localStorage.getItem(STORAGE_KEYS.APPLICATIONS)) {
+    localStorage.setItem(STORAGE_KEYS.APPLICATIONS, JSON.stringify(initialApplications));
+  }
+  // 상태 변경 데이터가 없으면 초기화
+  if (!localStorage.getItem(STORAGE_KEYS.STATE_CHANGES)) {
+    localStorage.setItem(STORAGE_KEYS.STATE_CHANGES, JSON.stringify(initialStateChanges));
+  }
+  // current_user는 건드리지 않음 (로그인 세션 유지)
+}
+
 // 기본 설정
 const DEFAULT_SETTINGS: SystemSettings = {
   maxCapacity: 16, // 기본 정원
   includeInactiveInCapacity: false, // 기본값: 활성 회원만 정원에 포함
+  kakaoInviteLink: 'https://invite.kakao.com/tc/yOTCtJKzHs', // 카카오톡 단톡방 초대 링크
 };
 
 // 로컬 스토리지에서 데이터 가져오기

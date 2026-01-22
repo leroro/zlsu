@@ -62,10 +62,56 @@ body {
   }
 }
 
-/* Date Picker 공통 스타일 - 가로 스크롤 방지 */
+/* Date Picker 공통 스타일 - 가로 스크롤 방지 및 다른 input과 일관성 */
 input[type="date"] {
   min-width: 0;
   max-width: 100%;
+  width: 100%;
+  box-sizing: border-box;
+  -webkit-appearance: none;
+  appearance: none;
+  background-color: #ffffff;
+  padding: 0.625rem 0.75rem; /* py-2.5 px-3 와 동일 */
+  font-size: 1rem;
+  line-height: 1.5;
+  min-height: 50px;
+  text-align: left;
+}
+
+/* Date input placeholder 스타일 (값이 없을 때) */
+input[type="date"]:invalid::-webkit-datetime-edit {
+  color: transparent;
+}
+
+input[type="date"]:invalid::before {
+  content: attr(placeholder);
+  color: #9ca3af;
+  position: absolute;
+  left: 0.75rem;
+}
+
+input[type="date"]:focus::-webkit-datetime-edit {
+  color: inherit;
+}
+
+input[type="date"]:focus::before {
+  display: none;
+}
+
+/* Date input 내부 텍스트 왼쪽 정렬 */
+input[type="date"]::-webkit-date-and-time-value {
+  text-align: left;
+}
+
+/* 모든 input 높이 일관성 (50px) */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="tel"],
+input[type="number"],
+select,
+textarea {
+  min-height: 50px;
   box-sizing: border-box;
 }
 
@@ -73,6 +119,7 @@ input[type="date"] {
 @media (max-width: 640px) {
   input[type="date"] {
     width: 100% !important;
+    max-width: 100% !important;
   }
 }
 

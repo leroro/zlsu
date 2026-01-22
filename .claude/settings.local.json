@@ -13,7 +13,11 @@
       "Bash(git commit:*)",
       "Bash(git push:*)",
       "Bash(git status:*)",
-      "Skill(deploy)"
+      "Skill(deploy)",
+      "WebFetch(domain:pms.inseq.co.kr)",
+      "Bash(curl -k -s \"http://pms.inseq.co.kr/leroro/zlsu/issue/4\")",
+      "Bash(curl:*)",
+      "Bash(tree:*)"
     ]
   }
 }

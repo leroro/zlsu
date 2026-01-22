@@ -202,37 +202,37 @@ export default function MembersPage() {
                           {levelLabel && member.gender && <span className="mx-1">·</span>}
                           {member.gender && <span>{GENDER_LABELS[member.gender]}</span>}
                           <span className="mx-1">·</span>
-                          <span>{shortJoinDate}</span>
+                          <span>가입 {shortJoinDate}</span>
                         </div>
                       </div>
                     </div>
-                    <MemberStatusBadge status={member.status} />
-                  </div>
-
-                  {/* 수영 영법 + 신청 상태 */}
-                  <div className="flex items-center justify-between">
-                    <div className="flex flex-wrap gap-1">
-                      {member.swimmingAbility?.freestyle && (
-                        <span className="px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-xs">자유형</span>
-                      )}
-                      {member.swimmingAbility?.backstroke && (
-                        <span className="px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-xs">배영</span>
-                      )}
-                      {member.swimmingAbility?.breaststroke && (
-                        <span className="px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-xs">평영</span>
-                      )}
-                      {member.swimmingAbility?.butterfly && (
-                        <span className="px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-xs">접영</span>
+                    <div className="flex flex-col items-end gap-1">
+                      <MemberStatusBadge status={member.status} />
+                      {pendingRequest && (
+                        <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${
+                          pendingRequest.type === 'withdrawal'
+                            ? 'bg-red-100 text-red-700'
+                            : 'bg-orange-100 text-orange-700'
+                        }`}>
+                          {pendingRequest.label}
+                        </span>
                       )}
                     </div>
-                    {pendingRequest && (
-                      <span className={`px-2 py-0.5 text-xs font-medium rounded-full flex-shrink-0 ${
-                        pendingRequest.type === 'withdrawal'
-                          ? 'bg-red-100 text-red-700'
-                          : 'bg-orange-100 text-orange-700'
-                      }`}>
-                        {pendingRequest.label}
-                      </span>
+                  </div>
+
+                  {/* 수영 영법 */}
+                  <div className="flex flex-wrap gap-1 mt-2">
+                    {member.swimmingAbility?.freestyle && (
+                      <span className="px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-xs">자유형</span>
+                    )}
+                    {member.swimmingAbility?.backstroke && (
+                      <span className="px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-xs">배영</span>
+                    )}
+                    {member.swimmingAbility?.breaststroke && (
+                      <span className="px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-xs">평영</span>
+                    )}
+                    {member.swimmingAbility?.butterfly && (
+                      <span className="px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-xs">접영</span>
                     )}
                   </div>
 
