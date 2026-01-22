@@ -273,6 +273,16 @@ export default function AboutPage() {
             </p>
           </div>
 
+          <div className="border-b border-gray-100 pb-4">
+            <h3 className="font-semibold text-gray-900 mb-1">
+              Q. 티타임에 참여 안 하면 회비를 안 내도 되나요?
+            </h3>
+            <p className="text-gray-600 text-sm">
+              아니에요, 회비는 참여 여부와 관계없이 납부해요.
+              티타임에 많이 안 나오시면 손해니까 자주 와주세요! ☕
+            </p>
+          </div>
+
           <div>
             <h3 className="font-semibold text-gray-900 mb-1">
               Q. 수모는 꼭 사야 하나요?
