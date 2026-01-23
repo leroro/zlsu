@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { getActiveAndInactiveMemberCount, getSettings } from '../../lib/api';
+import { asset } from '../../lib/assets';
 import {
   STATUS_LABELS,
   ACTIVITY_LEVEL_LABELS,
@@ -84,7 +85,7 @@ export default function Header() {
               </button>
             )}
             <Link to="/" className="flex items-center gap-2 hover:opacity-90">
-              <img src="./images/emblem.svg" alt="즐수팀 로고" className="h-6" />
+              <img src={asset('images/emblem.svg')} alt="즐수팀 로고" className="h-6" />
               <span className="text-base font-bold">수영을 즐겁게</span>
             </Link>
           </div>

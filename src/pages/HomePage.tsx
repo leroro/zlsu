@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { getActiveAndInactiveMemberCount, getSettings, getRecentJoinedMembers, getRecentStatusChanges, getStateChanges, getWithdrawalRequests, getMembersWithBirthdayThisMonth, getMembersWithBirthdayNextMonth, getPendingMembersForReferrer, getMemberById, withdrawApplication, markKakaoJoined, markOnboardingCompleted } from '../lib/api';
 import { StatusChangeHistory } from '../lib/types';
 import { STATUS_LABELS, BANK_ACCOUNT, SWIMMING_LEVEL_EMOJIS, canRecommendNewMember } from '../lib/constants';
+import { asset } from '../lib/assets';
 import Button from '../components/common/Button';
 import DevQuickLogin from '../components/common/DevQuickLogin';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
@@ -77,7 +78,7 @@ export default function HomePage() {
         <section className="bg-white md:rounded-lg md:shadow p-6">
           <div className="text-center mb-6">
             <img
-              src="./images/logo-simple.svg"
+              src={asset('images/logo-simple.svg')}
               alt="즐수팀 로고"
               className="w-20 h-20 mx-auto mb-3 rounded-lg"
             />

@@ -28,23 +28,21 @@
 
 ## 배포 정책
 
-**두 가지 배포 대상이 있으며, 사용자 요청에 따라 구분하여 배포한다.**
+**두 개의 저장소가 있으며, 용도에 따라 구분하여 배포한다.**
 
-| 요청 키워드 | 대상 | remote 이름 | URL |
-|-------------|------|-------------|-----|
-| "PMS에 올려" | 개인 저장소 | `origin` | 내부용 |
-| "깃헙에 올려" | GitHub Pages | `github` | https://leroro.github.io/zlsu/ |
+| 저장소 | 용도 | 스킬 | URL |
+|--------|------|------|-----|
+| PMS (`origin`) | 개발/테스트 | `/deploy-pms` | 내부용 |
+| GitHub (`github`) | 회원 공개 | `/deploy-github` | https://leroro.github.io/zlsu/ |
 
-**배포 절차 (동일):**
-1. `SHOW_DEV_LOGIN = false` 확인 (`src/components/common/DevQuickLogin.tsx`)
-2. `npm run build` 실행
-3. 커밋 후 해당 remote로 푸시
-   - PMS: `git push origin master`
-   - GitHub: `git push github master` → GitHub Actions가 자동 배포
+**사용자 요청 키워드:**
+- "PMS에 올려" → `/deploy-pms` 실행
+- "깃헙에 올려" → `/deploy-github` 실행
 
 **기술 참고:**
 - HashRouter 사용으로 `base: './'` (상대경로)가 모든 환경에서 동작
 - vite.config.ts 수정 불필요
+- GitHub 배포 시 `SHOW_DEV_LOGIN = false` 필수
 
 ---
 
@@ -208,6 +206,25 @@ src/
 ---
 
 ## UI/CSS 패턴 (필수 준수)
+
+### 이미지 경로 (필수)
+
+public 폴더의 이미지를 사용할 때는 반드시 `asset()` 함수를 사용합니다:
+
+```tsx
+import { asset } from '../lib/assets';
+
+// ✅ 올바른 패턴
+<img src={asset('images/logo.svg')} />
+
+// ❌ 잘못된 패턴 (로컬에서 깨짐)
+<img src="./images/logo.svg" />
+<img src="/images/logo.svg" />
+```
+
+**이유:** 개발 서버와 빌드 환경의 base URL이 다르기 때문
+
+---
 
 ### 입력창 + 버튼 가로 배치 패턴
 

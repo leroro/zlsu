@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { getActiveAndInactiveMemberCount, getSettings } from '../lib/api';
+import { asset } from '../lib/assets';
 import Button from '../components/common/Button';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
 
@@ -39,7 +40,7 @@ export default function AboutPage() {
       <section className="bg-gradient-to-br from-primary-500 to-primary-700 text-white md:rounded-lg p-6 sm:p-8 mb-4">
         <div className="text-center">
           <img
-            src="./images/logo-simple.svg"
+            src={asset('images/logo-simple.svg')}
             alt="즐수팀 로고"
             className="w-24 h-24 mx-auto mb-4 rounded-lg"
           />
@@ -159,7 +160,7 @@ export default function AboutPage() {
           {/* 수모 이미지 */}
           <div className="aspect-video bg-gray-200 rounded-lg overflow-hidden mb-4">
             <img
-              src="./images/swim-cap.jpg"
+              src={asset('images/swim-cap.jpg')}
               alt="즐수팀 수모"
               className="w-full h-full object-cover"
             />
