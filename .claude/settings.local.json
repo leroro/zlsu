@@ -18,7 +18,8 @@
       "Bash(curl -k -s \"http://pms.inseq.co.kr/leroro/zlsu/issue/4\")",
       "Bash(curl:*)",
       "Bash(tree:*)",
-      "Bash(cd:*)"
+      "Bash(cd:*)",
+      "Skill(commit)"
     ]
   }
 }

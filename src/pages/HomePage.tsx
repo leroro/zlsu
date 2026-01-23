@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { getActiveAndInactiveMemberCount, getSettings, getRecentJoinedMembers, getRecentStatusChanges, getStateChanges, getWithdrawalRequests, getMembersWithBirthdayThisMonth, getMembersWithBirthdayNextMonth, getPendingMembersForReferrer, getMemberById, withdrawApplication } from '../lib/api';
+import { getActiveAndInactiveMemberCount, getSettings, getRecentJoinedMembers, getRecentStatusChanges, getStateChanges, getWithdrawalRequests, getMembersWithBirthdayThisMonth, getMembersWithBirthdayNextMonth, getPendingMembersForReferrer, getMemberById, withdrawApplication, markKakaoJoined } from '../lib/api';
 import { StatusChangeHistory } from '../lib/types';
 import { STATUS_LABELS, BANK_ACCOUNT, SWIMMING_LEVEL_EMOJIS } from '../lib/constants';
 import Button from '../components/common/Button';
@@ -318,6 +318,18 @@ export default function HomePage() {
   // 추천인 동의 대기 목록 (내가 추천인인 회원)
   const pendingForMe = user.status === 'active' ? getPendingMembersForReferrer(user.name) : [];
 
+  // 신규 회원 환영 메시지 표시 여부 (active 상태이고 아직 카톡방 미입장)
+  const fullMemberData = getMemberById(user.id);
+  const showWelcomeMessage = user.status === 'active' && !fullMemberData?.hasJoinedKakao;
+
+  // 카톡방 입장 버튼 클릭 핸들러
+  const handleKakaoJoin = () => {
+    if (settings.kakaoInviteLink) {
+      markKakaoJoined(user.id);
+      window.open(settings.kakaoInviteLink, '_blank');
+    }
+  };
+
   // 날짜 포맷 (MM.DD)
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
@@ -390,6 +402,27 @@ export default function HomePage() {
         )}
       </section>
 
+      {/* 신규 회원 환영 메시지 - 카톡방 미입장 시에만 표시 */}
+      {showWelcomeMessage && settings.kakaoInviteLink && (
+        <section className="bg-gradient-to-r from-yellow-50 to-amber-50 border-y border-yellow-200 md:border md:rounded-lg md:shadow p-4">
+          <div className="text-center">
+            <div className="text-3xl mb-2">🎉</div>
+            <h2 className="text-lg font-bold text-gray-900 mb-1">가입을 환영합니다!</h2>
+            <p className="text-sm text-gray-600 mb-4">
+              카카오 단톡방에 입장하여 자기소개를 해주세요.
+            </p>
+            <button
+              onClick={handleKakaoJoin}
+              className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-bold text-base transition-all hover:scale-105 border-2"
+              style={{ backgroundColor: '#FEE500', borderColor: '#191919', color: '#191919' }}
+            >
+              <span className="text-xl">💬</span>
+              단톡방 입장하기
+            </button>
+          </div>
+        </section>
+      )}
+
       {/* 할 일 섹션 - 추천인 동의 대기가 있을 때만 표시 */}
       {pendingForMe.length > 0 && (
         <section className="bg-orange-50 border-y border-orange-200 md:border md:rounded-lg md:shadow p-4">
@@ -431,8 +464,8 @@ export default function HomePage() {
       <section className="bg-white md:rounded-lg md:shadow p-4">
         <h2 className="font-bold text-gray-900 mb-3">자주 찾는 메뉴</h2>
         <div className="grid grid-cols-2 gap-3">
-          {/* 카카오톡 팀 카톡방 - 카카오 브랜드 컬러 + 검정 테두리 */}
-          {settings.kakaoInviteLink && (
+          {/* 카카오톡 팀 카톡방 - 항상 표시 */}
+          {settings.kakaoInviteLink ? (
             <a
               href={settings.kakaoInviteLink}
               target="_blank"
@@ -443,6 +476,15 @@ export default function HomePage() {
               <span className="text-3xl mb-1">💬</span>
               <span className="text-sm font-bold" style={{ color: '#191919' }}>팀 카톡방 입장</span>
             </a>
+          ) : (
+            <div
+              className="flex flex-col items-center justify-center p-4 rounded-xl border-2 opacity-50 cursor-not-allowed"
+              style={{ backgroundColor: '#FEE500', borderColor: '#191919' }}
+            >
+              <span className="text-3xl mb-1">💬</span>
+              <span className="text-sm font-bold" style={{ color: '#191919' }}>팀 카톡방</span>
+              <span className="text-xs text-gray-600">링크 준비 중</span>
+            </div>
           )}
           {/* 수모 추가 구입 */}
           <Link

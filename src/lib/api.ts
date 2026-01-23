@@ -866,3 +866,14 @@ export function withdrawApplication(memberId: string): boolean {
 
   return deleteMember(memberId);
 }
+
+// ============ 카카오톡 단톡방 입장 API ============
+
+// 카카오톡 단톡방 입장 완료 처리
+export function markKakaoJoined(memberId: string): boolean {
+  const member = getMemberById(memberId);
+  if (!member) return false;
+
+  updateMember(memberId, { hasJoinedKakao: true });
+  return true;
+}

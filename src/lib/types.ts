@@ -63,6 +63,8 @@ export interface Member {
   // 이중 승인 시스템
   referrerApproval?: ReferrerApproval;
   adminApproval?: AdminApproval;
+  // 카카오톡 단톡방 입장 여부
+  hasJoinedKakao?: boolean;
 }
 
 // 가입 신청 인터페이스
