@@ -26,6 +26,30 @@
    - 사용자가 전혀 다른 업무를 요청할 때 → "기존 작업 커밋하고 다음 작업으로 진행할까요?" 확인
 3. 자잘한 수정사항마다 커밋하지 않고, 작업 단위가 마무리되면 한 번에 커밋
 
+## 배포 정책
+
+**두 가지 배포 대상이 있으며, 사용자 요청에 따라 구분하여 배포한다.**
+
+| 요청 키워드 | 대상 | remote 이름 | 설명 |
+|-------------|------|-------------|------|
+| "PMS에 올려" | 개인 저장소 | `origin` | 내부용 (기존) |
+| "깃헙에 올려" | GitHub Pages | `github` | 공개용 (회원 접속용) |
+
+**GitHub Pages 배포 절차:**
+1. `npm run build` 실행
+2. `vite.config.ts`의 `base` 경로 확인 (저장소명과 일치해야 함)
+3. `git push github master` 또는 GitHub Actions 자동 배포
+
+**PMS 배포 절차:**
+1. `npm run build` 실행
+2. `git push origin master`
+
+**주의사항:**
+- GitHub Pages 배포 전 `SHOW_DEV_LOGIN = false` 확인 (LoginPage.tsx)
+- GitHub remote가 없으면 먼저 추가: `git remote add github https://github.com/[사용자명]/[저장소명].git`
+
+---
+
 ## 현재 작업 중인 이슈
 
 작업 전 `docs/` 폴더의 최신 날짜 폴더에서 개발 요구사항을 확인하세요.
