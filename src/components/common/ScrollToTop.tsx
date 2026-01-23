@@ -1,27 +1,42 @@
-import { useLayoutEffect } from 'react';
+import { useEffect, useLayoutEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 
 export default function ScrollToTop() {
   const { pathname } = useLocation();
 
-  // useLayoutEffect로 DOM 업데이트 전에 실행
+  // useLayoutEffect로 DOM 렌더링 전에 먼저 실행
   useLayoutEffect(() => {
-    // 즉시 스크롤 시도
+    // 강제로 맨 위로 스크롤
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+  }, [pathname]);
+
+  // useEffect로 렌더링 후 추가 보정 (iOS Safari 주소창 대응)
+  useEffect(() => {
     const scrollToTop = () => {
-      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+      window.scrollTo(0, 0);
       document.documentElement.scrollTop = 0;
       document.body.scrollTop = 0;
+
+      // visualViewport API 사용 (iOS Safari 지원)
+      if (window.visualViewport) {
+        window.scrollTo(0, -window.visualViewport.offsetTop);
+      }
     };
 
     // 즉시 실행
     scrollToTop();
 
-    // iOS Safari를 위한 지연 실행 (주소창 높이 변화 대응)
-    requestAnimationFrame(() => {
-      scrollToTop();
-      // 추가 지연으로 iOS 주소창 애니메이션 완료 후 재시도
-      setTimeout(scrollToTop, 50);
-    });
+    // iOS Safari 주소창 애니메이션 완료 대기 (여러 시점에서 재시도)
+    const timers = [
+      setTimeout(scrollToTop, 0),
+      setTimeout(scrollToTop, 50),
+      setTimeout(scrollToTop, 100),
+      setTimeout(scrollToTop, 200),
+    ];
+
+    return () => timers.forEach(clearTimeout);
   }, [pathname]);
 
   return null;

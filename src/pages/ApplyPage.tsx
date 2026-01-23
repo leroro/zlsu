@@ -527,21 +527,21 @@ export default function ApplyPage() {
                   </div>
                 ) : (
                   /* 추천인 입력 + 확인 버튼 */
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 w-full">
                     <input
                       type="text"
                       id="referrer0"
                       value={referrerInput}
                       onChange={(e) => setReferrerInput(e.target.value)}
                       onKeyDown={(e) => e.key === 'Enter' && handleVerifyReferrer()}
-                      className="flex-1 px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                      className="flex-1 min-w-0 px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                       placeholder="추천인 이름 입력"
                     />
                     <Button
                       type="button"
                       onClick={handleVerifyReferrer}
                       variant="secondary"
-                      className="px-4 shrink-0 whitespace-nowrap"
+                      className="px-4 flex-none"
                     >
                       확인
                     </Button>
