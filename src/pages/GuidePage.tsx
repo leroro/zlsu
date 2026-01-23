@@ -56,11 +56,11 @@ export default function GuidePage() {
             </div>
             <div className="flex items-start gap-2">
               <span className="text-blue-500 mt-0.5">•</span>
-              <span><strong>2개월 후</strong> → 자동으로 일반 회원</span>
+              <span><strong>연습 4회 참여</strong> → 일반 회원</span>
             </div>
             <div className="flex items-start gap-2">
               <span className="text-blue-500 mt-0.5">•</span>
-              <span><strong>휴면 복귀</strong> → 일반으로 리셋 (스태프는 유지)</span>
+              <span><strong>휴면 복귀</strong> → 일반 회원 (스태프는 유지)</span>
             </div>
             <div className="flex items-start gap-2">
               <span className="text-blue-500 mt-0.5">•</span>
@@ -84,9 +84,11 @@ export default function GuidePage() {
       <section className="bg-white md:rounded-lg md:shadow p-6 mb-4">
         <h2 className="text-xl font-bold text-gray-900 mb-4">휴면과 활성</h2>
 
-        <p className="text-gray-600 text-sm mb-4">
-          사정이 생기면 휴면 상태로 전환할 수 있어요. 휴면 중에는 회비 납부 의무가 없습니다.
-        </p>
+        <div className="text-sm text-gray-600 mb-4 space-y-2">
+          <p>사정이 생기면 휴면 상태로 전환할 수 있어요. 휴면 중에는 회비 납부 의무가 없습니다.</p>
+          <p><strong className="text-gray-700">연속 {settings.dormancyPeriodWeeks}주 이상</strong> 불참이 예상되면 직접 휴면 신청해 주세요.</p>
+          <p className="text-red-600">회비를 미납하거나, 2주 연속 무단불참시 강제 휴면으로 전환되고, 회비는 반환되지 않아요.</p>
+        </div>
 
         <div className="space-y-3 mb-4">
           <div className="flex items-center gap-3 p-3 bg-green-50 rounded-lg">
@@ -103,28 +105,6 @@ export default function GuidePage() {
               <p className="text-sm text-gray-600">토요일 연습에 참여하지 못하는 상태. 회비 면제, 정원에서 제외</p>
             </div>
           </div>
-        </div>
-
-        {/* 휴면 전환 기준 안내 */}
-        <div className="bg-blue-50 rounded-lg p-4 mb-4">
-          <h3 className="font-semibold text-gray-900 mb-2 text-sm">휴면 전환 기준</h3>
-          <div className="text-sm text-gray-700 space-y-2">
-            <p>
-              <strong className="text-blue-700">연속 {settings.dormancyPeriodWeeks}주 이상</strong> 토요일 연습에 불참하면 휴면으로 전환됩니다.
-            </p>
-            <p className="text-gray-600">
-              미리 불참이 예상되면 직접 휴면 신청을 해주세요. 연속 불참 시 관리자가 휴면 전환을 안내드립니다.
-            </p>
-          </div>
-        </div>
-
-        <div className="bg-amber-50 rounded-lg p-4 mb-4">
-          <h3 className="font-semibold text-gray-900 mb-2 text-sm">알아두세요</h3>
-          <ul className="text-sm text-gray-700 space-y-1">
-            <li>• 휴면 중에도 <strong>팀 카톡방은 유지</strong>됩니다</li>
-            <li>• 휴면에서 활성으로 돌아오려면 정원에 여유가 있어야 해요</li>
-            <li>• 복귀 시 활동지수는 "일반"으로 리셋됩니다 (스태프 제외)</li>
-          </ul>
         </div>
 
         <div className="flex justify-end">
@@ -192,7 +172,7 @@ export default function GuidePage() {
             <h2 className="text-xl font-bold text-gray-900 mb-2">수모 추가 구입</h2>
             <p className="text-gray-600 text-sm mb-3">
               수모가 추가로 필요하신가요?
-              수모 담당자를 통해 구입할 수 있어요. (1장 2만원, 2장 3만원)
+              수모 관리자를 통해 구입할 수 있어요. (1장 2만원, 2장 3만원)
             </p>
             <Link
               to="/request/swim-cap"
@@ -227,7 +207,7 @@ export default function GuidePage() {
             <p className="text-gray-600 text-sm">
               매월 1일에 납부해 주세요.
               즐수팀 모임통장으로 2만원을 입금하시면 됩니다.
-              매월 8일에 단톡방에 회비 미납자 명단이 공개됩니다.
+              매월 10일에 단톡방에 회비 미납자 명단이 공개됩니다.
             </p>
           </div>
 
@@ -250,6 +230,16 @@ export default function GuidePage() {
         <p className="text-gray-600 text-sm">
           더 궁금한 점이 있으신가요?<br /> 팀 카톡방에서 질문해 주세요!
         </p>
+        {settings.kakaoInviteLink && (
+          <a
+            href={settings.kakaoInviteLink}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1 mt-3 text-sm text-yellow-700 hover:text-yellow-800 font-medium"
+          >
+            💬 팀 카톡방 입장하기 →
+          </a>
+        )}
       </section>
     </div>
   );

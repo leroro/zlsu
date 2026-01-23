@@ -81,7 +81,7 @@ export default function OperationsGuidePage() {
               Q. 수모는 어디서 받나요?
             </h3>
             <p className="text-gray-600 text-sm">
-              수모 담당자(최선숙 회원)에게 연락해서 받으시면 돼요.
+              수모 관리자(최선숙 회원)에게 연락해서 받으시면 돼요.
               주로 토요일 수영 시간 전후에 전달받습니다.
             </p>
           </div>

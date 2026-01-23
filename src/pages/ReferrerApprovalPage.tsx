@@ -301,7 +301,7 @@ export default function ReferrerApprovalPage() {
             </div>
             <div>
               <p className="text-sm font-medium text-gray-900">
-                모임통장에 가입비가 납부되면, <span className="text-purple-600 font-semibold">최선숙</span>님<span className="text-gray-500 text-xs ml-0.5">(수모 담당)</span>에게 <strong>수모</strong>를 요청하여 <span className="text-primary-600 font-semibold">{applicant.name}</span>님에게 전달하겠습니다.
+                모임통장에 가입비가 납부되면, <span className="text-purple-600 font-semibold">최선숙</span>님<span className="text-gray-500 text-xs ml-0.5">(수모 관리)</span>에게 <strong>수모</strong>를 요청하여 <span className="text-primary-600 font-semibold">{applicant.name}</span>님에게 전달하겠습니다.
               </p>
             </div>
           </label>

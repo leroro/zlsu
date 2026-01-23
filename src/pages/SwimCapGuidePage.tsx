@@ -9,7 +9,7 @@ export default function SwimCapGuidePage() {
   useDocumentTitle('수모 추가 구입 안내');
   const navigate = useNavigate();
 
-  // 수모 담당자 찾기 (position에 '수모'가 포함된 회원)
+  // 수모 관리자 찾기 (position에 '수모'가 포함된 회원)
   const members = getMembers();
   const swimCapManager = members.find(m =>
     m.position?.includes('수모') && (m.status === 'active' || m.status === 'inactive')
@@ -45,7 +45,7 @@ export default function SwimCapGuidePage() {
                     <span className="font-medium text-primary-600">{swimCapManager.name}</span> 회원님께 카톡 또는 대면으로 수모 구입 의사를 전달하고, 남은 수모가 있는지 확인해 주세요.
                   </>
                 ) : (
-                  <>수모 담당 회원님께 카톡 또는 대면으로 수모 구입 의사를 전달하고, 남은 수모가 있는지 확인해 주세요.</>
+                  <>수모 관리 회원님께 카톡 또는 대면으로 수모 구입 의사를 전달하고, 남은 수모가 있는지 확인해 주세요.</>
                 )}
               </p>
             </div>
@@ -102,7 +102,7 @@ export default function SwimCapGuidePage() {
                     <span className="font-medium text-primary-600">{swimCapManager.name}</span> 회원님께 직접 수모를 받으시면 됩니다.
                   </>
                 ) : (
-                  <>수모 담당 회원님께 직접 수모를 받으시면 됩니다.</>
+                  <>수모 관리 회원님께 직접 수모를 받으시면 됩니다.</>
                 )}
               </p>
             </div>

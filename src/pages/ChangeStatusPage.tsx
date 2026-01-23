@@ -159,12 +159,22 @@ export default function ChangeStatusPage() {
             </h3>
             <div className="text-sm text-blue-700 space-y-2">
               <p>
-                <strong>연속 {settings.dormancyPeriodWeeks}주 이상</strong> 토요일 연습에 참여하지 못할 때 휴면 상태로 전환됩니다.
+                <strong>연속 {settings.dormancyPeriodWeeks}주 이상</strong> 불참이 예상되면 직접 휴면 신청해 주세요.
               </p>
-              <ul className="space-y-1 text-blue-600">
-                <li>• 휴면 중에는 회비 납부 의무가 없습니다</li>
-                <li>• 팀 카톡방은 그대로 유지됩니다</li>
-              </ul>
+              <div className="space-y-1.5 text-blue-600">
+                <div className="flex gap-2">
+                  <span className="flex-shrink-0">•</span>
+                  <span>휴면 중에는 회비 납부 의무가 없습니다</span>
+                </div>
+                <div className="flex gap-2">
+                  <span className="flex-shrink-0">•</span>
+                  <span>팀 카톡방에는 계속 참여할 수 있습니다</span>
+                </div>
+                <div className="flex gap-2">
+                  <span className="flex-shrink-0">•</span>
+                  <span>티타임, 이벤트, 특별 활동 참여 시 별도 비용 납부가 필요합니다</span>
+                </div>
+              </div>
             </div>
           </div>
         )}
@@ -183,6 +193,10 @@ export default function ChangeStatusPage() {
               <div className="flex gap-2">
                 <span className="flex-shrink-0">•</span>
                 <span>정원이 꽉 차면 자리가 날 때까지 활성 신청을 할 수 없어요</span>
+              </div>
+              <div className="flex gap-2">
+                <span className="flex-shrink-0">•</span>
+                <span>복귀 시 활동지수는 "일반"으로 리셋됩니다 (스태프 제외)</span>
               </div>
               <div className="flex gap-2 text-yellow-600">
                 <span className="flex-shrink-0">•</span>
@@ -260,7 +274,7 @@ export default function ChangeStatusPage() {
 
             <div>
               <label htmlFor="reason" className="block text-sm font-medium text-gray-700 mb-1">
-                {isToInactive ? '휴면 사유' : '활성 신청 사유'} <span className="text-red-500">*</span>
+                {isToInactive ? '휴면 사유 및 예상 기간' : '활성 신청 사유'} <span className="text-red-500">*</span>
               </label>
               <textarea
                 id="reason"
@@ -268,7 +282,7 @@ export default function ChangeStatusPage() {
                 onChange={(e) => setReason(e.target.value)}
                 rows={4}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                placeholder={isToInactive ? '휴면 사유를 입력해주세요' : '활성 신청 사유를 입력해주세요'}
+                placeholder={isToInactive ? '예) 해외 출장으로 약 2개월간 쉬려고 합니다' : '활성 신청 사유를 입력해주세요'}
                 required
               />
             </div>

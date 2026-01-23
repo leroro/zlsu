@@ -35,10 +35,10 @@ export const GENDER_LABELS: Record<Gender, string> = {
 export const POSITION_OPTIONS = [
   { value: '', label: '없음' },
   { value: '수영 지도', label: '수영 지도' },
-  { value: '수모 담당', label: '수모 담당' },
-  { value: '대회 담당', label: '대회 담당' },
-  { value: '소통 담당', label: '소통 담당' },
-  { value: '총무 담당', label: '총무 담당' },
+  { value: '수모 관리', label: '수모 관리' },
+  { value: '대회 관리', label: '대회 관리' },
+  { value: '소통 관리', label: '소통 관리' },
+  { value: '총무', label: '총무' },
 ] as const;
 
 // 신청 상태 라벨
@@ -239,10 +239,10 @@ export const ACTIVITY_LEVEL_ICONS: Record<ActivityLevel, string> = {
 
 // 활동 지수 기준 설명
 export const ACTIVITY_LEVEL_DESCRIPTIONS: Record<ActivityLevel, string> = {
-  newbie: '가입 후 2개월까지',
-  regular: '월 2회 정도 참여',
-  passionate: '월 3회 이상 참여',
-  core: '월 3회 이상 참여 + 대회 꾸준히 참여',
+  newbie: '가입 후 4회 미만 참여',
+  regular: '최근 2개월간 월 2회 이상 참여',
+  passionate: '최근 2개월간 월 3~4회 참여',
+  core: '최근 3개월간 월 3~4회 이상 꾸준히 참여 + 대회 참석 의향',
   staff: '모임 운영 업무/기여',
 };
 
