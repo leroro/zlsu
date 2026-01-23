@@ -476,7 +476,7 @@ export default function ApplyPage() {
                 추천인 확인
               </h2>
               <p className="text-sm text-gray-500 mb-4">
-                즐수팀은 <span className="font-medium text-primary-600">열정 이상 레벨</span> 회원의 추천이 있어야 가입할 수 있습니다.
+                즐수팀은 <span className="font-medium text-primary-600">열정 레벨 이상</span> 회원의 추천이 있어야 가입할 수 있습니다.
               </p>
 
               {/* 추천인 선택 영역 */}
@@ -497,7 +497,7 @@ export default function ApplyPage() {
                             ? '존재하지 않는 회원입니다.'
                             : urlReferrerMember.status !== 'active'
                             ? '현재 활동 중인 회원이 아닙니다.'
-                            : `열정 이상 레벨만 추천할 수 있습니다. (현재: ${urlReferrerMember.activityLevel ? ACTIVITY_LEVEL_LABELS[urlReferrerMember.activityLevel] : '미지정'})`}
+                            : `열정 레벨 이상만 추천할 수 있습니다. (현재: ${urlReferrerMember.activityLevel ? ACTIVITY_LEVEL_LABELS[urlReferrerMember.activityLevel] : '미지정'})`}
                         </p>
                         <p className="text-xs text-red-700 mt-1">아래에서 다른 추천인을 선택해 주세요.</p>
                       </div>
@@ -527,21 +527,21 @@ export default function ApplyPage() {
                   </div>
                 ) : (
                   /* 추천인 입력 + 확인 버튼 */
-                  <div className="flex gap-2 w-full">
+                  <div className="flex gap-2">
                     <input
                       type="text"
                       id="referrer0"
                       value={referrerInput}
                       onChange={(e) => setReferrerInput(e.target.value)}
                       onKeyDown={(e) => e.key === 'Enter' && handleVerifyReferrer()}
-                      className="flex-1 min-w-0 px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                      className="flex-1 px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                       placeholder="추천인 이름 입력"
                     />
                     <Button
                       type="button"
                       onClick={handleVerifyReferrer}
                       variant="secondary"
-                      className="px-4 flex-none"
+                      className="px-4 shrink-0 whitespace-nowrap"
                     >
                       확인
                     </Button>

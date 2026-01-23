@@ -570,7 +570,7 @@ export default function HomePage() {
             </span>
           </div>
         </div>
-        {/* 열정 이상 레벨만 초대 가능 */}
+        {/* 열정 레벨 이상만 초대 가능 */}
         {remainingSlots > 0 && canRecommendNewMember(user.activityLevel) && (
           <button
             onClick={handleCopyInviteLink}

@@ -15,16 +15,6 @@ export default function AboutPage() {
   const referrer = searchParams.get('ref') || '';
   const applyUrl = referrer ? `/apply?ref=${encodeURIComponent(referrer)}` : '/apply';
 
-  // 링크 복사 상태
-  const [linkCopied, setLinkCopied] = useState(false);
-
-  const handleCopyLink = async () => {
-    const url = `${window.location.origin}/about`;
-    await navigator.clipboard.writeText(url);
-    setLinkCopied(true);
-    setTimeout(() => setLinkCopied(false), 2000);
-  };
-
   // CTA 플로팅 상태
   const [isFloating, setIsFloating] = useState(true);
   const ctaSectionRef = useRef<HTMLElement>(null);
@@ -148,10 +138,10 @@ export default function AboutPage() {
 
         <ul className="space-y-3">
           {[
-            '영법을 더 정확하게 배우고 싶은 분',
-            '수영 대회에 도전해보고 싶은 분',
-            '주말 아침을 건강하게 시작하고 싶은 분',
             '수영 친구를 만들고 싶은 분',
+            '영법을 더 정확하게 배우고 싶은 분',
+            '주말 아침을 건강하게 시작하고 싶은 분',
+            '수영 대회에 도전해보고 싶은 분',
           ].map((item, index) => (
             <li key={index} className="flex items-center gap-2">
               <span className="text-green-500">✓</span>
@@ -207,28 +197,6 @@ export default function AboutPage() {
             </p>
           </div>
         </div>
-
-        {/* 초대 링크 복사 버튼 */}
-        <button
-          onClick={handleCopyLink}
-          className="w-full mb-6 py-3 px-4 bg-primary-50 hover:bg-primary-100 border border-primary-200 text-primary-700 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2"
-        >
-          {linkCopied ? (
-            <>
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-              링크가 복사되었습니다!
-            </>
-          ) : (
-            <>
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-              </svg>
-              초대 링크 복사하기
-            </>
-          )}
-        </button>
 
         <div className="bg-gray-50 rounded-lg p-4 mb-4">
           <h3 className="font-semibold text-gray-900 mb-2">첫 가입 시 납부 금액</h3>
