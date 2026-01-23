@@ -150,7 +150,9 @@ export function getActiveAndInactiveMemberCount(): { active: number; inactive: n
 // ============ 설정 API ============
 
 export function getSettings(): SystemSettings {
-  return getStorageData(STORAGE_KEYS.SETTINGS, DEFAULT_SETTINGS);
+  const stored = getStorageData(STORAGE_KEYS.SETTINGS, DEFAULT_SETTINGS);
+  // 기존 저장된 설정과 기본값 병합 (새로 추가된 필드 포함)
+  return { ...DEFAULT_SETTINGS, ...stored };
 }
 
 export function updateSettings(updates: Partial<SystemSettings>): SystemSettings {
