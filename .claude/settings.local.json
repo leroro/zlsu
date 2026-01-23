@@ -22,7 +22,9 @@
       "Skill(commit)",
       "Bash(dir \"C:\\\\Users\\\\Administrator\\\\Documents\\\\zlsu\\\\docs\\\\2026-01-23\")",
       "Bash(dir:*)",
-      "Skill(end-session)"
+      "Skill(end-session)",
+      "Bash(del nul)",
+      "Bash(del /f /q \"\\\\?\\\\%cd%\\\\nul\")"
     ]
   }
 }
