@@ -34,7 +34,7 @@ export default function Button({
         ${sizeClasses[size]}
         rounded-md font-medium
         focus:outline-none focus:ring-2 focus:ring-offset-2
-        disabled:opacity-50 disabled:cursor-not-allowed
+        disabled:bg-primary-100 disabled:text-primary-300 disabled:cursor-not-allowed disabled:hover:bg-primary-100
         transition-colors
         ${className}
       `}

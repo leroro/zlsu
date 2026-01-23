@@ -5,6 +5,7 @@ import { getActiveAndInactiveMemberCount, getSettings, getRecentJoinedMembers, g
 import { StatusChangeHistory } from '../lib/types';
 import { STATUS_LABELS, BANK_ACCOUNT, SWIMMING_LEVEL_EMOJIS, canRecommendNewMember } from '../lib/constants';
 import Button from '../components/common/Button';
+import DevQuickLogin from '../components/common/DevQuickLogin';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
 
 export default function HomePage() {
@@ -95,6 +96,9 @@ export default function HomePage() {
             )}
           </div>
         </section>
+
+        {/* 개발용 빠른 로그인 */}
+        <DevQuickLogin />
       </div>
     );
   }
@@ -124,7 +128,9 @@ export default function HomePage() {
       const rejectReason = isReferrerRejected
         ? referrerApproval?.rejectReason
         : adminApproval?.rejectReason;
-      const rejectedBy = isReferrerRejected ? '추천인' : '관리자';
+      const rejectedByLabel = isReferrerRejected
+        ? `추천인 ${user.referrer}님`
+        : '관리자';
 
       return (
         <div className="max-w-md mx-auto space-y-4">
@@ -132,7 +138,7 @@ export default function HomePage() {
             <div className="text-center mb-4">
               <div className="text-4xl mb-2">😢</div>
               <h1 className="text-xl font-bold text-red-600">가입이 반려되었습니다</h1>
-              <p className="text-sm text-gray-500 mt-1">{rejectedBy}에 의해 반려되었습니다</p>
+              <p className="text-sm text-gray-500 mt-1">{rejectedByLabel}에 의해 반려되었습니다</p>
             </div>
 
             {/* 반려 사유 */}
@@ -150,11 +156,11 @@ export default function HomePage() {
 
             {/* 버튼 */}
             <div className="flex gap-3">
-              <Button variant="secondary" className="flex-1" onClick={handleWithdraw}>
-                가입 포기
+              <Button variant="secondary" className="flex-1 min-w-0" onClick={handleWithdraw}>
+                포기
               </Button>
-              <Link to="/my" className="flex-1">
-                <Button className="w-full">수정 후 재신청</Button>
+              <Link to="/apply?reapply=true" className="flex-1 min-w-0">
+                <Button className="w-full">재신청</Button>
               </Link>
             </div>
           </section>
@@ -169,15 +175,33 @@ export default function HomePage() {
 
     return (
       <div className="max-w-md mx-auto space-y-4">
+        {/* 본인 정보 */}
+        <section className="bg-white md:rounded-lg md:shadow p-4">
+          <div>
+            <h1 className="text-lg font-bold text-gray-900">
+              {user.swimmingLevel && SWIMMING_LEVEL_EMOJIS[user.swimmingLevel]} {user.name}님, 안녕하세요!
+            </h1>
+            <div className="flex items-center gap-2 mt-1">
+              <span className="text-xs font-medium px-2 py-0.5 rounded bg-blue-100 text-blue-700">
+                🔵 가입 대기
+              </span>
+            </div>
+          </div>
+        </section>
+
         {/* 상태 안내 */}
         <section className="bg-white md:rounded-lg md:shadow p-6">
           <div className="text-center mb-4">
             <div className="text-4xl mb-2">🏊</div>
-            <h1 className="text-xl font-bold text-gray-900">{user.name}님, 가입 신청이 완료되었어요!</h1>
+            <h1 className="text-xl font-bold text-gray-900">
+              {isReferrerPending
+                ? '추천인 동의를 기다리고 있어요'
+                : '관리자 승인을 기다리고 있어요'}
+            </h1>
             <p className="text-sm text-gray-500 mt-1">
               {isReferrerPending
-                ? '추천인의 승인을 기다리고 있어요.'
-                : '관리자의 승인을 기다리고 있어요.'}
+                ? <><span className="font-medium text-primary-600">{user.referrer}</span>님에게 동의를 요청해 주세요</>
+                : '가입비 납부 확인 후 승인해 드려요'}
             </p>
           </div>
 
@@ -198,7 +222,7 @@ export default function HomePage() {
               </div>
 
               {/* 2단계: 추천인 동의 */}
-              <div className="flex items-start gap-2.5">
+              <div className="flex items-center gap-2.5">
                 {isReferrerApproved ? (
                   <div className="w-5 h-5 rounded-full bg-green-500 text-white flex items-center justify-center flex-shrink-0">
                     <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -210,18 +234,16 @@ export default function HomePage() {
                     <span className="text-xs font-bold">2</span>
                   </div>
                 )}
-                <div>
-                  <span className={`text-sm ${isReferrerApproved ? 'text-green-600 font-medium' : 'font-semibold text-primary-600'}`}>
-                    {isReferrerApproved ? '추천인 동의 완료' : `추천인(${user.referrer || '미정'}) 동의 대기 중`}
-                  </span>
-                  {isReferrerPending && (
-                    <p className="text-xs text-gray-500 mt-0.5">추천인이 승인하면 다음 단계로 진행됩니다</p>
-                  )}
-                </div>
+                <span className={`text-sm ${isReferrerApproved ? 'text-green-600 font-medium' : 'font-bold text-primary-600'}`}>
+                  {isReferrerApproved ? '추천인 동의 완료' : '추천인 동의'}
+                </span>
+                {isReferrerPending && (
+                  <span className="text-xs text-primary-500">← 지금 여기</span>
+                )}
               </div>
 
               {/* 3단계: 관리자 승인 */}
-              <div className="flex items-start gap-2.5">
+              <div className="flex items-center gap-2.5">
                 {isAdminPending ? (
                   <div className="w-5 h-5 rounded-full bg-primary-600 text-white flex items-center justify-center flex-shrink-0 animate-pulse">
                     <span className="text-xs font-bold">3</span>
@@ -231,22 +253,20 @@ export default function HomePage() {
                     <span className="text-xs font-bold">3</span>
                   </div>
                 )}
-                <div>
-                  <span className={`text-sm ${isAdminPending ? 'font-semibold text-primary-600' : 'text-gray-400'}`}>
-                    {isAdminPending ? '관리자 승인 대기 중' : '관리자 승인 대기'}
-                  </span>
-                  {isAdminPending && (
-                    <p className="text-xs text-gray-500 mt-0.5">관리자이 승인하면 가입이 완료됩니다</p>
-                  )}
-                </div>
+                <span className={`text-sm ${isAdminPending ? 'font-bold text-primary-600' : 'text-gray-400'}`}>
+                  {isAdminPending ? '가입비 납부 확인' : '가입비 납부 확인'}
+                </span>
+                {isAdminPending && (
+                  <span className="text-xs text-primary-500">← 지금 여기</span>
+                )}
               </div>
 
-              {/* 4단계: 가입 완료 */}
+              {/* 4단계: 팀 카톡방 입장 (가입 완료) */}
               <div className="flex items-center gap-2.5">
                 <div className="w-5 h-5 rounded-full bg-gray-200 text-gray-400 flex items-center justify-center flex-shrink-0">
                   <span className="text-xs font-bold">4</span>
                 </div>
-                <span className="text-sm text-gray-400">가입 완료</span>
+                <span className="text-sm text-gray-400">팀 카톡방 입장 (가입 완료)</span>
               </div>
             </div>
           </div>
@@ -254,10 +274,10 @@ export default function HomePage() {
           {/* 가입비 납부 안내 - 항상 표시 */}
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
               <h2 className="font-semibold text-blue-900 mb-3 flex items-center gap-2">
-                <span>💰</span> 가입비를 납부해주세요
+                <span>💰</span> 회비 납부 계좌 (모임통장)
               </h2>
               <div className="text-sm text-blue-800 space-y-2">
-                <p>첫 달 회비 2만원 + 수모 2만원 = <span className="font-bold">총 4만원</span></p>
+                <p>가입비 : 회비 2만원 + 수모 2만원 = <span className="font-bold">총 4만원</span></p>
                 <div className="bg-white rounded-lg p-3 mt-3">
                   <p className="text-gray-600 text-xs mb-1">{BANK_ACCOUNT.bank}</p>
                   <p className="font-mono font-bold text-lg text-gray-900">{BANK_ACCOUNT.accountNumber}</p>
@@ -283,10 +303,6 @@ export default function HomePage() {
                     </>
                   )}
                 </button>
-                <p className="text-xs text-blue-700 mt-2 pt-2 border-t border-blue-200">
-                  💡 관리자가 납부를 확인하고 승인하면 가입이 완료됩니다.<br />
-                  이미 납부하셨다면 잠시만 기다려주세요.
-                </p>
               </div>
             </div>
 
@@ -508,12 +524,12 @@ export default function HomePage() {
                   ✕
                 </button>
                 <div className="font-bold mb-1 pr-6">🎉 가입을 환영합니다!</div>
-                <div className="text-gray-300 mb-2">팀 카톡방에 입장 후 자기소개 해주세요</div>
+                <div className="text-gray-300 mb-2">팀 카톡방에 입장 후 자기소개 해주세요!</div>
                 <button
-                  onClick={handleKakaoJoin}
+                  onClick={() => markKakaoJoined(user.id)}
                   className="text-yellow-400 hover:text-yellow-300 text-xs underline"
                 >
-                  다시 보지 않기
+                  완료했어요! (다시보지 않기)
                 </button>
               </div>
               {/* 말풍선 꼬리 - 왼쪽 버튼 가리킴 */}

@@ -23,8 +23,8 @@ export function resetToMockData(): void {
   localStorage.removeItem(STORAGE_KEYS.SETTINGS);
 }
 
-// 데이터 버전 (활동 레벨 데이터 추가)
-const DATA_VERSION = 6;
+// 데이터 버전 (재신청 자동 로그인 적용)
+const DATA_VERSION = 9;
 const DATA_VERSION_KEY = 'zlsu_data_version';
 
 // 앱 초기화 - 데이터가 없거나 버전이 다르면 mock 데이터로 초기화
@@ -542,64 +542,65 @@ export function getMembersWithBirthdayNextMonth(): Member[] {
 // 기본 체크리스트 항목 (신규 회원 인지 순서대로 정리)
 // label: 명사형 제목, description: ~요 문장
 const DEFAULT_CHECKLIST_ITEMS: ChecklistItem[] = [
-  // [1. 활동 소개]
+  // [1. 회칙 동의 - 가장 먼저]
   {
-    id: 'activity',
-    label: '매주 토요일 8시 수영',
-    description: '8시 정각 입수 기준이에요. 수영 후 티타임은 자율 참석!',
+    id: 'rulesConfirm',
+    label: '회칙 확인 및 동의',
+    description: '회칙 전체 내용을 확인하였으며, 이에 동의합니다.',
     isActive: true,
     order: 1,
   },
-  // [2. 가입 비용]
+  // [2. 활동 참여]
   {
-    id: 'joinFee',
-    label: '첫 달 4만원 (회비 2만 + 수모 2만)',
-    description: '첫 달 회비가 포함된 금액이에요. 수모 2장은 5만원. 가입 승인 후 입금해주세요.',
+    id: 'activity',
+    label: '토요일 8시 정각 입수',
+    description: '매주 토요일 8시 정각에 입수하겠습니다. 수영 후 티타임은 자율 참석임을 인지하였습니다.',
     isActive: true,
     order: 2,
   },
+  // [3. 가입 비용]
   {
-    id: 'monthlyFee',
-    label: '다음 달부터 월 회비 2만원 (매월 1일 납부)',
-    description: '납부한 회비는 환불되지 않아요.',
+    id: 'joinFee',
+    label: '첫 달 4만원 납부',
+    description: '가입 승인 후 첫 달 회비 4만원을 납부하겠습니다. (회비 2만 + 수모 2만)',
     isActive: true,
     order: 3,
   },
-  // [3. 출석 체크]
   {
-    id: 'attendance',
-    label: "매주 금요일 자정까지 카톡 '일정'에 출석 체크",
-    description: '참석/불참 여부를 표시해주세요. 미표시 후 불참 시 무단불참으로 벌금이 발생해요.',
+    id: 'monthlyFee',
+    label: '매월 회비 2만원 납부',
+    description: '매월 1일에 회비 2만원을 납부하겠습니다. 납부한 회비는 환불되지 않음을 인지하였습니다.',
     isActive: true,
     order: 4,
   },
-  // [4. 벌금 규정]
+  // [4. 출석 체크]
   {
-    id: 'penalty',
-    label: '지각·무단불참 시 벌금',
-    description: '지각 1분당 500원(최대 1만원), 무단불참 1만원이에요. 사전 표시 시 면제!',
+    id: 'attendance',
+    label: '금요일 자정까지 출석 체크',
+    description: "카톡 '일정'에서 참석/불참을 표시하겠습니다. 미표시 후 불참 시 벌금이 발생함을 인지하였습니다.",
     isActive: true,
     order: 5,
   },
-  // [5. 동의]
+  // [5. 벌금 규정]
   {
-    id: 'rulesConfirm',
-    label: '회칙 숙지',
-    description: '회칙 보기 메뉴에서 전문을 확인할 수 있어요.',
+    id: 'penalty',
+    label: '지각·무단불참 시 벌금',
+    description: '지각 1분당 500원(최대 1만원), 무단불참 1만원을 납부하겠습니다.',
     isActive: true,
     order: 6,
   },
+  // [6. 개인정보 동의]
   {
     id: 'agreeAll',
-    label: '위 내용 및 개인정보 수집·이용 동의',
-    description: '이름, 연락처, 이메일 등을 모임 운영 목적으로 수집해요.',
+    label: '개인정보 수집·이용 동의',
+    description: '이름, 연락처, 이메일 등을 모임 운영 목적으로 수집하는 것에 동의합니다.',
     isActive: true,
     order: 7,
   },
 ];
 
 // 체크리스트 버전 (항목 변경 시 증가시키면 자동 초기화됨)
-const CHECKLIST_VERSION = 7;
+const CHECKLIST_VERSION = 12;
 
 export function getChecklistItems(): ChecklistItem[] {
   const versionKey = 'zlsu_checklist_version';
