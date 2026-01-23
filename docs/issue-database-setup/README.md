@@ -45,6 +45,12 @@ localStorage 기반 목업 시스템을 실제 데이터베이스로 전환
    - `Project URL`
    - `anon public` 키
 
+**전달 형식 예시:**
+```
+Project URL: https://abcdefg.supabase.co
+anon key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+```
+
 ### 4단계: (선택) 카카오 로그인 연동
 
 > SNS 로그인도 함께 구현할 경우

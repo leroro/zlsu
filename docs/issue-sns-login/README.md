@@ -63,6 +63,11 @@
 
 - 복사한 `JavaScript 키`를 Claude에게 전달
 
+**전달 형식 예시:**
+```
+JavaScript 키: abcd1234efgh5678ijkl
+```
+
 ### Claude 작업
 
 - [ ] 카카오 SDK 설치 및 초기화
