@@ -72,7 +72,7 @@ export default function GuidePage() {
             to="/members"
             className="inline-flex items-center gap-1 text-sm text-primary-600 hover:text-primary-700 font-medium"
           >
-            회원 명단에서 확인
+            회원 명단 보러가기
             <span>→</span>
           </Link>
         </div>
@@ -116,7 +116,7 @@ export default function GuidePage() {
             to="/change-status"
             className="inline-flex items-center gap-1 text-sm text-primary-600 hover:text-primary-700 font-medium"
           >
-            상태 변경 신청
+            상태 변경 신청하기
             <span>→</span>
           </Link>
         </div>
@@ -136,7 +136,7 @@ export default function GuidePage() {
               to="/members?tab=birthday"
               className="inline-flex items-center gap-1 text-sm text-primary-600 hover:text-primary-700 font-medium"
             >
-              생일 탭 바로가기
+              생일 보러가기
               <span>→</span>
             </Link>
           </div>
@@ -161,7 +161,7 @@ export default function GuidePage() {
               to="/members"
               className="inline-flex items-center gap-1 text-sm text-primary-600 hover:text-primary-700 font-medium mt-2"
             >
-              회원 명단
+              회원 명단 보러가기
               <span>→</span>
             </Link>
           </div>
@@ -211,6 +211,7 @@ export default function GuidePage() {
             <p className="text-gray-600 text-sm">
               매월 1일에 납부해 주세요.
               즐수팀 모임통장으로 2만원을 입금하시면 됩니다.
+              매월 8일에 단톡방에 회비 미납자 명단이 공개됩니다.
             </p>
           </div>
 
@@ -229,9 +230,9 @@ export default function GuidePage() {
       </section>
 
       {/* 더 궁금한 점 */}
-      <section className="bg-gray-50 md:rounded-lg p-6 mb-4 text-center">
+      <section className="bg-gray-50 md:rounded-lg p-6 pb-10 text-center">
         <p className="text-gray-600 text-sm">
-          더 궁금한 점이 있으시면 카카오톡 단톡방에서 질문해 주세요!
+          더 궁금한 점이 있으신가요?<br /> 팀 카톡방에서 질문해 주세요!
         </p>
       </section>
     </div>

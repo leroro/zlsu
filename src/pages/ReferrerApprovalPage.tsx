@@ -154,13 +154,13 @@ export default function ReferrerApprovalPage() {
         <h1 className="text-xl font-bold text-gray-900 mb-2 text-center">추천인 동의 요청</h1>
         <p className="text-sm text-gray-500 text-center mb-4">
           <span className="font-bold text-primary-600">{applicant.name}</span>님이 회원 가입을 위해<br />
-          <span className="font-bold">{user.name}</span>님을 추천인으로 지정했습니다.
+          <span className="font-bold">{user.name}</span>님을 추천인으로 지정했어요.
         </p>
 
-        {/* 신청자 정보 */}
+        {/* 신청서 정보 */}
         <div className="bg-gray-50 rounded-lg p-4 mb-6">
           <h2 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-            <span>👤</span> 신청자 정보
+            <span>👤</span> 신청서 정보
           </h2>
           <div className="grid grid-cols-2 gap-3 text-sm">
             <div>
@@ -223,8 +223,11 @@ export default function ReferrerApprovalPage() {
           )}
         </div>
 
+        <p className="text-gray-700 mb-3 font-medium">
+          ✓ 추천인 <span className="font-bold text-primary-700">{user.name}</span>님, <span className="font-bold">체크</span>해 주세요.
+        </p>
         {/* 체크박스 */}
-        <div className="space-y-3 mb-6">
+        <div className="space-y-3 mb-4">
           <label
             onClick={() => setAgreedToSuitability(!agreedToSuitability)}
             className={`flex items-start gap-3 p-3 border rounded-lg cursor-pointer transition-colors ${
@@ -246,7 +249,7 @@ export default function ReferrerApprovalPage() {
             </div>
             <div>
               <p className="text-sm font-medium text-gray-900">
-                <span className="text-primary-600">{applicant.name}</span>님이 우리 모임에 적합하다고 생각하여 추천합니다.
+                <span className="text-primary-600">{applicant.name}</span>님이 제출한 신청서 정보에 이상이 없음을 확인했습니다.
               </p>
             </div>
           </label>
@@ -272,7 +275,7 @@ export default function ReferrerApprovalPage() {
             </div>
             <div>
               <p className="text-sm font-medium text-gray-900">
-                <span className="text-primary-600">{applicant.name}</span>님이 모임에 잘 융화될 수 있도록 안내하고 돕겠습니다.
+                <span className="text-primary-600">{applicant.name}</span>님을 우리 모임에 추천하며, 잘 융화될 수 있도록 돕겠습니다.
               </p>
             </div>
           </label>
@@ -298,7 +301,7 @@ export default function ReferrerApprovalPage() {
             </div>
             <div>
               <p className="text-sm font-medium text-gray-900">
-                <span className="text-purple-600 font-semibold">최선숙</span>님<span className="text-gray-500 text-xs ml-0.5">(수모 담당)</span>에게 수모를 수령하여 <span className="text-primary-600 font-semibold">{applicant.name}</span>님에게 전달하겠습니다.
+                모임통장에 가입비가 납부되면, <span className="text-purple-600 font-semibold">최선숙</span>님<span className="text-gray-500 text-xs ml-0.5">(수모 담당)</span>에게 <strong>수모</strong>를 요청하여 <span className="text-primary-600 font-semibold">{applicant.name}</span>님에게 전달하겠습니다.
               </p>
             </div>
           </label>
@@ -306,25 +309,20 @@ export default function ReferrerApprovalPage() {
 
         {/* 안내 메시지 */}
         <div className="bg-gray-50 rounded-lg p-4 mb-4 text-sm">
-          <p className="text-gray-700 mb-3">
-            ✓ <span className="font-medium">모두 체크</span>해야 동의할 수 있습니다.
+          <p className="text-gray-600 mb-2">
+            신청서 정보에 <strong>잘못된 내용</strong>이 있거나, 동의할 수 없는 항목이 있나요?
           </p>
-          <div className="border-t border-gray-200 pt-3">
-            <p className="text-gray-600 mb-2">
-              신청자 정보에 잘못된 내용이 있거나, 동의할 수 없는 항목이 있나요?
-            </p>
-            <p className="text-gray-500 text-xs mb-3">
-              반려해도 신청자가 정보를 수정한 뒤 재신청할 수 있어요.
-            </p>
-            <button
-              type="button"
-              onClick={() => setShowRejectModal(true)}
-              disabled={isLoading}
-              className="text-sm text-red-600 hover:text-red-700 underline"
-            >
-              반려 사유 입력하기
-            </button>
-          </div>
+          <button
+            type="button"
+            onClick={() => setShowRejectModal(true)}
+            disabled={isLoading}
+            className="text-sm text-red-600 hover:text-red-700 underline font-bold"
+          >
+            반려 사유 입력하기
+          </button>
+          <p className="text-gray-500 text-xs mt-2">
+            💡안심하세요! 반려해도 재신청할 수 있어요.
+          </p>
         </div>
 
         {/* 에러 메시지 */}
@@ -364,8 +362,8 @@ export default function ReferrerApprovalPage() {
             {/* 반려 사유 라디오 버튼 */}
             <div className="space-y-2 mb-4">
               {[
-                { id: 'not-met', label: '직접 만나본 적이 없습니다.', needsDetail: false },
-                { id: 'not-informed', label: '사전에 가입 의사를 전달받지 못했습니다.', needsDetail: false },
+                { id: 'not-met', label: '모르는 사람입니다.', needsDetail: false },
+                { id: 'not-informed', label: '가입 의사를 전달받지 못했습니다.', needsDetail: false },
                 { id: 'wrong-info', label: '신청서 정보가 잘못 입력되었습니다.', needsDetail: true },
                 { id: 'other', label: '기타 (직접 입력)', needsDetail: true },
               ].map((option) => (

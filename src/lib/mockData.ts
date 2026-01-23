@@ -361,7 +361,7 @@ export const initialMembers: Member[] = [
     referrerApproval: {
       status: 'rejected',
       processedAt: '2026-01-18',
-      rejectReason: '직접 만나본 적이 없어서 추천하기 어렵습니다.',
+      rejectReason: '모르는 사람입니다.',
     },
   },
 

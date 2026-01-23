@@ -553,8 +553,8 @@ const DEFAULT_CHECKLIST_ITEMS: ChecklistItem[] = [
   // [2. 활동 참여]
   {
     id: 'activity',
-    label: '토요일 8시 정각 입수',
-    description: '매주 토요일 8시 정각에 입수하겠습니다. 수영 후 티타임은 자율 참석임을 인지하였습니다.',
+    label: '토요일 8시 정각 입수 (수영장 시계)',
+    description: '매주 토요일 8시 정각에 입수하겠습니다. 티타임은 자율 참석임을 인지하였습니다.',
     isActive: true,
     order: 2,
   },

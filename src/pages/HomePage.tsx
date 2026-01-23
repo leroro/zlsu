@@ -398,7 +398,7 @@ export default function HomePage() {
   return (
     <div className="space-y-4">
       {/* 환영 + 내 상태 */}
-      <section className="bg-white md:rounded-lg md:shadow p-4">
+      <section className="bg-white md:rounded-lg md:shadow p-4 pt-5">
         <div>
           <h1 className="text-lg font-bold text-gray-900">
             {user.swimmingLevel && SWIMMING_LEVEL_EMOJIS[user.swimmingLevel]} {user.position && <span className="text-gray-500 font-normal">{user.position} </span>}{user.name}님, 안녕하세요!
@@ -572,7 +572,7 @@ export default function HomePage() {
 
       {/* 정원 */}
       <section className="bg-white md:rounded-lg md:shadow p-4">
-        <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span>📊</span>
             <h2 className="font-bold text-gray-900">팀 정원</h2>
@@ -590,7 +590,7 @@ export default function HomePage() {
         {remainingSlots > 0 && canRecommendNewMember(user.activityLevel) && (
           <button
             onClick={handleCopyInviteLink}
-            className="w-full py-2 px-4 bg-primary-50 hover:bg-primary-100 text-primary-700 text-sm font-medium rounded-lg transition-colors flex items-center justify-center gap-2"
+            className="w-full mt-3 py-2 px-4 bg-primary-50 hover:bg-primary-100 text-primary-700 text-sm font-medium rounded-lg transition-colors flex items-center justify-center gap-2"
           >
             <span>🔗</span>
             {inviteLinkCopied ? '복사됨!' : '초대 링크 복사하기'}

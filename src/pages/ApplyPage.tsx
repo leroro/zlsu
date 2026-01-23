@@ -674,7 +674,7 @@ export default function ApplyPage() {
               {referrerVerified && (
                 <div className="bg-primary-50 border border-primary-100 rounded-lg p-4">
                   <p className="text-sm text-gray-700">
-                    신청서를 작성해 주세요. 이상이 없다면 <span className="font-semibold text-primary-600">{additionalInfo.referrer}</span>님이 추천인 동의를 해주실 거예요.
+                    가입신청서를 제출하면 <span className="font-semibold text-primary-600">{additionalInfo.referrer}</span>님에게 추천인 동의 요청이 발송됩니다.
                   </p>
                 </div>
               )}
@@ -812,7 +812,7 @@ export default function ApplyPage() {
         {/* 3단계: 기본 정보 */}
         {currentStep === 3 && (
           <div className="space-y-4">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">기본 정보 입력</h2>
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">기본 정보를 입력해 주세요.</h2>
 
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
@@ -958,7 +958,7 @@ export default function ApplyPage() {
         {/* 4단계: 부가 정보 */}
         {currentStep === 4 && (
           <form onSubmit={handleSubmit} className="space-y-4">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">부가 정보 입력</h2>
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">수영 정보를 입력해 주세요.</h2>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
