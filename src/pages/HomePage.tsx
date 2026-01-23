@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { getActiveAndInactiveMemberCount, getSettings, getRecentJoinedMembers, getRecentStatusChanges, getStateChanges, getWithdrawalRequests, getMembersWithBirthdayThisMonth, getMembersWithBirthdayNextMonth, getPendingMembersForReferrer, getMemberById, withdrawApplication, markKakaoJoined } from '../lib/api';
+import { getActiveAndInactiveMemberCount, getSettings, getRecentJoinedMembers, getRecentStatusChanges, getStateChanges, getWithdrawalRequests, getMembersWithBirthdayThisMonth, getMembersWithBirthdayNextMonth, getPendingMembersForReferrer, getMemberById, withdrawApplication, markKakaoJoined, markOnboardingCompleted } from '../lib/api';
 import { StatusChangeHistory } from '../lib/types';
 import { STATUS_LABELS, BANK_ACCOUNT, SWIMMING_LEVEL_EMOJIS } from '../lib/constants';
 import Button from '../components/common/Button';
@@ -322,12 +322,21 @@ export default function HomePage() {
   const fullMemberData = getMemberById(user.id);
   const showWelcomeMessage = user.status === 'active' && !fullMemberData?.hasJoinedKakao;
 
+  // 입장 후 온보딩 안내 표시 여부 (카톡방 입장 완료 && 온보딩 미완료)
+  const showOnboardingGuide = user.status === 'active' && fullMemberData?.hasJoinedKakao && !fullMemberData?.hasCompletedOnboarding;
+
   // 카톡방 입장 버튼 클릭 핸들러
   const handleKakaoJoin = () => {
     if (settings.kakaoInviteLink) {
       markKakaoJoined(user.id);
       window.open(settings.kakaoInviteLink, '_blank');
     }
+  };
+
+  // 온보딩 완료 핸들러
+  const handleCompleteOnboarding = () => {
+    markOnboardingCompleted(user.id);
+    window.location.reload();
   };
 
   // 날짜 포맷 (MM.DD)
@@ -419,6 +428,38 @@ export default function HomePage() {
               <span className="text-xl">💬</span>
               단톡방 입장하기
             </button>
+          </div>
+        </section>
+      )}
+
+      {/* 신규 회원 온보딩 가이드 - 카톡방 입장 후 표시 */}
+      {showOnboardingGuide && (
+        <section className="bg-gradient-to-r from-green-50 to-emerald-50 border-y border-green-200 md:border md:rounded-lg md:shadow p-4">
+          <div className="flex items-start gap-3">
+            <span className="text-2xl">✅</span>
+            <div className="flex-1">
+              <h2 className="font-bold text-gray-900 mb-2">다음 단계를 완료해주세요!</h2>
+              <div className="space-y-2 text-sm text-gray-700">
+                <div className="flex items-center gap-2">
+                  <span className="text-green-600">1.</span>
+                  <span>카톡방에서 <strong>자기소개</strong>하기</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-green-600">2.</span>
+                  <span>카톡방 <strong>일정(달력)</strong>에서 참석할 토요일 출석 체크</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-green-600">3.</span>
+                  <span>추천인에게 <strong>수모 수령</strong>하기</span>
+                </div>
+              </div>
+              <button
+                onClick={handleCompleteOnboarding}
+                className="mt-4 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium transition-colors"
+              >
+                완료했어요!
+              </button>
+            </div>
           </div>
         </section>
       )}

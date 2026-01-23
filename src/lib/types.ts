@@ -65,6 +65,8 @@ export interface Member {
   adminApproval?: AdminApproval;
   // 카카오톡 단톡방 입장 여부
   hasJoinedKakao?: boolean;
+  // 신규 회원 온보딩 완료 여부 (자기소개, 일정 확인 등)
+  hasCompletedOnboarding?: boolean;
 }
 
 // 가입 신청 인터페이스

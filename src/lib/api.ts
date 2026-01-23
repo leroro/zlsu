@@ -877,3 +877,12 @@ export function markKakaoJoined(memberId: string): boolean {
   updateMember(memberId, { hasJoinedKakao: true });
   return true;
 }
+
+// 신규 회원 온보딩 완료 처리
+export function markOnboardingCompleted(memberId: string): boolean {
+  const member = getMemberById(memberId);
+  if (!member) return false;
+
+  updateMember(memberId, { hasCompletedOnboarding: true });
+  return true;
+}
