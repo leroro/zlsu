@@ -346,9 +346,6 @@ export default function MembersPage() {
                           <div>
                             <div className="flex items-center gap-2">
                               <span className="font-medium text-gray-900">{member.name}</span>
-                              {member.isLunar && (
-                                <span className="px-1.5 py-0.5 text-xs bg-purple-100 text-purple-700 rounded">(음)</span>
-                              )}
                               <MemberStatusBadge status={member.status} />
                             </div>
                           </div>
