@@ -420,27 +420,6 @@ export default function HomePage() {
         )}
       </section>
 
-      {/* 신규 회원 환영 메시지 - 카톡방 미입장 시에만 표시 */}
-      {showWelcomeMessage && settings.kakaoInviteLink && (
-        <section className="bg-gradient-to-r from-yellow-50 to-amber-50 border-y border-yellow-200 md:border md:rounded-lg md:shadow p-4">
-          <div className="text-center">
-            <div className="text-3xl mb-2">🎉</div>
-            <h2 className="text-lg font-bold text-gray-900 mb-1">가입을 환영합니다!</h2>
-            <p className="text-sm text-gray-600 mb-4">
-              카카오 단톡방에 입장하여 자기소개를 해주세요.
-            </p>
-            <button
-              onClick={handleKakaoJoin}
-              className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-bold text-base transition-all hover:scale-105 border-2"
-              style={{ backgroundColor: '#FEE500', borderColor: '#191919', color: '#191919' }}
-            >
-              <span className="text-xl">💬</span>
-              단톡방 입장하기
-            </button>
-          </div>
-        </section>
-      )}
-
       {/* 신규 회원 온보딩 가이드 - 카톡방 입장 후 표시 */}
       {showOnboardingGuide && (
         <section className="bg-gradient-to-r from-green-50 to-emerald-50 border-y border-green-200 md:border md:rounded-lg md:shadow p-4">
@@ -515,27 +494,50 @@ export default function HomePage() {
         <h2 className="font-bold text-gray-900 mb-3">자주 찾는 메뉴</h2>
         <div className="grid grid-cols-2 gap-3">
           {/* 카카오톡 팀 카톡방 - 항상 표시 */}
-          {settings.kakaoInviteLink ? (
-            <a
-              href={settings.kakaoInviteLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex flex-col items-center justify-center p-4 rounded-xl transition-all hover:scale-105 border-2"
-              style={{ backgroundColor: '#FEE500', borderColor: '#191919' }}
-            >
-              <span className="text-3xl mb-1">💬</span>
-              <span className="text-sm font-bold" style={{ color: '#191919' }}>팀 카톡방 입장</span>
-            </a>
-          ) : (
-            <div
-              className="flex flex-col items-center justify-center p-4 rounded-xl border-2 opacity-50 cursor-not-allowed"
-              style={{ backgroundColor: '#FEE500', borderColor: '#191919' }}
-            >
-              <span className="text-3xl mb-1">💬</span>
-              <span className="text-sm font-bold" style={{ color: '#191919' }}>팀 카톡방</span>
-              <span className="text-xs text-gray-600">링크 준비 중</span>
-            </div>
-          )}
+          <div className="relative">
+            {/* 신규 회원 환영 툴팁 */}
+            {showWelcomeMessage && settings.kakaoInviteLink && (
+              <div className="absolute -top-2 left-1/2 -translate-x-1/2 -translate-y-full z-10 w-48">
+                <div className="bg-gray-900 text-white text-xs rounded-lg p-3 shadow-lg">
+                  <div className="font-bold mb-1">🎉 가입을 환영합니다!</div>
+                  <div className="text-gray-300 mb-2">입장 후 자기소개 해주세요</div>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleKakaoJoin();
+                    }}
+                    className="text-yellow-400 hover:text-yellow-300 text-xs underline"
+                  >
+                    다시 보지 않기
+                  </button>
+                </div>
+                {/* 말풍선 꼬리 */}
+                <div className="absolute left-1/2 -translate-x-1/2 -bottom-1 w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-gray-900"></div>
+              </div>
+            )}
+            {settings.kakaoInviteLink ? (
+              <a
+                href={settings.kakaoInviteLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => showWelcomeMessage && handleKakaoJoin()}
+                className="flex flex-col items-center justify-center p-4 rounded-xl transition-all hover:scale-105 border-2 h-full"
+                style={{ backgroundColor: '#FEE500', borderColor: '#191919' }}
+              >
+                <span className="text-3xl mb-1">💬</span>
+                <span className="text-sm font-bold" style={{ color: '#191919' }}>팀 카톡방 입장</span>
+              </a>
+            ) : (
+              <div
+                className="flex flex-col items-center justify-center p-4 rounded-xl border-2 opacity-50 cursor-not-allowed h-full"
+                style={{ backgroundColor: '#FEE500', borderColor: '#191919' }}
+              >
+                <span className="text-3xl mb-1">💬</span>
+                <span className="text-sm font-bold" style={{ color: '#191919' }}>팀 카톡방</span>
+                <span className="text-xs text-gray-600">링크 준비 중</span>
+              </div>
+            )}
+          </div>
           {/* 수모 추가 구입 */}
           <Link
             to="/request/swim-cap"
