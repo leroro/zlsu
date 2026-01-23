@@ -234,6 +234,11 @@ export default function MembersPage() {
                           {nameInfo && (
                             <span className="text-sm text-gray-500">({nameInfo})</span>
                           )}
+                          {member.birthDateType === 'lunar' && member.birthDate && (
+                            <span className="text-xs text-purple-600">
+                              (음력 {extractMonthDay(member.birthDate).month}/{extractMonthDay(member.birthDate).day})
+                            </span>
+                          )}
                           {member.role === 'admin' && (
                             <span className="px-1.5 py-0.5 text-xs font-medium bg-primary-600 text-white rounded ml-1">
                               스탭
