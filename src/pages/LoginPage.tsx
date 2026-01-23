@@ -40,6 +40,12 @@ const DEV_ACCOUNTS = [
       { email: 'choisunsuk@test.com', password: 'test123', name: '최선숙', desc: '활성 회원' },
     ],
   },
+  {
+    category: '신규 회원 (환영 툴팁 테스트)',
+    accounts: [
+      { email: 'newmember@test.com', password: 'test123', name: '김신규', desc: '카톡방 미입장' },
+    ],
+  },
 ];
 
 export default function LoginPage() {

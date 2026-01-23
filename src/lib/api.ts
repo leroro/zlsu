@@ -23,8 +23,8 @@ export function resetToMockData(): void {
   localStorage.removeItem(STORAGE_KEYS.SETTINGS);
 }
 
-// 데이터 버전 (음력 생일 데이터 추가로 버전 업)
-const DATA_VERSION = 3;
+// 데이터 버전 (신규 회원 테스트 계정 이름 수정)
+const DATA_VERSION = 5;
 const DATA_VERSION_KEY = 'zlsu_data_version';
 
 // 앱 초기화 - 데이터가 없거나 버전이 다르면 mock 데이터로 초기화
@@ -291,6 +291,7 @@ export function createPendingMember(data: {
   referrer?: string;
   swimmingAbility?: Member['swimmingAbility'];
   swimmingLevel?: Member['swimmingLevel'];
+  competitionHistory?: Member['competitionHistory'];
   competitionInterest?: Member['competitionInterest'];
   motivation?: string;
 }): Member {
@@ -306,6 +307,7 @@ export function createPendingMember(data: {
     referrer: data.referrer,
     swimmingAbility: data.swimmingAbility,
     swimmingLevel: data.swimmingLevel,
+    competitionHistory: data.competitionHistory,
     competitionInterest: data.competitionInterest,
     motivation: data.motivation,
     status: 'pending',
