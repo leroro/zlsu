@@ -36,6 +36,13 @@ const DEV_ACCOUNTS = [
     ],
   },
   {
+    category: '휴면 회원 (활성 신청 테스트)',
+    accounts: [
+      { email: 'kangsoyeon@test.com', password: 'test123', name: '강소연', desc: '휴면 상태' },
+      { email: 'joyounghoon@test.com', password: 'test123', name: '조영훈', desc: '휴면 상태' },
+    ],
+  },
+  {
     category: '신규 회원 (환영 툴팁 테스트)',
     accounts: [
       { email: 'newmember@test.com', password: 'test123', name: '김신규', desc: '카톡방 미입장' },

@@ -1,9 +1,11 @@
 import { Link } from 'react-router-dom';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import { ACTIVITY_LEVELS, ACTIVITY_LEVEL_LABELS, ACTIVITY_LEVEL_ICONS, ACTIVITY_LEVEL_DESCRIPTIONS } from '../lib/constants';
+import { getSettings } from '../lib/api';
 
 export default function GuidePage() {
   useDocumentTitle('필독! 모임 가이드');
+  const settings = getSettings();
 
   return (
     <div className="max-w-2xl mx-auto">
@@ -91,21 +93,35 @@ export default function GuidePage() {
             <span className="text-xl">🟢</span>
             <div className="flex-1">
               <span className="font-semibold text-gray-900">활성</span>
-              <p className="text-sm text-gray-600">정기적으로 모임에 참여하는 상태. 매월 회비 납부</p>
+              <p className="text-sm text-gray-600">매주 토요일 연습에 참여하는 상태. 매월 회비 납부</p>
             </div>
           </div>
           <div className="flex items-center gap-3 p-3 bg-yellow-50 rounded-lg">
             <span className="text-xl">🟡</span>
             <div className="flex-1">
               <span className="font-semibold text-gray-900">휴면</span>
-              <p className="text-sm text-gray-600">일시적으로 쉬는 상태. 회비 면제, 정원에서 제외</p>
+              <p className="text-sm text-gray-600">토요일 연습에 참여하지 못하는 상태. 회비 면제, 정원에서 제외</p>
             </div>
+          </div>
+        </div>
+
+        {/* 휴면 전환 기준 안내 */}
+        <div className="bg-blue-50 rounded-lg p-4 mb-4">
+          <h3 className="font-semibold text-gray-900 mb-2 text-sm">휴면 전환 기준</h3>
+          <div className="text-sm text-gray-700 space-y-2">
+            <p>
+              <strong className="text-blue-700">연속 {settings.dormancyPeriodWeeks}주 이상</strong> 토요일 연습에 불참하면 휴면으로 전환됩니다.
+            </p>
+            <p className="text-gray-600">
+              미리 불참이 예상되면 직접 휴면 신청을 해주세요. 연속 불참 시 관리자가 휴면 전환을 안내드립니다.
+            </p>
           </div>
         </div>
 
         <div className="bg-amber-50 rounded-lg p-4 mb-4">
           <h3 className="font-semibold text-gray-900 mb-2 text-sm">알아두세요</h3>
           <ul className="text-sm text-gray-700 space-y-1">
+            <li>• 휴면 중에도 <strong>팀 카톡방은 유지</strong>됩니다</li>
             <li>• 휴면에서 활성으로 돌아오려면 정원에 여유가 있어야 해요</li>
             <li>• 복귀 시 활동지수는 "일반"으로 리셋됩니다 (스태프 제외)</li>
           </ul>

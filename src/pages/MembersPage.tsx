@@ -1,22 +1,20 @@
 import { useState, useMemo } from 'react';
 import { Navigate, useSearchParams } from 'react-router-dom';
 import { getMembers, getStateChanges, getWithdrawalRequests } from '../lib/api';
-import { MemberStatus, Member, ActivityLevel } from '../lib/types';
-import { STATUS_LABELS, GENDER_LABELS, ACTIVITY_LEVEL_ICONS, ACTIVITY_LEVEL_LABELS } from '../lib/constants';
+import { MemberStatus, Member } from '../lib/types';
+import { STATUS_LABELS, GENDER_LABELS, ACTIVITY_LEVEL_ICONS } from '../lib/constants';
+// 순위 탭 복원 시 필요: import { ActivityLevel } from '../lib/types';
+// 순위 탭 복원 시 필요: import { ACTIVITY_LEVEL_LABELS } from '../lib/constants';
 import { MemberStatusBadge } from '../components/common/StatusBadge';
 import Button from '../components/common/Button';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import { useAuth } from '../contexts/AuthContext';
 import { lunarToSolar, extractMonthDay } from '../lib/dateUtils';
 
-// 활동지수 레벨 순서 (높은 순)
-const LEVEL_ORDER: Record<ActivityLevel, number> = {
-  staff: 5,
-  core: 4,
-  passionate: 3,
-  regular: 2,
-  newbie: 1,
-};
+// 순위 탭 복원 시 필요: 활동지수 레벨 순서 (높은 순)
+// const LEVEL_ORDER: Record<ActivityLevel, number> = {
+//   staff: 5, core: 4, passionate: 3, regular: 2, newbie: 1,
+// };
 
 // 생일 회원 정보 타입 (양력 변환 정보 포함)
 type BirthdayMember = Member & {
@@ -45,8 +43,9 @@ export default function MembersPage() {
   }
 
   // 탭 상태 (URL 파라미터 기반)
+  // 순위 탭은 포인트 시스템 도입 전까지 숨김 처리 (ranking → members로 리다이렉트)
   const tabParam = searchParams.get('tab');
-  const currentTab: TabType = tabParam === 'birthday' ? 'birthday' : tabParam === 'ranking' ? 'ranking' : 'members';
+  const currentTab: TabType = tabParam === 'birthday' ? 'birthday' : 'members';
   const setTab = (tab: TabType) => {
     if (tab === 'members') {
       setSearchParams({});
@@ -97,18 +96,18 @@ export default function MembersPage() {
       });
   }, [members, filter]);
 
-  // 순위 탭용 (레벨 순 정렬, 활성 회원만)
-  const rankingMembers = useMemo(() => {
-    return members
-      .filter((m) => m.role !== 'admin')
-      .filter((m) => m.status === 'active') // 활성 회원만
-      .sort((a, b) => {
-        const levelA = a.activityLevel ? LEVEL_ORDER[a.activityLevel] : 0;
-        const levelB = b.activityLevel ? LEVEL_ORDER[b.activityLevel] : 0;
-        if (levelA !== levelB) return levelB - levelA;
-        return new Date(a.joinedAt).getTime() - new Date(b.joinedAt).getTime();
-      });
-  }, [members]);
+  // 순위 탭 복원 시 필요: 레벨 순 정렬, 활성 회원만
+  // const rankingMembers = useMemo(() => {
+  //   return members
+  //     .filter((m) => m.role !== 'admin')
+  //     .filter((m) => m.status === 'active')
+  //     .sort((a, b) => {
+  //       const levelA = a.activityLevel ? LEVEL_ORDER[a.activityLevel] : 0;
+  //       const levelB = b.activityLevel ? LEVEL_ORDER[b.activityLevel] : 0;
+  //       if (levelA !== levelB) return levelB - levelA;
+  //       return new Date(a.joinedAt).getTime() - new Date(b.joinedAt).getTime();
+  //     });
+  // }, [members]);
 
   const statusCounts = useMemo(() => {
     const regularMembers = members.filter((m) => m.role !== 'admin');
@@ -171,6 +170,7 @@ export default function MembersPage() {
           >
             👥 명단
           </button>
+          {/* 순위 탭: 포인트 시스템 도입 전까지 숨김 처리
           <button
             onClick={() => setTab('ranking')}
             className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${
@@ -181,6 +181,7 @@ export default function MembersPage() {
           >
             🏆 순위
           </button>
+          */}
           <button
             onClick={() => setTab('birthday')}
             className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${
@@ -309,23 +310,21 @@ export default function MembersPage() {
           </>
         )}
 
-        {/* 순위 탭 - 활동지수 레벨 순위 */}
+        {/* 순위 탭 - 포인트 시스템 도입 전까지 숨김 처리
         {currentTab === 'ranking' && (
           <>
-            {/* 내 순위 요약 */}
             {(() => {
               const myRank = rankingMembers.findIndex(m => m.id === user?.id) + 1;
               const myLevel = user?.activityLevel;
               const myLevelLabel = myLevel ? ACTIVITY_LEVEL_LABELS[myLevel] : null;
               const myLevelEmoji = myLevel ? ACTIVITY_LEVEL_ICONS[myLevel] : null;
 
-              // 레벨별 응원 메시지
               const encourageMessage: Record<ActivityLevel, string> = {
-                staff: '모임의 든든한 기둥! 감사합니다 🙏',
-                core: '핵심 멤버로 활약 중! 👏',
-                passionate: '열정이 넘치네요! 🔥',
-                regular: '꾸준히 참여해 주세요! 💪',
-                newbie: '환영해요! 곧 적응할 거예요 🌱',
+                staff: '모임의 든든한 기둥! 감사합니다',
+                core: '핵심 멤버로 활약 중!',
+                passionate: '열정이 넘치네요!',
+                regular: '꾸준히 참여해 주세요!',
+                newbie: '환영해요! 곧 적응할 거예요',
               };
 
               if (myRank > 0 && myLevel) {
@@ -366,7 +365,6 @@ export default function MembersPage() {
                       isMe ? 'bg-primary-100 ring-2 ring-primary-400' : 'bg-gray-50'
                     }`}
                   >
-                    {/* 순위 */}
                     <div className="w-8 text-center">
                       <span className={`text-sm font-bold ${
                         index === 0 ? 'text-amber-500' :
@@ -378,14 +376,12 @@ export default function MembersPage() {
                       </span>
                     </div>
 
-                    {/* 레벨 아이콘 */}
                     <div className={`w-8 h-8 rounded-full flex items-center justify-center text-base flex-shrink-0 ${
                       isMe ? 'bg-primary-200' : 'bg-gray-100'
                     }`}>
                       {levelEmoji || '-'}
                     </div>
 
-                    {/* 이름 + 나 표시 */}
                     <div className="flex-1 min-w-0 flex items-center gap-1.5">
                       {isMe && (
                         <span className="w-5 h-5 text-[10px] font-medium bg-primary-500 text-white rounded-full flex items-center justify-center flex-shrink-0">
@@ -400,7 +396,6 @@ export default function MembersPage() {
                       )}
                     </div>
 
-                    {/* 레벨명 */}
                     {levelLabel && (
                       <span className={`text-sm ${isMe ? 'text-primary-700 font-medium' : 'text-gray-500'}`}>
                         {levelLabel}
@@ -412,6 +407,7 @@ export default function MembersPage() {
             </div>
           </>
         )}
+        */}
 
         {/* 생일 탭 */}
         {currentTab === 'birthday' && (

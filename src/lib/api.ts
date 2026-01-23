@@ -62,6 +62,7 @@ const DEFAULT_SETTINGS: SystemSettings = {
   maxCapacity: 16, // 기본 정원
   includeInactiveInCapacity: false, // 기본값: 활성 회원만 정원에 포함
   kakaoInviteLink: 'https://invite.kakao.com/tc/yOTCtJKzHs', // 카카오톡 단톡방 초대 링크
+  dormancyPeriodWeeks: 3, // 휴면 신청 기준: 3주 이상 불참 시
 };
 
 // 로컬 스토리지에서 데이터 가져오기

@@ -16,23 +16,54 @@ export default function HomePage() {
   const maxCapacity = settings.maxCapacity;
   const remainingSlots = maxCapacity - stats.capacityCount;
 
+  // 클립보드 복사 유틸리티 (모바일 fallback 포함)
+  const copyToClipboard = async (text: string): Promise<boolean> => {
+    try {
+      await navigator.clipboard.writeText(text);
+      return true;
+    } catch {
+      // fallback: 임시 textarea 생성 (모바일 호환)
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      textarea.style.position = 'fixed';
+      textarea.style.left = '-9999px';
+      textarea.style.top = '0';
+      textarea.setAttribute('readonly', '');
+      document.body.appendChild(textarea);
+      textarea.focus();
+      textarea.select();
+      try {
+        document.execCommand('copy');
+        return true;
+      } catch {
+        return false;
+      } finally {
+        document.body.removeChild(textarea);
+      }
+    }
+  };
+
   // 계좌번호 복사 상태 (훅은 조건부 반환 전에 선언)
   const [copied, setCopied] = useState(false);
-  const handleCopyAccount = () => {
-    navigator.clipboard.writeText(BANK_ACCOUNT.accountNumber);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+  const handleCopyAccount = async () => {
+    const success = await copyToClipboard(BANK_ACCOUNT.accountNumber);
+    if (success) {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
   };
 
   // 초대 링크 복사 상태
   const [inviteLinkCopied, setInviteLinkCopied] = useState(false);
-  const handleCopyInviteLink = () => {
+  const handleCopyInviteLink = async () => {
     // 추천인 정보를 포함한 초대 링크 생성
     const referrerParam = encodeURIComponent(user?.name || '');
     const inviteUrl = `${window.location.origin}/about?ref=${referrerParam}`;
-    navigator.clipboard.writeText(inviteUrl);
-    setInviteLinkCopied(true);
-    setTimeout(() => setInviteLinkCopied(false), 2000);
+    const success = await copyToClipboard(inviteUrl);
+    if (success) {
+      setInviteLinkCopied(true);
+      setTimeout(() => setInviteLinkCopied(false), 2000);
+    }
   };
 
   // 환영 툴팁 임시 닫기 상태 (세션 동안만 유지)
@@ -559,13 +590,13 @@ export default function HomePage() {
               <span className="text-xs text-gray-600">링크 준비 중</span>
             </div>
           )}
-          {/* 수모 추가 구입 */}
+          {/* 필독! 모임 가이드 */}
           <Link
-            to="/request/swim-cap"
+            to="/guide"
             className="flex flex-col items-center justify-center p-4 bg-blue-50 hover:bg-blue-100 rounded-xl transition-all hover:scale-105"
           >
-            <span className="text-3xl mb-1">🏊</span>
-            <span className="text-sm font-bold text-blue-900">수모 추가 구입 안내</span>
+            <span className="text-3xl mb-1">📖</span>
+            <span className="text-sm font-bold text-blue-900">필독! 모임 가이드</span>
           </Link>
         </div>
       </section>

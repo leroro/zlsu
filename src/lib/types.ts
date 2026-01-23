@@ -6,6 +6,7 @@ export interface SystemSettings {
   maxCapacity: number; // 최대 정원
   includeInactiveInCapacity: boolean; // 휴면 회원 정원 포함 여부
   kakaoInviteLink?: string; // 카카오톡 단톡방 초대 링크
+  dormancyPeriodWeeks: number; // 휴면 신청 기준 기간 (주 단위)
 }
 
 // 회원 역할

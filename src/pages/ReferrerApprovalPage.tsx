@@ -451,19 +451,20 @@ export default function ReferrerApprovalPage() {
       {showApproveModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-lg p-6 max-w-md w-full">
-            <h3 className="text-lg font-bold text-gray-900 mb-2">
-              {applicant.name}님의 가입에 동의하시겠습니까?
+            <h3 className="text-lg font-bold text-gray-900 mb-3">
+              가입에 동의하시겠습니까?
             </h3>
 
-            {/* 가입 절차 안내 */}
-            <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 mb-4">
-              <p className="text-sm text-amber-800">
-                <span className="font-medium">📋 가입 절차 안내</span><br />
-                <span className="text-xs">
-                  추천인 동의 후, 신청자가 <span className="font-medium">가입비를 납부</span>하면<br />
-                  관리자가 납부 확인 후 최종 승인합니다.
-                </span>
-              </p>
+            {/* 신청자 안내 메시지 */}
+            <p className="text-sm font-medium mb-2">
+              💬 <strong className="text-blue-700">{applicant.name}</strong>님에게 이렇게 안내해 주세요!
+            </p>
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
+              <ol className="text-xs text-blue-700 space-y-2 ml-4 list-decimal">
+                <li>추천인 동의 후 <strong>{applicant.name}</strong>님의 홈 화면에 가입비 납부 계좌가 안내돼요.</li>
+                <li>가입비 납부 후 총무가 가입을 최종 승인해 드려요.</li>
+                <li>승인 후 홈 화면에 "팀 카톡방 입장" 버튼이 나타나며, 버튼을 클릭해 단톡방에 입장할 수 있어요.</li>
+              </ol>
             </div>
 
             <div className="flex gap-2 justify-end">
