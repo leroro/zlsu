@@ -22,6 +22,9 @@ import ProtectedRoute from './components/common/ProtectedRoute';
 import NotFoundPage from './pages/NotFoundPage';
 import SwimCapGuidePage from './pages/SwimCapGuidePage';
 import GuidePage from './pages/GuidePage';
+// 미리보기 페이지 (임시 - 컨펌용)
+import PreviewAboutPage from './pages/preview/PreviewAboutPage';
+import PreviewGuidePage from './pages/preview/PreviewGuidePage';
 
 export const router = createHashRouter([
   {
@@ -154,6 +157,9 @@ export const router = createHashRouter([
 
       ],
     },
+    // 미리보기 페이지 (헤더 없이, 컨펌용 임시)
+    { path: 'preview/about', element: <PreviewAboutPage /> },
+    { path: 'preview/guide', element: <PreviewGuidePage /> },
     // 404 페이지 (헤더 없이 전체 화면)
     { path: '*', element: <NotFoundPage /> },
   ],
