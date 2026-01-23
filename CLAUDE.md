@@ -153,6 +153,40 @@ src/
 
 ---
 
+## UI/CSS 패턴 (필수 준수)
+
+### 입력창 + 버튼 가로 배치 패턴
+
+입력창과 버튼을 `flex`로 가로 배치할 때 **모바일에서 overflow 발생 방지** 필수:
+
+```tsx
+// ✅ 올바른 패턴
+<div className="flex gap-2">
+  <input className="flex-1 min-w-0 ..." />  {/* min-w-0 필수! */}
+  <Button className="whitespace-nowrap">확인</Button>
+</div>
+
+// ❌ 잘못된 패턴 (overflow 발생)
+<div className="flex gap-2">
+  <input className="flex-1 ..." />  {/* min-w-0 없음 → 기본 min-width로 인해 버튼이 밀려남 */}
+  <Button className="shrink-0">확인</Button>  {/* shrink-0 → 버튼이 축소 안됨 */}
+</div>
+```
+
+**핵심 규칙:**
+1. `flex-1` 입력창에는 반드시 `min-w-0` 추가 (flexbox 기본 min-width 오버라이드)
+2. 버튼에 `shrink-0` 사용 금지 (컨테이너가 좁으면 overflow 발생)
+3. 버튼 텍스트 줄바꿈 방지는 `whitespace-nowrap`만 사용
+4. `overflow-hidden`은 포커스 링을 잘라버리므로 사용 금지
+
+### iOS Safari 스크롤 이슈
+
+페이지 이동 시 스크롤이 맨 위로 안 올라가는 문제:
+- 원인: 모바일 브라우저 주소창 높이 변화
+- 해결: `ScrollToTop.tsx`에서 다중 타이머 + `visualViewport` API 사용
+
+---
+
 ## 빌드 및 테스트
 
 ```bash
