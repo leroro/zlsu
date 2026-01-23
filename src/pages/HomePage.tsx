@@ -251,9 +251,8 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* 가입비 납부 안내 - 추천인 동의 완료 후에만 표시 */}
-          {isReferrerApproved && (
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+          {/* 가입비 납부 안내 - 항상 표시 */}
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
               <h2 className="font-semibold text-blue-900 mb-3 flex items-center gap-2">
                 <span>💰</span> 가입비를 납부해주세요
               </h2>
@@ -290,7 +289,6 @@ export default function HomePage() {
                 </p>
               </div>
             </div>
-          )}
 
           {/* 문의 안내 - 추천인 강조 */}
           <div className="text-sm text-gray-600 p-3 bg-gray-50 rounded-lg">
