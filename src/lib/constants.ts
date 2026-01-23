@@ -1,4 +1,4 @@
-import { MemberStatus, MemberRole, ApplicationStatus, StateChangeStatus, WithdrawalStatus, Gender, SwimmingLevel, CompetitionInterest } from './types';
+import { MemberStatus, MemberRole, ApplicationStatus, StateChangeStatus, WithdrawalStatus, Gender, SwimmingLevel, CompetitionInterest, CompetitionHistory, ActivityLevel } from './types';
 
 // 정원
 export const MAX_CAPACITY = 16;
@@ -162,7 +162,6 @@ export const SWIMMING_LEVELS: { id: SwimmingLevel; label: string }[] = [
   { id: 'intermediate', label: '중급' },
   { id: 'advanced', label: '상급' },
   { id: 'masters', label: '마스터' },
-  { id: 'competition', label: '대회수상' },
 ];
 
 // 수영 레벨 라벨
@@ -171,7 +170,6 @@ export const SWIMMING_LEVEL_LABELS: Record<SwimmingLevel, string> = {
   intermediate: '중급',
   advanced: '상급',
   masters: '마스터',
-  competition: '대회수상',
 };
 
 // 수영 레벨 이모지
@@ -180,7 +178,20 @@ export const SWIMMING_LEVEL_EMOJIS: Record<SwimmingLevel, string> = {
   intermediate: '🏊',
   advanced: '🐬',
   masters: '🦈',
-  competition: '🏆',
+};
+
+// 대회 경험 옵션
+export const COMPETITION_HISTORY_OPTIONS: { id: CompetitionHistory; label: string }[] = [
+  { id: 'none', label: '없음' },
+  { id: 'participated', label: '참여 경험 있음' },
+  { id: 'awarded', label: '입상 경험 있음' },
+];
+
+// 대회 경험 라벨
+export const COMPETITION_HISTORY_LABELS: Record<CompetitionHistory, string> = {
+  none: '없음',
+  participated: '참여 경험 있음',
+  awarded: '입상 경험 있음',
 };
 
 // 대회 참가 의향 옵션
@@ -195,4 +206,42 @@ export const COMPETITION_INTEREST_LABELS: Record<CompetitionInterest, string> = 
   none: '관심 없음',
   interested: '관심 있음',
   very_interested: '꼭 참여하고 싶음',
+};
+
+// ============ 활동 지수 ============
+
+// 활동 지수 레벨 (낮은 순서대로)
+export const ACTIVITY_LEVELS: ActivityLevel[] = [
+  'newbie',
+  'regular',
+  'passionate',
+  'core',
+  'staff',
+];
+
+// 활동 지수 라벨
+export const ACTIVITY_LEVEL_LABELS: Record<ActivityLevel, string> = {
+  newbie: '뉴비',
+  regular: '일반',
+  passionate: '열정',
+  core: '핵심',
+  staff: '스태프',
+};
+
+// 활동 지수 아이콘
+export const ACTIVITY_LEVEL_ICONS: Record<ActivityLevel, string> = {
+  newbie: '🛟',
+  regular: '🏊',
+  passionate: '🐬',
+  core: '🦈',
+  staff: '🏆',
+};
+
+// 활동 지수 기준 설명
+export const ACTIVITY_LEVEL_DESCRIPTIONS: Record<ActivityLevel, string> = {
+  newbie: '가입 후 2개월까지',
+  regular: '월 2회 정도 참여',
+  passionate: '월 3회 이상 참여',
+  core: '월 3회 이상 참여 + 대회 꾸준히 참여',
+  staff: '모임 운영 업무/기여',
 };

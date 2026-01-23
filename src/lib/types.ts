@@ -32,13 +32,19 @@ export interface SwimmingAbility {
 }
 
 // 수영 레벨
-export type SwimmingLevel = 'beginner' | 'intermediate' | 'advanced' | 'masters' | 'competition';
+export type SwimmingLevel = 'beginner' | 'intermediate' | 'advanced' | 'masters';
+
+// 대회 경험
+export type CompetitionHistory = 'none' | 'participated' | 'awarded';
 
 // 생년월일 유형 (양력/음력)
 export type BirthDateType = 'solar' | 'lunar';
 
 // 대회 참가 의향
 export type CompetitionInterest = 'none' | 'interested' | 'very_interested';
+
+// 활동 지수 (관리자 지정)
+export type ActivityLevel = 'newbie' | 'regular' | 'passionate' | 'core' | 'staff';
 
 // 회원 인터페이스
 export interface Member {
@@ -54,7 +60,9 @@ export interface Member {
   referrer?: string;  // 추천인
   swimmingAbility?: SwimmingAbility;  // 주종목
   swimmingLevel?: SwimmingLevel;  // 수영 레벨
+  competitionHistory?: CompetitionHistory;  // 대회 경험 (없음/참여/입상)
   competitionInterest?: CompetitionInterest;  // 대회 참가 의향
+  activityLevel?: ActivityLevel;  // 활동 지수 (관리자 지정)
   motivation?: string;  // 자기소개
   status: MemberStatus;
   role: MemberRole;
