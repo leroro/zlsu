@@ -1,3 +1,4 @@
+import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { getActiveAndInactiveMemberCount, getSettings } from '../lib/api';
 import Button from '../components/common/Button';
@@ -8,6 +9,34 @@ export default function AboutPage() {
   const stats = getActiveAndInactiveMemberCount();
   const settings = getSettings();
   const remainingSlots = settings.maxCapacity - stats.capacityCount;
+
+  // 링크 복사 상태
+  const [linkCopied, setLinkCopied] = useState(false);
+
+  const handleCopyLink = async () => {
+    const url = `${window.location.origin}/about`;
+    await navigator.clipboard.writeText(url);
+    setLinkCopied(true);
+    setTimeout(() => setLinkCopied(false), 2000);
+  };
+
+  // CTA 플로팅 상태
+  const [isFloating, setIsFloating] = useState(true);
+  const ctaSectionRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!ctaSectionRef.current) return;
+      const rect = ctaSectionRef.current.getBoundingClientRect();
+      // CTA 섹션이 화면에 보이기 시작하면 플로팅 해제
+      const isAtBottom = rect.top < window.innerHeight;
+      setIsFloating(!isAtBottom);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    handleScroll(); // 초기 상태 체크
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   return (
     <div className="max-w-2xl mx-auto">
@@ -174,6 +203,28 @@ export default function AboutPage() {
           </div>
         </div>
 
+        {/* 초대 링크 복사 버튼 */}
+        <button
+          onClick={handleCopyLink}
+          className="w-full mb-6 py-3 px-4 bg-primary-50 hover:bg-primary-100 border border-primary-200 text-primary-700 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2"
+        >
+          {linkCopied ? (
+            <>
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+              링크가 복사되었습니다!
+            </>
+          ) : (
+            <>
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+              </svg>
+              초대 링크 복사하기
+            </>
+          )}
+        </button>
+
         <div className="bg-gray-50 rounded-lg p-4 mb-4">
           <h3 className="font-semibold text-gray-900 mb-2">첫 가입 시 납부 금액</h3>
           <p className="text-gray-600 text-sm">
@@ -204,7 +255,7 @@ export default function AboutPage() {
           {[
             { step: 1, title: '가입 신청서 작성하기', desc: '추천인(기존 회원)에게 링크 받아서 신청' },
             { step: 2, title: '가입비 입금하기', desc: '회비 + 수모 금액 입금' },
-            { step: 3, title: '카톡방 & 모임통장 초대받기', desc: '총무가 초대드려요' },
+            { step: 3, title: '카톡방 & 모임통장 입장하기', desc: '로그인 후 카톡방 입장하기 버튼 클릭' },
             { step: 4, title: '첫 수영 참석 신청하기', desc: '카톡방 일정(달력)에서 참석할 토요일에 출석체크' },
             { step: 5, title: '수모 수령하기', desc: '추천인에게 수령' },
             { step: 6, title: '토요일에 만나요!', desc: '수영장에서 함께해요 🏊' },
@@ -304,7 +355,7 @@ export default function AboutPage() {
       </section>
 
       {/* CTA */}
-      <section className="bg-white md:rounded-lg md:shadow p-6">
+      <section ref={ctaSectionRef} className="bg-white md:rounded-lg md:shadow p-6 pb-20 md:pb-6">
         <div className="text-center">
           <p className="text-gray-600 mb-4">
             함께 즐겁게 수영해요!
@@ -327,6 +378,15 @@ export default function AboutPage() {
           </div>
         </div>
       </section>
+
+      {/* 플로팅 CTA 버튼 (모바일) */}
+      {isFloating && remainingSlots > 0 && (
+        <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-200 shadow-lg md:hidden z-50">
+          <Link to="/apply" className="block">
+            <Button size="lg" className="w-full">가입 신청하기</Button>
+          </Link>
+        </div>
+      )}
     </div>
   );
 }

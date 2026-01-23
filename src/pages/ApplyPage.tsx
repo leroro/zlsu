@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { createPendingMember, getMemberByEmail, getActiveChecklistItems, getActiveAndInactiveMemberCount, getSettings, getMembers } from '../lib/api';
 import { SwimmingAbility, SwimmingLevel, ChecklistItem, Member, BirthDateType, CompetitionInterest } from '../lib/types';
-import { SWIMMING_STROKES, SWIMMING_LEVELS, SWIMMING_LEVEL_EMOJIS, COMPETITION_INTEREST_OPTIONS, BANK_ACCOUNT } from '../lib/constants';
+import { SWIMMING_STROKES, SWIMMING_LEVELS, SWIMMING_LEVEL_EMOJIS, COMPETITION_INTEREST_OPTIONS } from '../lib/constants';
 import Button from '../components/common/Button';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
 
@@ -296,14 +296,6 @@ export default function ApplyPage() {
     }
   };
 
-  // 계좌번호 복사
-  const [copied, setCopied] = useState(false);
-  const handleCopyAccount = () => {
-    navigator.clipboard.writeText(BANK_ACCOUNT.accountNumber);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
   // 성공 화면
   if (success) {
     return (
@@ -311,67 +303,38 @@ export default function ApplyPage() {
         <div className="bg-white md:rounded-lg md:shadow p-6 sm:p-8">
           <div className="text-center mb-6">
             <div className="text-5xl mb-3">🎉</div>
-            <h1 className="text-2xl font-bold text-gray-900">가입 신청이 완료되었어요!</h1>
+            <h1 className="text-2xl font-bold text-gray-900">가입 신청이 완료되었습니다</h1>
           </div>
 
-          {/* 가입비 납부 안내 */}
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-            <h2 className="font-semibold text-blue-900 mb-3 flex items-center gap-2">
-              <span>💰</span> 가입비를 납부해주세요
+          {/* 진행 절차 안내 */}
+          <div className="bg-primary-50 border border-primary-200 rounded-lg p-4 mb-6">
+            <h2 className="font-semibold text-primary-900 mb-3 flex items-center gap-2">
+              <span>📋</span> 다음 절차로 진행됩니다
             </h2>
-            <div className="text-sm text-blue-800 space-y-2">
-              <p>첫 달 회비 2만원 + 수모 2만원 = <span className="font-bold">총 4만원</span></p>
-              <div className="bg-white rounded-lg p-3 mt-3">
-                <p className="text-gray-600 text-xs mb-1">{BANK_ACCOUNT.bank}</p>
-                <p className="font-mono font-bold text-lg text-gray-900">{BANK_ACCOUNT.accountNumber}</p>
-                <p className="text-gray-600 text-xs">예금주: {BANK_ACCOUNT.accountHolder}</p>
-              </div>
-              <button
-                onClick={handleCopyAccount}
-                className="w-full mt-2 py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2"
-              >
-                {copied ? (
-                  <>
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                    복사 완료!
-                  </>
-                ) : (
-                  <>
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                    </svg>
-                    계좌번호 복사
-                  </>
-                )}
-              </button>
-            </div>
-          </div>
-
-          {/* 진행 순서 안내 */}
-          <div className="bg-gray-50 rounded-lg p-4 mb-6">
-            <h2 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-              <span>📋</span> 입금 후 진행 순서
-            </h2>
-            <ol className="text-sm text-gray-600 space-y-2">
-              <li className="flex gap-2">
-                <span className="font-medium text-primary-600">1.</span>
-                <span>총무가 입금 확인 후 승인</span>
+            <ol className="text-sm text-primary-800 space-y-3">
+              <li className="flex gap-3">
+                <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary-600 text-white flex items-center justify-center text-xs font-bold">1</span>
+                <span>추천인이 동의해야 합니다</span>
               </li>
-              <li className="flex gap-2">
-                <span className="font-medium text-primary-600">2.</span>
-                <span>카카오톡 단톡방 + 모임통장 초대</span>
+              <li className="flex gap-3">
+                <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary-600 text-white flex items-center justify-center text-xs font-bold">2</span>
+                <span>추천인 동의 후 관리자가 입금 확인합니다</span>
               </li>
-              <li className="flex gap-2">
-                <span className="font-medium text-primary-600">3.</span>
-                <span>추천인에게 수모 수령</span>
-              </li>
-              <li className="flex gap-2">
-                <span className="font-medium text-primary-600">4.</span>
-                <span>토요일 수영장에서 만나요! 🏊</span>
+              <li className="flex gap-3">
+                <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary-600 text-white flex items-center justify-center text-xs font-bold">3</span>
+                <span>입금 확인 후 최종 가입 승인됩니다</span>
               </li>
             </ol>
+          </div>
+
+          {/* 가입비 안내 */}
+          <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6">
+            <div className="flex items-start gap-2">
+              <span className="text-amber-600 text-lg">💡</span>
+              <p className="text-sm text-amber-800">
+                가입비 납부 안내는 관리자 승인 단계에서 별도 연락드립니다.
+              </p>
+            </div>
           </div>
 
           {/* 문의 안내 - 추천인 강조 */}
