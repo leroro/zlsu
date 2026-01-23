@@ -55,7 +55,7 @@ export default function PreviewGuidePage() {
           </div>
 
           {/* 활동지수 규칙 */}
-          <div className="bg-blue-50 rounded-lg p-4 mb-4">
+          <div className="bg-blue-50 rounded-lg p-4">
             <h3 className="font-semibold text-gray-900 mb-3 text-sm">활동지수는 이렇게 바뀌어요</h3>
             <div className="space-y-2 text-sm text-gray-700">
               <div className="flex items-start gap-2">
@@ -76,13 +76,6 @@ export default function PreviewGuidePage() {
               </div>
             </div>
           </div>
-
-          <div className="flex justify-end">
-            <span className="inline-flex items-center gap-1 text-sm text-primary-600 font-medium">
-              회원 명단 보러가기
-              <span>→</span>
-            </span>
-          </div>
         </section>
 
         {/* 휴면과 활성 섹션 */}
@@ -95,7 +88,7 @@ export default function PreviewGuidePage() {
             <p className="text-red-600">회비를 미납하거나, 2주 연속 무단불참시 강제 휴면으로 전환되고, 회비는 반환되지 않아요.</p>
           </div>
 
-          <div className="space-y-3 mb-4">
+          <div className="space-y-3">
             <div className="flex items-center gap-3 p-3 bg-green-50 rounded-lg">
               <span className="text-xl">🟢</span>
               <div className="flex-1">
@@ -111,13 +104,6 @@ export default function PreviewGuidePage() {
               </div>
             </div>
           </div>
-
-          <div className="flex justify-end">
-            <span className="inline-flex items-center gap-1 text-sm text-primary-600 font-medium">
-              상태 변경 신청하기
-              <span>→</span>
-            </span>
-          </div>
         </section>
 
         {/* 생일 축하 */}
@@ -126,14 +112,10 @@ export default function PreviewGuidePage() {
             <span className="text-2xl">🎂</span>
             <div className="flex-1">
               <h2 className="text-xl font-bold text-gray-900 mb-2">생일 축하</h2>
-              <p className="text-gray-600 text-sm mb-3">
+              <p className="text-gray-600 text-sm">
                 이번 달 생일인 회원을 확인하고 축하해 주세요.
                 음력 생일도 자동으로 양력 변환되어 표시됩니다.
               </p>
-              <span className="inline-flex items-center gap-1 text-sm text-primary-600 font-medium">
-                생일 보러가기
-                <span>→</span>
-              </span>
             </div>
           </div>
         </section>
@@ -144,18 +126,11 @@ export default function PreviewGuidePage() {
             <span className="text-2xl">🏆</span>
             <div className="flex-1">
               <h2 className="text-xl font-bold text-gray-900 mb-2">대회 참가</h2>
-              <p className="text-gray-600 text-sm mb-3">
+              <p className="text-gray-600 text-sm">
                 즐수팀은 다양한 수영 대회에 참가하고 있어요.
                 대회 일정은 카카오톡 단톡방에서 안내됩니다.
                 참가는 자율이니 부담 없이 도전해 보세요!
               </p>
-              <p className="text-gray-600 text-sm">
-                회원 명단에서 각 회원의 주종목을 확인할 수 있어요.
-              </p>
-              <span className="inline-flex items-center gap-1 text-sm text-primary-600 font-medium mt-2">
-                회원 명단 보러가기
-                <span>→</span>
-              </span>
             </div>
           </div>
         </section>
@@ -166,14 +141,10 @@ export default function PreviewGuidePage() {
             <span className="text-2xl">🧢</span>
             <div className="flex-1">
               <h2 className="text-xl font-bold text-gray-900 mb-2">수모 추가 구입</h2>
-              <p className="text-gray-600 text-sm mb-3">
+              <p className="text-gray-600 text-sm">
                 수모가 추가로 필요하신가요?
                 수모 관리자를 통해 구입할 수 있어요. (1장 2만원, 2장 3만원)
               </p>
-              <span className="inline-flex items-center gap-1 text-sm text-primary-600 font-medium">
-                수모 구입 안내
-                <span>→</span>
-              </span>
             </div>
           </div>
         </section>
@@ -208,12 +179,9 @@ export default function PreviewGuidePage() {
               <h3 className="font-semibold text-gray-900 mb-1">
                 Q. 탈퇴는 어떻게 하나요?
               </h3>
-              <p className="text-gray-600 text-sm mb-2">
+              <p className="text-gray-600 text-sm">
                 탈퇴 시 납부한 회비는 환불되지 않습니다.
               </p>
-              <span className="text-sm text-primary-600 font-medium">
-                탈퇴 신청하기 →
-              </span>
             </div>
           </div>
         </section>
@@ -223,11 +191,6 @@ export default function PreviewGuidePage() {
           <p className="text-gray-600 text-sm">
             더 궁금한 점이 있으신가요?<br /> 팀 카톡방에서 질문해 주세요!
           </p>
-          {settings.kakaoInviteLink && (
-            <span className="inline-flex items-center gap-1 mt-3 text-sm text-yellow-700 font-medium">
-              💬 팀 카톡방 입장하기 →
-            </span>
-          )}
         </section>
       </div>
     </div>
