@@ -1,12 +1,20 @@
 import { useState, useMemo } from 'react';
 import { Navigate, useSearchParams } from 'react-router-dom';
-import { getMembers, getStateChanges, getWithdrawalRequests, getMembersWithBirthdayByMonth } from '../lib/api';
-import { MemberStatus } from '../lib/types';
+import { getMembers, getStateChanges, getWithdrawalRequests } from '../lib/api';
+import { MemberStatus, Member } from '../lib/types';
 import { STATUS_LABELS, GENDER_LABELS, SWIMMING_LEVEL_EMOJIS } from '../lib/constants';
 import { MemberStatusBadge } from '../components/common/StatusBadge';
 import Button from '../components/common/Button';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import { useAuth } from '../contexts/AuthContext';
+import { lunarToSolar, extractMonthDay } from '../lib/dateUtils';
+
+// 생일 회원 정보 타입 (양력 변환 정보 포함)
+type BirthdayMember = Member & {
+  displayMonth: number;
+  displayDay: number;
+  isLunar: boolean;
+};
 
 type FilterStatus = MemberStatus | 'all';
 type TabType = 'members' | 'birthday';
@@ -91,10 +99,37 @@ export default function MembersPage() {
     return counts;
   }, [members]);
 
-  // 생일 회원 목록
-  const birthdayMembers = useMemo(() => {
-    return getMembersWithBirthdayByMonth(selectedMonth);
-  }, [selectedMonth]);
+  // 생일 회원 목록 (음력→양력 변환 포함)
+  const birthdayMembers = useMemo((): BirthdayMember[] => {
+    const currentYear = new Date().getFullYear();
+
+    return members
+      .filter((m) => m.birthDate && m.status !== 'withdrawn' && m.status !== 'pending' && m.role !== 'admin')
+      .map((member) => {
+        const { month, day } = extractMonthDay(member.birthDate!);
+        const isLunar = member.birthDateType === 'lunar';
+
+        // 음력인 경우 양력으로 변환
+        if (isLunar) {
+          const solar = lunarToSolar(month, day, currentYear);
+          return {
+            ...member,
+            displayMonth: solar.month,
+            displayDay: solar.day,
+            isLunar: true
+          };
+        }
+
+        return {
+          ...member,
+          displayMonth: month,
+          displayDay: day,
+          isLunar: false
+        };
+      })
+      .filter((m) => m.displayMonth === selectedMonth)
+      .sort((a, b) => a.displayDay - b.displayDay);
+  }, [members, selectedMonth]);
 
   return (
     <div className="space-y-6">
@@ -288,8 +323,6 @@ export default function MembersPage() {
                     {selectedMonth}월 생일 회원 {birthdayMembers.length}명
                   </p>
                   {birthdayMembers.map((member) => {
-                    const day = parseInt(member.birthDate!.split('-')[2], 10);
-                    const isLunar = member.birthDateType === 'lunar';
                     return (
                       <div
                         key={member.id}
@@ -308,16 +341,21 @@ export default function MembersPage() {
                           <div>
                             <div className="flex items-center gap-2">
                               <span className="font-medium text-gray-900">{member.name}</span>
+                              {member.isLunar && (
+                                <span className="px-1.5 py-0.5 text-xs bg-purple-100 text-purple-700 rounded">(음)</span>
+                              )}
                               <MemberStatusBadge status={member.status} />
                             </div>
                           </div>
                         </div>
                         <div className="text-right">
                           <div className="font-medium text-gray-900">
-                            {selectedMonth}월 {day}일
+                            {member.displayMonth}월 {member.displayDay}일
                           </div>
-                          {isLunar && (
-                            <span className="text-xs text-purple-600">음력</span>
+                          {member.isLunar && (
+                            <span className="text-xs text-purple-600">
+                              음력 {extractMonthDay(member.birthDate!).month}/{extractMonthDay(member.birthDate!).day}
+                            </span>
                           )}
                         </div>
                       </div>
