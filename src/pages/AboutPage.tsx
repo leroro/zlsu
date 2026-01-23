@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { getActiveAndInactiveMemberCount, getSettings } from '../lib/api';
 import Button from '../components/common/Button';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
@@ -9,6 +9,11 @@ export default function AboutPage() {
   const stats = getActiveAndInactiveMemberCount();
   const settings = getSettings();
   const remainingSlots = settings.maxCapacity - stats.capacityCount;
+
+  // URL에서 추천인 파라미터 읽기
+  const [searchParams] = useSearchParams();
+  const referrer = searchParams.get('ref') || '';
+  const applyUrl = referrer ? `/apply?ref=${encodeURIComponent(referrer)}` : '/apply';
 
   // 링크 복사 상태
   const [linkCopied, setLinkCopied] = useState(false);
@@ -362,7 +367,7 @@ export default function AboutPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             {remainingSlots > 0 ? (
-              <Link to="/apply">
+              <Link to={applyUrl}>
                 <Button size="lg" className="w-full sm:w-auto">가입 신청하기</Button>
               </Link>
             ) : (
@@ -382,7 +387,7 @@ export default function AboutPage() {
       {/* 플로팅 CTA 버튼 (모바일) */}
       {isFloating && remainingSlots > 0 && (
         <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-200 shadow-lg md:hidden z-50">
-          <Link to="/apply" className="block">
+          <Link to={applyUrl} className="block">
             <Button size="lg" className="w-full">가입 신청하기</Button>
           </Link>
         </div>

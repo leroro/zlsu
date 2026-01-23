@@ -64,6 +64,10 @@ export default function ApplyPage() {
   useDocumentTitle('가입 신청');
   const [searchParams, setSearchParams] = useSearchParams();
 
+  // URL에서 추천인 파라미터 읽기
+  const referrerFromUrl = searchParams.get('ref') || '';
+  const hasReferrerFromUrl = !!referrerFromUrl;
+
   // 개발용: URL 파라미터로 단계 지정 (?step=1,2,3,4,complete,full)
   // 프로덕션 빌드에서는 step 파라미터 무시 (보안)
   const isDev = import.meta.env.DEV;
@@ -115,7 +119,7 @@ export default function ApplyPage() {
 
   // 3단계: 부가 정보
   const [additionalInfo, setAdditionalInfo] = useState({
-    referrer: isDevMode ? '홍길동' : '',
+    referrer: referrerFromUrl || (isDevMode ? '홍길동' : ''),
     motivation: '',
   });
 
@@ -397,6 +401,18 @@ export default function ApplyPage() {
         <h1 className="text-2xl font-bold text-gray-900 mb-2 text-center">가입 신청</h1>
         <p className="text-sm text-gray-500 text-center mb-6">즐수팀 회원이 되어주세요</p>
 
+        {/* 추천인 정보 배너 */}
+        {hasReferrerFromUrl && (
+          <div className="mb-6 p-4 bg-primary-50 border border-primary-200 rounded-lg text-center">
+            <div className="text-primary-600 font-bold text-lg">
+              {referrerFromUrl}님의 추천
+            </div>
+            <div className="text-sm text-primary-500 mt-1">
+              추천인 확인 후 신청서를 작성해 주세요
+            </div>
+          </div>
+        )}
+
         <StepIndicator currentStep={currentStep} />
 
         {/* 1단계: 가입동의 */}
@@ -614,32 +630,42 @@ export default function ApplyPage() {
               <label htmlFor="referrer" className="block text-sm font-medium text-gray-700 mb-1">
                 추천인 <span className="text-red-500">*</span>
               </label>
-              {/* 추천인 안내 문구 */}
-              <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 mb-2">
-                <div className="flex items-start gap-2">
-                  <span className="text-amber-600 text-lg">⚠️</span>
-                  <div className="text-sm text-amber-800">
-                    <p className="font-medium mb-1">추천인 없이는 가입할 수 없습니다</p>
-                    <p className="text-xs text-amber-700">
-                      본인이 실제로 아는 회원을 선택해 주세요. 추천인이 승인해야 가입이 진행됩니다.
-                    </p>
-                  </div>
+              {/* 추천인 링크로 접속한 경우 - 읽기 전용 */}
+              {hasReferrerFromUrl ? (
+                <div className="w-full px-3 py-2.5 bg-gray-100 border border-gray-300 rounded-lg text-gray-700">
+                  {additionalInfo.referrer}
+                  <span className="ml-2 text-xs text-gray-500">(자동 입력됨)</span>
                 </div>
-              </div>
-              <select
-                id="referrer"
-                name="referrer"
-                value={additionalInfo.referrer}
-                onChange={handleAdditionalInfoChange}
-                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-              >
-                <option value="">추천인을 선택해주세요</option>
-                {memberList.map((member) => (
-                  <option key={member.id} value={member.name}>
-                    {member.name}
-                  </option>
-                ))}
-              </select>
+              ) : (
+                <>
+                  {/* 추천인 안내 문구 */}
+                  <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 mb-2">
+                    <div className="flex items-start gap-2">
+                      <span className="text-amber-600 text-lg">⚠️</span>
+                      <div className="text-sm text-amber-800">
+                        <p className="font-medium mb-1">추천인 없이는 가입할 수 없습니다</p>
+                        <p className="text-xs text-amber-700">
+                          본인이 실제로 아는 회원을 선택해 주세요. 추천인이 승인해야 가입이 진행됩니다.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <select
+                    id="referrer"
+                    name="referrer"
+                    value={additionalInfo.referrer}
+                    onChange={handleAdditionalInfoChange}
+                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  >
+                    <option value="">추천인을 선택해주세요</option>
+                    {memberList.map((member) => (
+                      <option key={member.id} value={member.name}>
+                        {member.name}
+                      </option>
+                    ))}
+                  </select>
+                </>
+              )}
             </div>
 
             <div>
