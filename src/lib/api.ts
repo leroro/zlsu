@@ -23,8 +23,8 @@ export function resetToMockData(): void {
   localStorage.removeItem(STORAGE_KEYS.SETTINGS);
 }
 
-// 데이터 버전 (신규 회원 테스트 계정 이름 수정)
-const DATA_VERSION = 5;
+// 데이터 버전 (활동 레벨 데이터 추가)
+const DATA_VERSION = 6;
 const DATA_VERSION_KEY = 'zlsu_data_version';
 
 // 앱 초기화 - 데이터가 없거나 버전이 다르면 mock 데이터로 초기화
@@ -388,7 +388,15 @@ export function approveStateChange(id: string, processedBy: string): boolean {
   setStorageData(STORAGE_KEYS.STATE_CHANGES, stateChanges);
 
   // 회원 상태 업데이트
-  updateMember(stateChange.memberId, { status: stateChange.requestedStatus });
+  const member = getMemberById(stateChange.memberId);
+  const updateData: Partial<Member> = { status: stateChange.requestedStatus };
+
+  // 휴면 → 활성 복귀 시 활동지수를 '일반'으로 리셋 (스태프는 유지)
+  if (stateChange.requestedStatus === 'active' && member?.activityLevel !== 'staff') {
+    updateData.activityLevel = 'regular';
+  }
+
+  updateMember(stateChange.memberId, updateData);
 
   return true;
 }
@@ -804,11 +812,12 @@ export function adminApprovePendingMember(memberId: string, processedBy: string)
     processedBy,
   };
 
-  // 회원 상태를 active로 변경
+  // 회원 상태를 active로 변경, 활동지수는 뉴비로 시작
   updateMember(memberId, {
     adminApproval,
     status: 'active',
     joinedAt: getCurrentDate(),
+    activityLevel: 'newbie',
   });
 
   // 가입 이력 추가
@@ -889,4 +898,39 @@ export function markOnboardingCompleted(memberId: string): boolean {
 
   updateMember(memberId, { hasCompletedOnboarding: true });
   return true;
+}
+
+// ============ 활동 지수 API ============
+
+// 회원 활동 지수 업데이트 (관리자 전용)
+export function updateMemberActivityLevel(memberId: string, activityLevel: Member['activityLevel']): boolean {
+  const member = getMemberById(memberId);
+  if (!member) return false;
+
+  updateMember(memberId, { activityLevel });
+  return true;
+}
+
+// 뉴비 → 일반 자동 승급 체크 (가입 후 2개월 경과 시)
+export function checkAndUpgradeNewbies(): number {
+  const members = getMembers();
+  const today = new Date();
+  let upgradedCount = 0;
+
+  members.forEach(member => {
+    // 활성 상태이고 뉴비인 회원만 체크
+    if (member.status === 'active' && member.activityLevel === 'newbie' && member.joinedAt) {
+      const joinedDate = new Date(member.joinedAt);
+      const monthsDiff = (today.getFullYear() - joinedDate.getFullYear()) * 12
+        + (today.getMonth() - joinedDate.getMonth());
+
+      // 2개월 이상 경과 시 일반으로 자동 승급
+      if (monthsDiff >= 2) {
+        updateMember(member.id, { activityLevel: 'regular' });
+        upgradedCount++;
+      }
+    }
+  });
+
+  return upgradedCount;
 }

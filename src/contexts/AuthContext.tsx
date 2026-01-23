@@ -21,6 +21,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const currentUser = api.getCurrentUser();
     setUser(currentUser);
     setIsLoading(false);
+
+    // 뉴비 → 일반 자동 승급 체크 (가입 후 2개월 경과 시)
+    api.checkAndUpgradeNewbies();
   }, []);
 
   const login = async (email: string, password: string): Promise<CurrentUser | null> => {

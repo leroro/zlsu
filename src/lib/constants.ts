@@ -245,3 +245,12 @@ export const ACTIVITY_LEVEL_DESCRIPTIONS: Record<ActivityLevel, string> = {
   core: '월 3회 이상 참여 + 대회 꾸준히 참여',
   staff: '모임 운영 업무/기여',
 };
+
+// 추천 가능 활동 레벨 (열정 이상만 추천 가능)
+export const REFERRER_ELIGIBLE_LEVELS: ActivityLevel[] = ['passionate', 'core', 'staff'];
+
+// 활동 레벨이 추천 가능한지 확인
+export function canRecommendNewMember(level: ActivityLevel | undefined): boolean {
+  if (!level) return false;
+  return REFERRER_ELIGIBLE_LEVELS.includes(level);
+}

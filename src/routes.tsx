@@ -21,6 +21,7 @@ import ChecklistManagePage from './pages/admin/ChecklistManagePage';
 import ProtectedRoute from './components/common/ProtectedRoute';
 import NotFoundPage from './pages/NotFoundPage';
 import SwimCapGuidePage from './pages/SwimCapGuidePage';
+import GuidePage from './pages/GuidePage';
 
 export const router = createHashRouter([
   {
@@ -89,6 +90,14 @@ export const router = createHashRouter([
           element: (
             <ProtectedRoute>
               <SwimCapGuidePage />
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: 'guide',
+          element: (
+            <ProtectedRoute>
+              <GuidePage />
             </ProtectedRoute>
           ),
         },

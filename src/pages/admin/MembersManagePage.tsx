@@ -1,8 +1,8 @@
 import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { getMembers } from '../../lib/api';
-import { MemberStatus } from '../../lib/types';
-import { STATUS_LABELS } from '../../lib/constants';
+import { getMembers, updateMemberActivityLevel } from '../../lib/api';
+import { MemberStatus, ActivityLevel } from '../../lib/types';
+import { STATUS_LABELS, ACTIVITY_LEVELS, ACTIVITY_LEVEL_LABELS, ACTIVITY_LEVEL_ICONS } from '../../lib/constants';
 import { MemberStatusBadge } from '../../components/common/StatusBadge';
 import Button from '../../components/common/Button';
 import { useDocumentTitle } from '../../hooks/useDocumentTitle';
@@ -12,9 +12,16 @@ type FilterStatus = MemberStatus | 'all';
 export default function MembersManagePage() {
   useDocumentTitle('회원 관리');
   const [filter, setFilter] = useState<FilterStatus>('all');
+  const [, setRefresh] = useState(0); // 리렌더링용
 
   const allMembers = getMembers();
   const members = allMembers.filter(m => m.role !== 'admin'); // 관리자 전용 계정 제외
+
+  // 활동 지수 변경 핸들러
+  const handleActivityLevelChange = (memberId: string, level: ActivityLevel) => {
+    updateMemberActivityLevel(memberId, level);
+    setRefresh(prev => prev + 1); // 리렌더링 트리거
+  };
 
   const filteredMembers = useMemo(() => {
     return members
@@ -73,6 +80,20 @@ export default function MembersManagePage() {
                 </div>
                 <div className="flex flex-col items-end gap-2">
                   <MemberStatusBadge status={member.status} />
+                  {/* 활동 지수 드롭다운 (활성/휴면 회원만) */}
+                  {(member.status === 'active' || member.status === 'inactive') && (
+                    <select
+                      value={member.activityLevel || 'newbie'}
+                      onChange={(e) => handleActivityLevelChange(member.id, e.target.value as ActivityLevel)}
+                      className="text-sm border border-gray-300 rounded px-2 py-1 bg-white"
+                    >
+                      {ACTIVITY_LEVELS.map((level) => (
+                        <option key={level} value={level}>
+                          {ACTIVITY_LEVEL_ICONS[level]} {ACTIVITY_LEVEL_LABELS[level]}
+                        </option>
+                      ))}
+                    </select>
+                  )}
                   <Link to={`/admin/members/${member.id}`}>
                     <Button size="sm" variant="secondary">수정</Button>
                   </Link>
@@ -89,6 +110,7 @@ export default function MembersManagePage() {
               <tr>
                 <th className="px-3 py-3 text-left font-medium text-gray-700">이름</th>
                 <th className="px-3 py-3 text-left font-medium text-gray-700">담당</th>
+                <th className="px-3 py-3 text-left font-medium text-gray-700">활동지수</th>
                 <th className="px-3 py-3 text-left font-medium text-gray-700">이메일</th>
                 <th className="px-3 py-3 text-left font-medium text-gray-700">연락처</th>
                 <th className="px-3 py-3 text-left font-medium text-gray-700">가입일</th>
@@ -101,6 +123,23 @@ export default function MembersManagePage() {
                 <tr key={member.id} className="hover:bg-gray-50">
                   <td className="px-3 py-3 font-medium">{member.name}</td>
                   <td className="px-3 py-3 text-gray-600">{member.position || '-'}</td>
+                  <td className="px-3 py-3">
+                    {(member.status === 'active' || member.status === 'inactive') ? (
+                      <select
+                        value={member.activityLevel || 'newbie'}
+                        onChange={(e) => handleActivityLevelChange(member.id, e.target.value as ActivityLevel)}
+                        className="text-sm border border-gray-300 rounded px-2 py-1 bg-white cursor-pointer hover:border-primary-400"
+                      >
+                        {ACTIVITY_LEVELS.map((level) => (
+                          <option key={level} value={level}>
+                            {ACTIVITY_LEVEL_ICONS[level]} {ACTIVITY_LEVEL_LABELS[level]}
+                          </option>
+                        ))}
+                      </select>
+                    ) : (
+                      <span className="text-gray-400">-</span>
+                    )}
+                  </td>
                   <td className="px-3 py-3 text-gray-600">{member.email}</td>
                   <td className="px-3 py-3 text-gray-600">{member.phone}</td>
                   <td className="px-3 py-3 text-gray-600">{member.joinedAt}</td>

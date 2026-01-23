@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { getActiveAndInactiveMemberCount, getSettings, getRecentJoinedMembers, getRecentStatusChanges, getStateChanges, getWithdrawalRequests, getMembersWithBirthdayThisMonth, getMembersWithBirthdayNextMonth, getPendingMembersForReferrer, getMemberById, withdrawApplication, markKakaoJoined, markOnboardingCompleted } from '../lib/api';
 import { StatusChangeHistory } from '../lib/types';
-import { STATUS_LABELS, BANK_ACCOUNT, SWIMMING_LEVEL_EMOJIS } from '../lib/constants';
+import { STATUS_LABELS, BANK_ACCOUNT, SWIMMING_LEVEL_EMOJIS, canRecommendNewMember } from '../lib/constants';
 import Button from '../components/common/Button';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
 
@@ -572,7 +572,8 @@ export default function HomePage() {
             </span>
           </div>
         </div>
-        {remainingSlots > 0 && (
+        {/* 열정 이상 레벨만 초대 가능 */}
+        {remainingSlots > 0 && canRecommendNewMember(user.activityLevel) && (
           <button
             onClick={handleCopyInviteLink}
             className="w-full py-2 px-4 bg-primary-50 hover:bg-primary-100 text-primary-700 text-sm font-medium rounded-lg transition-colors flex items-center justify-center gap-2"
