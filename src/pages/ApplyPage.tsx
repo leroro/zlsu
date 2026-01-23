@@ -527,7 +527,7 @@ export default function ApplyPage() {
                   </div>
                 ) : (
                   /* 추천인 입력 + 확인 버튼 */
-                  <div className="flex gap-2 overflow-hidden">
+                  <div className="flex gap-2">
                     <input
                       type="text"
                       id="referrer0"
