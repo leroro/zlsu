@@ -23,6 +23,15 @@ export default function HomePage() {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  // 초대 링크 복사 상태
+  const [inviteLinkCopied, setInviteLinkCopied] = useState(false);
+  const handleCopyInviteLink = () => {
+    const inviteUrl = `${window.location.origin}/about`;
+    navigator.clipboard.writeText(inviteUrl);
+    setInviteLinkCopied(true);
+    setTimeout(() => setInviteLinkCopied(false), 2000);
+  };
+
   // 비로그인 사용자용 랜딩 페이지
   if (!user) {
     return (
@@ -540,7 +549,7 @@ export default function HomePage() {
 
       {/* 정원 */}
       <section className="bg-white md:rounded-lg md:shadow p-4">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
             <span>📊</span>
             <h2 className="font-bold text-gray-900">팀 정원</h2>
@@ -554,6 +563,15 @@ export default function HomePage() {
             </span>
           </div>
         </div>
+        {remainingSlots > 0 && (
+          <button
+            onClick={handleCopyInviteLink}
+            className="w-full py-2 px-4 bg-primary-50 hover:bg-primary-100 text-primary-700 text-sm font-medium rounded-lg transition-colors flex items-center justify-center gap-2"
+          >
+            <span>🔗</span>
+            {inviteLinkCopied ? '복사됨!' : '초대 링크 복사하기'}
+          </button>
+        )}
       </section>
 
       {/* 생일 */}
@@ -561,7 +579,7 @@ export default function HomePage() {
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
             <span>🎂</span>
-            <h2 className="font-bold text-gray-900">곧 생일인 회원</h2>
+            <h2 className="font-bold text-gray-900">곧 생일</h2>
           </div>
           <Link to="/members?tab=birthday" className="text-xs text-primary-600 hover:text-primary-700">
             전체 보기
