@@ -541,7 +541,7 @@ export default function ApplyPage() {
                       type="button"
                       onClick={handleVerifyReferrer}
                       variant="secondary"
-                      className="px-4"
+                      className="px-4 shrink-0 whitespace-nowrap"
                     >
                       확인
                     </Button>
