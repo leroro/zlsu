@@ -110,7 +110,7 @@ export default function ApplyPage() {
     password: '',
     passwordConfirm: '',
     phone: '',
-    birthDate: '',
+    birthDate: '1980-01-01',
     birthDateType: 'solar' as BirthDateType,
   });
 
@@ -727,7 +727,7 @@ export default function ApplyPage() {
                 생년월일 <span className="text-red-500">*</span>
               </label>
               <p className="text-sm text-gray-500 mb-2">
-                회원분들의 생일을 축하해 드리기 위해 수집해요 🎂
+                티타임에서 생일을 축하해 드려요 🎂
               </p>
               <input
                 type="date"
