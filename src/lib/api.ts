@@ -59,8 +59,9 @@ export function initializeAppData(): void {
 
 // 기본 설정
 const DEFAULT_SETTINGS: SystemSettings = {
-  maxCapacity: 16, // 기본 정원
-  includeInactiveInCapacity: false, // 기본값: 활성 회원만 정원에 포함
+  maxCapacity: 16, // 활동 회원 정원
+  weeklyCapacity: 14, // 주간 참석 정원 (레인 수용 인원)
+  includeInactiveInCapacity: false, // 기본값: 활동 회원만 정원에 포함
   kakaoInviteLink: 'https://invite.kakao.com/tc/yOTCtJKzHs', // 카카오톡 단톡방 초대 링크
   dormancyPeriodWeeks: 3, // 휴면 신청 기준: 3주 이상 불참 시
 };
@@ -361,6 +362,8 @@ export function createStateChange(data: {
   currentStatus: MemberStatus;
   requestedStatus: MemberStatus;
   reason: string;
+  startMonth?: string; // 휴면 시작월
+  endMonth?: string;   // 휴면 종료월 (복귀 예정월)
 }): StateChange {
   const stateChanges = getStateChanges();
   const newStateChange: StateChange = {
@@ -392,7 +395,7 @@ export function approveStateChange(id: string, processedBy: string): boolean {
   const member = getMemberById(stateChange.memberId);
   const updateData: Partial<Member> = { status: stateChange.requestedStatus };
 
-  // 휴면 → 활성 복귀 시 활동지수를 '일반'으로 리셋 (스태프는 유지)
+  // 휴면 → 활동 복귀 시 활동지수를 '일반'으로 리셋 (스태프는 유지)
   if (stateChange.requestedStatus === 'active' && member?.activityLevel !== 'staff') {
     updateData.activityLevel = 'regular';
   }
@@ -500,7 +503,7 @@ export function getAdminDashboardStats() {
 
 // ============ 생일 API ============
 
-// 특정 월의 생일 회원 조회 (활성/휴면 회원만)
+// 특정 월의 생일 회원 조회 (활동/휴면 회원만)
 export function getMembersWithBirthdayByMonth(month: number): Member[] {
   const members = getMembers();
 
@@ -508,7 +511,7 @@ export function getMembersWithBirthdayByMonth(month: number): Member[] {
     .filter((member) => {
       // 관리자 제외
       if (member.role === 'admin') return false;
-      // 활성 또는 휴면 회원만
+      // 활동 또는 휴면 회원만
       if (member.status !== 'active' && member.status !== 'inactive') return false;
       // 생년월일이 없으면 제외
       if (!member.birthDate) return false;
@@ -920,7 +923,7 @@ export function checkAndUpgradeNewbies(): number {
   let upgradedCount = 0;
 
   members.forEach(member => {
-    // 활성 상태이고 뉴비인 회원만 체크
+    // 활동 상태이고 뉴비인 회원만 체크
     if (member.status === 'active' && member.activityLevel === 'newbie' && member.joinedAt) {
       const joinedDate = new Date(member.joinedAt);
       const monthsDiff = (today.getFullYear() - joinedDate.getFullYear()) * 12

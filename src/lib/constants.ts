@@ -6,7 +6,7 @@ export const MAX_CAPACITY = 16;
 // 상태 라벨
 export const STATUS_LABELS: Record<MemberStatus, string> = {
   pending: '승인대기',
-  active: '활성',
+  active: '활동',
   inactive: '휴면',
   withdrawn: '탈퇴',
 };
@@ -15,7 +15,7 @@ export const STATUS_LABELS: Record<MemberStatus, string> = {
 export const STATUS_DESCRIPTIONS: Record<MemberStatus, string> = {
   pending: '가입비 납부 후 승인 대기 중인 회원입니다.',
   active: '정기적으로 모임에 참여하는 회원입니다.',
-  inactive: '일시적으로 모임 참여를 쉬고 있는 회원입니다. 정원에 여유가 있을 때 활성 신청이 가능합니다.',
+  inactive: '일시적으로 모임 참여를 쉬고 있는 회원입니다. 정원에 여유가 있을 때 활동 신청이 가능합니다.',
   withdrawn: '모임에서 탈퇴한 회원입니다.',
 };
 

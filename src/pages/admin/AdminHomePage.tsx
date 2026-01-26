@@ -85,7 +85,7 @@ export default function AdminHomePage() {
           </div>
           <div className="bg-green-50 rounded-lg p-4 text-center">
             <div className="text-2xl md:text-3xl font-bold text-green-600">{stats.active}</div>
-            <div className="text-xs md:text-sm text-gray-600">활성</div>
+            <div className="text-xs md:text-sm text-gray-600">활동</div>
           </div>
           <div className="bg-yellow-50 rounded-lg p-4 text-center">
             <div className="text-2xl md:text-3xl font-bold text-yellow-600">{stats.inactive}</div>
@@ -116,7 +116,7 @@ export default function AdminHomePage() {
             />
           </div>
           <p className="text-xs text-gray-400 mt-1">
-            {settings.includeInactiveInCapacity ? '활성+휴면 기준' : '활성 회원 기준'}
+            {settings.includeInactiveInCapacity ? '활동+휴면 기준' : '활동 회원 기준'}
           </p>
         </div>
 

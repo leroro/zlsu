@@ -1,9 +1,10 @@
-// 회원 상태 (승인대기/활성/휴면/탈퇴)
+// 회원 상태 (승인대기/활동/휴면/탈퇴)
 export type MemberStatus = 'pending' | 'active' | 'inactive' | 'withdrawn';
 
 // 시스템 설정
 export interface SystemSettings {
-  maxCapacity: number; // 최대 정원
+  maxCapacity: number; // 활동 회원 정원
+  weeklyCapacity?: number; // 주간 참석 정원 (레인 수용 인원)
   includeInactiveInCapacity: boolean; // 휴면 회원 정원 포함 여부
   kakaoInviteLink?: string; // 카카오톡 단톡방 초대 링크
   dormancyPeriodWeeks: number; // 휴면 신청 기준 기간 (주 단위)
@@ -109,6 +110,8 @@ export interface StateChange {
   currentStatus: MemberStatus;
   requestedStatus: MemberStatus;
   reason: string;
+  startMonth?: string; // 휴면 시작월 (예: "2026-02")
+  endMonth?: string;   // 휴면 종료월 (없으면 무기한)
   status: StateChangeStatus;
   createdAt: string;
   processedAt?: string;

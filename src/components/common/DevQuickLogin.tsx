@@ -32,7 +32,7 @@ const DEV_ACCOUNTS = [
   {
     category: '일반 회원',
     accounts: [
-      { email: 'choisunsuk@test.com', password: 'test123', name: '최선숙', desc: '활성 회원' },
+      { email: 'choisunsuk@test.com', password: 'test123', name: '최선숙', desc: '활동 회원' },
     ],
   },
   {
