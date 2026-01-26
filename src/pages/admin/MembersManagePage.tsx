@@ -80,7 +80,7 @@ export default function MembersManagePage() {
                 </div>
                 <div className="flex flex-col items-end gap-2">
                   <MemberStatusBadge status={member.status} />
-                  {/* 활동 지수 드롭다운 (활성/휴면 회원만) */}
+                  {/* 활동 지수 드롭다운 (활동/휴면 회원만) */}
                   {(member.status === 'active' || member.status === 'inactive') && (
                     <select
                       value={member.activityLevel || 'newbie'}
