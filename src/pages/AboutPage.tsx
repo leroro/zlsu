@@ -252,6 +252,41 @@ export default function AboutPage() {
         </div>
       </section>
 
+      {/* 가입 조건 */}
+      <section className="bg-white md:rounded-lg md:shadow p-6 mb-4">
+        <h2 className="text-xl font-bold text-gray-900 mb-4">가입 조건</h2>
+
+        <div className="space-y-3 mb-4">
+          <div className="flex items-start gap-3 p-3 bg-blue-50 rounded-lg">
+            <span className="text-xl">🏊</span>
+            <div>
+              <h3 className="font-semibold text-gray-900">수영 실력</h3>
+              <p className="text-sm text-gray-600">자유형 50m를 페이스 유지하며 완주 가능</p>
+            </div>
+          </div>
+
+          <div className="flex items-start gap-3 p-3 bg-blue-50 rounded-lg">
+            <span className="text-xl">🎯</span>
+            <div>
+              <h3 className="font-semibold text-gray-900">영법</h3>
+              <p className="text-sm text-gray-600">4개 영법(자유형, 배영, 평영, 접영) 모두 배운 사람</p>
+            </div>
+          </div>
+
+          <div className="flex items-start gap-3 p-3 bg-blue-50 rounded-lg">
+            <span className="text-xl">🤝</span>
+            <div>
+              <h3 className="font-semibold text-gray-900">추천인</h3>
+              <p className="text-sm text-gray-600">기존 회원(열정 레벨 이상)의 추천 필수</p>
+            </div>
+          </div>
+        </div>
+
+        <p className="text-sm text-gray-500 bg-gray-50 rounded-lg p-3">
+          💡 조건이 맞지 않아도 먼저 체험 후 실력을 키워서 가입할 수 있어요!
+        </p>
+      </section>
+
       {/* 자주 묻는 질문 */}
       <section className="bg-white md:rounded-lg md:shadow p-6 mb-4">
         <h2 className="text-xl font-bold text-gray-900 mb-4">자주 묻는 질문</h2>
@@ -262,8 +297,8 @@ export default function AboutPage() {
               Q. 수영 초보도 가입할 수 있나요?
             </h3>
             <p className="text-gray-600 text-sm">
-              초급반부터 마스터반까지 다양한 레벨의 회원이 있어요.
-              코치님이 수준에 맞게 지도해주세요.
+              4개 영법을 배우고 자유형 50m를 완주할 수 있으면 가입 가능해요.
+              아직 조건이 안 되면 먼저 체험하면서 실력을 키워보세요!
             </p>
           </div>
 

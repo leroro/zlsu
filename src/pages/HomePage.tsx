@@ -93,7 +93,7 @@ export default function HomePage() {
               <div className="text-xs text-gray-500">
                 현재 인원
                 <span className="text-gray-400 ml-1">
-                  ({settings.includeInactiveInCapacity ? '활성+휴면' : '활성'})
+                  ({settings.includeInactiveInCapacity ? '활동+휴면' : '활동'})
                 </span>
               </div>
             </div>
@@ -421,7 +421,7 @@ export default function HomePage() {
   const getChangeTypeLabel = (history: StatusChangeHistory): string => {
     switch (history.changeType) {
       case 'to_inactive': return '휴면';
-      case 'to_active': return '활성';
+      case 'to_active': return '활동';
       case 'withdrawn': return '탈퇴';
       default: return '';
     }
@@ -448,7 +448,7 @@ export default function HomePage() {
             {/* 상태 전환 버튼 - 상태 라벨 옆에 */}
             {user.role !== 'admin' && user.status !== 'pending' && !pendingStateChange && !pendingWithdrawal && (
               <Link to="/change-status" className="text-xs text-gray-500 hover:text-gray-700 underline">
-                {user.status === 'active' ? '휴면 신청하기' : '활성 신청하기'}
+                {user.status === 'active' ? '휴면 신청하기' : '활동 신청하기'}
               </Link>
             )}
           </div>
@@ -608,7 +608,7 @@ export default function HomePage() {
           <div className="flex items-center gap-2">
             <span>📊</span>
             <h2 className="font-bold text-gray-900">팀 정원</h2>
-            <span className="text-xs text-gray-400">({settings.includeInactiveInCapacity ? '활성+휴면' : '활성'} 기준)</span>
+            <span className="text-xs text-gray-400">({settings.includeInactiveInCapacity ? '활동+휴면' : '활동'} 기준)</span>
           </div>
           <div className="flex items-center gap-2">
             <span className="font-bold text-primary-600">{stats.capacityCount}</span>
