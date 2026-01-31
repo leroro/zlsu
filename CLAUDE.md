@@ -44,6 +44,19 @@
 - vite.config.ts 수정 불필요
 - GitHub 배포 시 `SHOW_DEV_LOGIN = false` 필수
 
+## master 병합 정책
+
+**master 브랜치 푸시 권한이 없을 때:**
+
+1. feature 브랜치(`claude/xxx`)에 모든 변경사항 푸시
+2. 사용자에게 PR 생성 URL 제공
+3. 사용자가 직접 병합
+
+```
+PR 생성 URL 형식:
+https://github.com/leroro/zlsu/pull/new/{브랜치명}
+```
+
 ---
 
 ## 현재 작업 중인 이슈
