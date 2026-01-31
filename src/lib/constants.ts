@@ -1,7 +1,7 @@
 import { MemberStatus, MemberRole, ApplicationStatus, StateChangeStatus, WithdrawalStatus, Gender, SwimmingLevel, CompetitionInterest, CompetitionHistory, ActivityLevel } from './types';
 
 // 정원
-export const MAX_CAPACITY = 16;
+export const MAX_CAPACITY = 14;
 
 // 상태 라벨
 export const STATUS_LABELS: Record<MemberStatus, string> = {
@@ -86,7 +86,8 @@ export const WITHDRAWAL_STATUS_COLORS: Record<WithdrawalStatus, string> = {
 
 // 회칙 버전
 export const RULES_VERSIONS = [
-  { version: 'v2.1', label: '현재 회칙 (v2.1)', path: '/rules/v2.1.md' },
+  { version: 'v2.0', label: '현재 회칙 (v2.0)', path: '/rules/v2.0.md' },
+  { version: 'v1.1', label: '이전 회칙 (v1.1)', path: '/rules/v1.1.md' },
   { version: 'v1.0', label: '초기 회칙 (v1.0)', path: '/rules/v1.0.md' },
 ];
 
@@ -109,7 +110,7 @@ export const SIGNUP_CHECKLIST_ITEMS = [
   {
     id: 'time',
     label: '매주 토요일 8시 정각 도착',
-    description: '수영장 시계 기준, 연습 레인 입수 기준입니다. (실제 58분까지 도착 필요)',
+    description: '수영장 시계 기준, 연습 레인 입수 기준입니다. (실제 57분까지 도착 필요)',
   },
   {
     id: 'lateFee',
@@ -119,7 +120,7 @@ export const SIGNUP_CHECKLIST_ITEMS = [
   {
     id: 'absenceFee',
     label: '무단 불참 벌금: 1만원',
-    description: '금요일 자정까지 불참 표시 시 면제됩니다.',
+    description: '토요일 새벽 4시까지 불참 표시 시 면제됩니다.',
   },
   {
     id: 'monthlyFee',
@@ -133,8 +134,8 @@ export const SIGNUP_CHECKLIST_ITEMS = [
   },
   {
     id: 'absenceNotice',
-    label: '불참 시 금요일 자정까지 일정에 불참 표시 필수',
-    description: '채팅이 아닌 일정 기능에서 불참 선택해야 합니다.',
+    label: '불참 시 토요일 새벽 4시까지 일정에 불참 표시 필수',
+    description: '채팅이 아닌 일정 기능에서 불참 선택해야 합니다. (미선택 시 자동 참석 처리)',
   },
   {
     id: 'swimCap',
@@ -242,7 +243,7 @@ export const ACTIVITY_LEVEL_DESCRIPTIONS: Record<ActivityLevel, string> = {
   newbie: '가입 후 4회 미만 참여',
   regular: '최근 2개월간 월 2회 이상 참여',
   passionate: '최근 2개월간 월 3~4회 참여',
-  core: '최근 3개월간 월 3~4회 이상 꾸준히 참여 + 대회 참석 의향',
+  core: '최근 3개월간 월 3~4회 이상 꾸준히 참여 + 이벤트 참여 (번개, 대회 등)',
   staff: '모임 운영 업무/기여',
 };
 

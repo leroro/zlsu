@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 
 // 개발용 빠른 로그인 활성화 (배포 시 false로 변경)
-export const SHOW_DEV_LOGIN = false;
+export const SHOW_DEV_LOGIN = true;
 
 // 개발용 테스트 계정 목록
 const DEV_ACCOUNTS = [
