@@ -326,7 +326,7 @@ export default function AboutPage() {
               Q. 못 가는 날은 어떻게 하나요?
             </h3>
             <p className="text-gray-600 text-sm">
-              금요일 자정까지 카톡방의 <strong>달력(캘린더)</strong>에서 불참 표시하면 돼요.
+              토요일 새벽 4시까지 카톡방의 <strong>달력(캘린더)</strong>에서 불참 표시하면 돼요.
               채팅으로만 말씀하시면 인원 파악이 어려워요!
             </p>
           </div>
