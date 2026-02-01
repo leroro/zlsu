@@ -285,11 +285,11 @@ export default function AboutPage() {
         <div className="space-y-4">
           <div className="border-b border-gray-100 pb-4">
             <h3 className="font-semibold text-gray-900 mb-1">
-              Q. 수영만 하고 싶어요. 가입해야 하나요?
+              Q. 수영만 배우고 싶어요. 가입해야 하나요?
             </h3>
             <p className="text-gray-600 text-sm">
-              수영만 하시려면 게스트로 충분해요.
-              당일 빈 자리가 있을 때 참여 가능하니 편하게 오세요.
+              가입은 친목 활동까지 함께하실 분을 위한 거예요.
+              게스트는 당일 빈 자리가 있을 때만 참여 가능해요.
             </p>
           </div>
 
