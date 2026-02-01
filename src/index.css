@@ -204,3 +204,11 @@ h1, h2, h3, h4 {
   font-weight: 700 !important;
   letter-spacing: -0.01em; /* 약간 타이트하게 */
 }
+
+/* 회칙 테이블 - 이름/직책 컬럼 줄바꿈 방지 */
+.prose table td:first-child,
+.prose table td:nth-child(2),
+.prose table th:first-child,
+.prose table th:nth-child(2) {
+  white-space: nowrap;
+}
