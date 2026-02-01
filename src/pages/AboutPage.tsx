@@ -114,16 +114,8 @@ export default function AboutPage() {
           <div className="flex gap-3">
             <span className="text-2xl">🏆</span>
             <div>
-              <h3 className="font-semibold text-gray-900">수영 대회 단체 출전</h3>
-              <p className="text-gray-600">연중 수영 대회 개최 시 희망자에 한해 단체로 개인전에 출전해요.</p>
-            </div>
-          </div>
-
-          <div className="flex gap-3">
-            <span className="text-2xl">🤝</span>
-            <div>
-              <h3 className="font-semibold text-gray-900">단체전 대회 참여</h3>
-              <p className="text-gray-600">단체전 형태의 추발, 계영 대회 등에 함께 참여한 경험이 있어요.</p>
+              <h3 className="font-semibold text-gray-900">수영 대회 참여</h3>
+              <p className="text-gray-600">희망자에 한해 개인전, 단체전(계영, 추발 등) 대회에 함께 출전해요.</p>
             </div>
           </div>
         </div>
@@ -137,9 +129,16 @@ export default function AboutPage() {
       <section className="bg-white md:rounded-lg md:shadow p-6 mb-4">
         <h2 className="text-xl font-bold text-gray-900 mb-4">이런 분께 추천해요</h2>
 
+        <div className="space-y-3 text-gray-700 mb-4">
+          <p>
+            <strong>'수영을 즐겁게'</strong>는 수영을 통해 배움과 성장을 함께하는 사람들 모임이에요.
+            기록이나 성과보다는, 다양한 연령대의 회원들이 함께 화합하며 즐겁게 교류하는 <strong>친목 모임</strong>이에요.
+          </p>
+        </div>
+
         <ul className="space-y-3">
           {[
-            '수영 친구를 만들고 싶은 분',
+            '수영도 하고, 회원들과 친목도 즐기고 싶은 분',
             '영법을 더 정확하게 배우고 싶은 분',
             '주말 아침을 건강하게 시작하고 싶은 분',
             '수영 대회에 도전해보고 싶은 분',
@@ -150,73 +149,41 @@ export default function AboutPage() {
             </li>
           ))}
         </ul>
+
       </section>
 
-      {/* 수모 안내 */}
+      {/* 참여 조건 */}
       <section className="bg-white md:rounded-lg md:shadow p-6 mb-4">
-        <h2 className="text-xl font-bold text-gray-900 mb-4">즐수팀 수모</h2>
+        <h2 className="text-xl font-bold text-gray-900 mb-4">참여 조건</h2>
 
-        <div className="bg-gray-50 rounded-lg p-4 mb-4">
-          {/* 수모 이미지 */}
-          <div className="aspect-video bg-gray-200 rounded-lg overflow-hidden mb-4">
-            <img
-              src={asset('images/swim-cap.jpg')}
-              alt="즐수팀 수모"
-              className="w-full h-full object-cover"
-            />
+        {/* 게스트 */}
+        <div className="border border-gray-200 rounded-lg p-4 mb-4">
+          <div className="flex items-center gap-2 mb-3">
+            <span className="text-xl">🐣</span>
+            <h3 className="font-semibold text-gray-900">게스트</h3>
+            <span className="text-xs text-gray-500">가입 전 체험 참여</span>
           </div>
-
-          <div className="text-sm text-gray-600 space-y-2">
-            <p>• <strong>소재:</strong> 메시 소재 (통기성 좋음)</p>
-            <p>• <strong>가격:</strong> 1장 2만원 / 2장 3만원</p>
-            <p>• <strong>구매:</strong> 가입 시 필수 구매</p>
-          </div>
+          <ul className="text-sm text-gray-600 space-y-1 ml-7">
+            <li>• 당일 빈 자리가 있을 때만 연습에 참여 가능</li>
+            <li>• 4개 영법을 모두 배운 사람</li>
+            <li>• 자유형 50m 일정 페이스 유지하며 완주 가능자</li>
+          </ul>
         </div>
 
-        <p className="text-sm text-gray-500">
-          즐수팀 회원임을 나타내는 수모예요. 수영장에서 서로를 쉽게 알아볼 수 있어요!
-        </p>
-      </section>
-
-      {/* 가입 안내 */}
-      <section className="bg-white md:rounded-lg md:shadow p-6 mb-4">
-        <h2 className="text-xl font-bold text-gray-900 mb-4">가입 안내</h2>
-
-        <div className="grid grid-cols-2 gap-4 mb-6">
-          <div className="bg-blue-50 rounded-lg p-4 text-center">
-            <p className="text-sm text-gray-600 mb-1">월 회비</p>
-            <p className="text-2xl font-bold text-blue-600">2만원</p>
-            <p className="text-xs text-gray-500">매월 1일 납부</p>
+        {/* 회원 */}
+        <div className="border-2 border-blue-200 bg-blue-50/30 rounded-lg p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <span className="text-xl">🏊</span>
+            <h3 className="font-semibold text-gray-900">회원</h3>
+            <span className="text-xs text-gray-500">정식 가입 후 활동</span>
           </div>
-          <div className="bg-green-50 rounded-lg p-4 text-center">
-            <p className="text-sm text-gray-600 mb-1">현재 인원</p>
-            <p className="text-2xl font-bold text-green-600">
-              {stats.capacityCount}/{settings.maxCapacity}명
-            </p>
-            <p className="text-xs text-gray-500">
-              {remainingSlots > 0 ? `${remainingSlots}자리 남음` : '정원 마감'}
-            </p>
-          </div>
-        </div>
-
-        <div className="bg-gray-50 rounded-lg p-4 mb-4">
-          <h3 className="font-semibold text-gray-900 mb-2">첫 가입 시 납부 금액</h3>
-          <p className="text-gray-600 text-sm">
-            첫 달 회비 2만원 + 수모 2만원 = <span className="font-bold text-primary-600">총 4만원</span>
-          </p>
-          <p className="text-xs text-gray-500 mt-1">
-            * 수모 2장 구매 시 총 5만원 (회비 2만 + 수모 3만)
-          </p>
-        </div>
-
-        <div className="text-sm text-gray-600">
-          <p className="flex items-center gap-2 mb-1">
-            <span>💡</span>
-            <span>기존 회원의 추천이 필요해요</span>
-          </p>
-          <p className="flex items-center gap-2">
-            <span>💡</span>
-            <span>첫 1회는 무료 체험 가능해요</span>
+          <ul className="text-sm text-gray-600 space-y-1 ml-7">
+            <li>• 티타임 등 친목 활동에 함께할 의향</li>
+            <li>• 정원(14명)에 공석이 있어야 가입 가능</li>
+            <li>• 기존 열정 레벨 회원의 추천 필수</li>
+          </ul>
+          <p className="text-xs text-blue-600 mt-3 ml-7">
+            💡 게스트 활동을 하시면 추천 기회가 생길 수 있어요
           </p>
         </div>
       </section>
@@ -227,12 +194,11 @@ export default function AboutPage() {
 
         <div className="space-y-4">
           {[
-            { step: 1, title: '가입 신청서 작성하기', desc: '추천인(기존 회원)에게 링크 받아서 신청' },
-            { step: 2, title: '가입비 입금하기', desc: '회비 + 수모 금액 입금' },
-            { step: 3, title: '카톡방 & 모임통장 입장하기', desc: '로그인 후 카톡방 입장하기 버튼 클릭' },
-            { step: 4, title: '첫 수영 참석 신청하기', desc: '카톡방 일정(달력)에서 참석할 토요일에 출석체크' },
-            { step: 5, title: '수모 수령하기', desc: '추천인에게 수령' },
-            { step: 6, title: '토요일에 만나요!', desc: '수영장에서 함께해요 🏊' },
+            { step: 1, title: '게스트로 활동하기', desc: '당일 빈 자리가 있을 때 참여 가능' },
+            { step: 2, title: '추천 받기', desc: '공석이 생기면 추천 기회가 생길 수 있어요' },
+            { step: 3, title: '회칙 동의 & 가입비 입금', desc: '회비 + 수모 금액 입금' },
+            { step: 4, title: '카톡방 입장하기', desc: '입장 후 자기소개' },
+            { step: 5, title: '수모 받고 토요일에 만나요!', desc: '추천인에게 수모 수령' },
           ].map((item, index, arr) => (
             <div key={item.step} className="flex gap-4">
               <div className="flex flex-col items-center">
@@ -252,47 +218,56 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* 가입 조건 */}
+      {/* 가입 안내 */}
       <section className="bg-white md:rounded-lg md:shadow p-6 mb-4">
-        <h2 className="text-xl font-bold text-gray-900 mb-4">가입 조건</h2>
+        <h2 className="text-xl font-bold text-gray-900 mb-4">가입 안내</h2>
 
-        <div className="space-y-3 mb-4">
-          <div className="flex items-start gap-3 p-3 bg-blue-50 rounded-lg">
-            <span className="text-xl">🏊</span>
-            <div>
-              <h3 className="font-semibold text-gray-900">수영 실력</h3>
-              <p className="text-sm text-gray-600">자유형 50m를 페이스 유지하며 완주 가능</p>
-            </div>
+        <div className="grid grid-cols-2 gap-4 mb-6">
+          <div className="bg-blue-50 rounded-lg p-4 text-center">
+            <p className="text-sm text-gray-600 mb-1">월 회비</p>
+            <p className="text-2xl font-bold text-blue-600">2만원</p>
+            <p className="text-xs text-gray-500">매월 1일 납부</p>
           </div>
-
-          <div className="flex items-start gap-3 p-3 bg-blue-50 rounded-lg">
-            <span className="text-xl">🎯</span>
-            <div>
-              <h3 className="font-semibold text-gray-900">영법</h3>
-              <p className="text-sm text-gray-600">4개 영법(자유형, 배영, 평영, 접영) 모두 배운 사람</p>
-            </div>
-          </div>
-
-          <div className="flex items-start gap-3 p-3 bg-blue-50 rounded-lg">
-            <span className="text-xl">🤝</span>
-            <div>
-              <h3 className="font-semibold text-gray-900">추천인</h3>
-              <p className="text-sm text-gray-600">기존 회원(열정 레벨 이상)의 추천 필수</p>
-            </div>
-          </div>
-
-          <div className="flex items-start gap-3 p-3 bg-blue-50 rounded-lg">
-            <span className="text-xl">☕</span>
-            <div>
-              <h3 className="font-semibold text-gray-900">친목 활동 참여 의향</h3>
-              <p className="text-sm text-gray-600">티타임, 각종 이벤트 등 친목 활동에 함께할 의향</p>
-            </div>
+          <div className="bg-green-50 rounded-lg p-4 text-center">
+            <p className="text-sm text-gray-600 mb-1">정원 현황</p>
+            <p className="text-2xl font-bold text-green-600">
+              {stats.capacityCount}/{settings.maxCapacity}자리
+            </p>
+            <p className="text-xs text-gray-500">
+              {remainingSlots > 0 ? `공석 ${remainingSlots}자리` : '정원 마감'}
+            </p>
           </div>
         </div>
 
-        <p className="text-sm text-gray-500 bg-gray-50 rounded-lg p-3">
-          💡 조건이 맞지 않아도 먼저 체험 후 실력을 키워서 가입할 수 있어요!
-        </p>
+        <div className="bg-gray-50 rounded-lg p-4 mb-4">
+          <h3 className="font-semibold text-gray-900 mb-2">첫 가입 시 납부 금액</h3>
+          <p className="text-gray-600 text-sm">
+            첫 달 회비 2만원 + 수모 2만원 = <span className="font-bold text-primary-600">총 4만원</span>
+          </p>
+          <p className="text-xs text-gray-500 mt-1">
+            * 수모 2장 구매 시 총 5만원 (회비 2만 + 수모 3만)
+          </p>
+        </div>
+
+        {/* 수모 안내 */}
+        <div className="border-t border-gray-100 pt-4">
+          <h3 className="font-semibold text-gray-900 mb-1">즐수팀 수모</h3>
+          <p className="text-sm text-gray-500 mb-3">
+            즐수팀 회원임을 나타내는 수모예요. 수영장에서 서로를 쉽게 알아볼 수 있어요!
+          </p>
+          <div className="aspect-[2/1] bg-gray-200 rounded-lg overflow-hidden mb-3">
+            <img
+              src={asset('images/swim-cap.jpg')}
+              alt="즐수팀 수모"
+              className="w-full h-full object-cover"
+            />
+          </div>
+          <div className="text-sm text-gray-600 flex flex-wrap gap-x-4 gap-y-1">
+            <span>• 메시 소재</span>
+            <span>• 1장 2만원 / 2장 3만원</span>
+            <span>• 필수 구매 및 착용</span>
+          </div>
+        </div>
       </section>
 
       {/* 자주 묻는 질문 */}
@@ -302,30 +277,61 @@ export default function AboutPage() {
         <div className="space-y-4">
           <div className="border-b border-gray-100 pb-4">
             <h3 className="font-semibold text-gray-900 mb-1">
+              Q. 수영만 하고 싶어요. 가입해야 하나요?
+            </h3>
+            <p className="text-gray-600 text-sm">
+              수영만 하시려면 게스트로 충분해요.
+              당일 빈 자리가 있을 때 참여 가능하니 편하게 오세요.
+            </p>
+          </div>
+
+          <div className="border-b border-gray-100 pb-4">
+            <h3 className="font-semibold text-gray-900 mb-1">
+              Q. 게스트인데 수모만 살 수 있나요?
+            </h3>
+            <p className="text-gray-600 text-sm">
+              즐수팀 수모는 회원 전용이라 게스트는 구입이 어려워요.
+              가입하시면 필수로 구매하시게 되고, 연습 시 꼭 착용해야 해요.
+            </p>
+          </div>
+
+          <div className="border-b border-gray-100 pb-4">
+            <h3 className="font-semibold text-gray-900 mb-1">
               Q. 수영 초보도 가입할 수 있나요?
             </h3>
             <p className="text-gray-600 text-sm">
-              4개 영법을 배우고 자유형 50m를 완주할 수 있으면 가입 가능해요.
-              아직 조건이 안 되면 먼저 체험하면서 실력을 키워보세요!
+              4개 영법을 모두 배우고, 자유형 50m를 일정한 페이스로 완주할 수 있어야 해요.
             </p>
           </div>
 
           <div className="border-b border-gray-100 pb-4">
             <h3 className="font-semibold text-gray-900 mb-1">
-              Q. 지각하면 어떻게 되나요?
+              Q. 가입하고 싶은데 추천은 어떻게 받나요?
             </h3>
             <p className="text-gray-600 text-sm">
-              1분당 500원 벌금이 있어요 (최대 1만원).
-              8시 정각 입수 기준이에요!
+              게스트로 꾸준히 참여하고 인사를 나눠 보세요.
+              공석이 발생하면 자연스럽게 추천인이 생길 거에요.
             </p>
           </div>
 
           <div className="border-b border-gray-100 pb-4">
             <h3 className="font-semibold text-gray-900 mb-1">
-              Q. 무단 불참하면 어떻게 되나요?
+              Q. 회비는 어디에 쓰이나요?
             </h3>
             <p className="text-gray-600 text-sm">
-              출석체크 미응답 시 1만원 벌금이 있어요.
+              대부분 수영 후 티타임 커피값으로 사용해요.
+              그 외 송년회 등 이벤트, 수모 제작 등 모임 운영에 활용돼요.
+              이벤트 비용이 부족할 때는 별도로 걷기도 해요.
+            </p>
+          </div>
+
+          <div className="border-b border-gray-100 pb-4">
+            <h3 className="font-semibold text-gray-900 mb-1">
+              Q. 티타임 불참시 회비를 안 내도 되나요?
+            </h3>
+            <p className="text-gray-600 text-sm">
+              아니에요, 회비는 참여 여부와 관계없이 납부해요.
+              그러니까 티타임에 자주 와주세요! ☕
             </p>
           </div>
 
@@ -341,31 +347,20 @@ export default function AboutPage() {
 
           <div className="border-b border-gray-100 pb-4">
             <h3 className="font-semibold text-gray-900 mb-1">
-              Q. 회비는 어디에 쓰이나요?
+              Q. 무단 불참하면 어떻게 되나요?
             </h3>
             <p className="text-gray-600 text-sm">
-              대부분 수영 후 티타임 커피값으로 사용해요.
-              그 외 송년회 등 이벤트, 수모 제작 등 모임 운영에 활용돼요.
-            </p>
-          </div>
-
-          <div className="border-b border-gray-100 pb-4">
-            <h3 className="font-semibold text-gray-900 mb-1">
-              Q. 티타임 불참시 회비를 안 내도 되나요?
-            </h3>
-            <p className="text-gray-600 text-sm">
-              아니에요, 회비는 참여 여부와 관계없이 납부해요.
-              그러니까 티타임에 자주 와주세요! ☕
+              출석체크 미응답, 또는 출석하겠다고 하고 안 나오면 1만원 벌금이 있어요.
             </p>
           </div>
 
           <div>
             <h3 className="font-semibold text-gray-900 mb-1">
-              Q. 수모는 꼭 사야 하나요?
+              Q. 지각하면 어떻게 되나요?
             </h3>
             <p className="text-gray-600 text-sm">
-              네, 가입 시 필수 구매예요.
-              즐수팀 회원임을 나타내고 수영장에서 서로 알아볼 수 있어요!
+              1분당 500원 벌금이 있어요 (최대 1만원).
+              8시 정각 입수 기준이에요!
             </p>
           </div>
         </div>
