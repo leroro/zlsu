@@ -2,8 +2,11 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 
-// 개발용 빠른 로그인 활성화 (배포 시 false로 변경)
-export const SHOW_DEV_LOGIN = true;
+// 개발용 빠른 로그인 활성화
+// - GitHub Pages (leroro.github.io): 비활성화
+// - PMS / localhost: 활성화
+const isGitHubPages = window.location.hostname === 'leroro.github.io';
+export const SHOW_DEV_LOGIN = !isGitHubPages;
 
 // 개발용 테스트 계정 목록
 const DEV_ACCOUNTS = [

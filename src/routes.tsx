@@ -26,6 +26,9 @@ import GuidePage from './pages/GuidePage';
 import PreviewAboutPage from './pages/preview/PreviewAboutPage';
 import PreviewGuidePage from './pages/preview/PreviewGuidePage';
 import PreviewRulesPage from './pages/preview/PreviewRulesPage';
+// 외부 공유용 안내 페이지
+import InfoPage from './pages/InfoPage';
+import InfoRulesPage from './pages/InfoRulesPage';
 
 export const router = createHashRouter([
   {
@@ -158,6 +161,9 @@ export const router = createHashRouter([
 
       ],
     },
+    // 외부 공유용 안내 페이지 (헤더 없이)
+    { path: 'info', element: <InfoPage /> },
+    { path: 'info/rules', element: <InfoRulesPage /> },
     // 미리보기 페이지 (헤더 없이, 컨펌용 임시)
     { path: 'preview/about', element: <PreviewAboutPage /> },
     { path: 'preview/guide', element: <PreviewGuidePage /> },
