@@ -168,6 +168,9 @@ export default function AboutPage() {
             <li>• 4개 영법을 모두 배운 사람</li>
             <li>• 자유형 50m 일정 페이스 유지하며 완주 가능자</li>
           </ul>
+          <p className="text-xs text-gray-500 mt-3 ml-7">
+            💡 게스트 활동하며 친해지면 추천 기회가 생길 수 있어요
+          </p>
         </div>
 
         {/* 회원 */}
@@ -182,9 +185,6 @@ export default function AboutPage() {
             <li>• 정원(14명)에 공석이 있어야 가입 가능</li>
             <li>• 기존 열정 레벨 회원의 추천 필수</li>
           </ul>
-          <p className="text-xs text-blue-600 mt-3 ml-7">
-            💡 게스트 활동을 하시면 추천 기회가 생길 수 있어요
-          </p>
         </div>
       </section>
 
