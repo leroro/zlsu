@@ -152,50 +152,52 @@ export default function AboutPage() {
 
       </section>
 
-      {/* 참여 조건 */}
-      <section className="bg-white md:rounded-lg md:shadow p-6 mb-4">
-        <h2 className="text-xl font-bold text-gray-900 mb-4">참여 조건</h2>
-
-        {/* 게스트 */}
-        <div className="border border-gray-200 rounded-lg p-4 mb-4">
-          <div className="flex items-center gap-2 mb-3">
-            <span className="text-xl">🐣</span>
-            <h3 className="font-semibold text-gray-900">게스트</h3>
-            <span className="text-xs text-gray-500">가입 전 체험 참여</span>
-          </div>
-          <ul className="text-sm text-gray-600 space-y-1 ml-7">
-            <li>• 당일 빈 자리가 있을 때만 연습에 참여 가능</li>
-            <li>• 4개 영법을 모두 배운 사람</li>
-            <li>• 자유형 50m 일정 페이스 유지하며 완주 가능자</li>
-          </ul>
-          <p className="text-xs text-gray-500 mt-3 ml-7">
-            💡 게스트 활동하며 친해지면 추천 기회가 생길 수 있어요
-          </p>
-        </div>
-
-        {/* 회원 */}
-        <div className="border-2 border-blue-200 bg-blue-50/30 rounded-lg p-4">
-          <div className="flex items-center gap-2 mb-3">
-            <span className="text-xl">🏊</span>
-            <h3 className="font-semibold text-gray-900">회원</h3>
-            <span className="text-xs text-gray-500">정식 가입 후 활동</span>
-          </div>
-          <ul className="text-sm text-gray-600 space-y-1 ml-7">
-            <li>• 티타임 등 친목 활동에 함께할 의향</li>
-            <li>• 정원(14명)에 공석이 있어야 가입 가능</li>
-            <li>• 기존 열정 레벨 회원의 추천 필수</li>
-          </ul>
-        </div>
-      </section>
-
       {/* 가입 절차 */}
       <section className="bg-white md:rounded-lg md:shadow p-6 mb-4">
         <h2 className="text-xl font-bold text-gray-900 mb-4">가입 절차</h2>
 
-        <div className="space-y-4">
+        <div className="space-y-0">
+          {/* Step 1: 게스트로 활동하기 */}
+          <div className="flex gap-4">
+            <div className="flex flex-col items-center">
+              <div className="w-8 h-8 rounded-full bg-gray-400 text-white flex items-center justify-center text-sm font-bold">1</div>
+              <div className="w-0.5 flex-1 bg-gray-200 my-1" />
+            </div>
+            <div className="flex-1 pb-4">
+              <div className="flex items-center gap-2 mb-2">
+                <h3 className="font-semibold text-gray-900">게스트로 활동하기</h3>
+                <span className="text-xs text-gray-500">가입 전 체험</span>
+              </div>
+              <ul className="text-sm text-gray-600 space-y-1 mb-2">
+                <li>• 당일 빈 자리가 있을 때 참여 가능</li>
+                <li>• 4개 영법을 모두 배운 사람</li>
+                <li>• 자유형 50m 페이스 유지하며 완주 가능</li>
+              </ul>
+              <p className="text-xs text-gray-500">💡 친해지면 추천 기회가 생길 수 있어요</p>
+            </div>
+          </div>
+
+          {/* Step 2: 추천 받고 정식 가입 */}
+          <div className="flex gap-4">
+            <div className="flex flex-col items-center">
+              <div className="w-8 h-8 rounded-full bg-primary-600 text-white flex items-center justify-center text-sm font-bold">2</div>
+              <div className="w-0.5 flex-1 bg-primary-200 my-1" />
+            </div>
+            <div className="flex-1 pb-4">
+              <div className="flex items-center gap-2 mb-2">
+                <h3 className="font-semibold text-gray-900">추천 받고 정식 가입</h3>
+                <span className="text-xs text-gray-500">회원 전환</span>
+              </div>
+              <ul className="text-sm text-gray-600 space-y-1">
+                <li>☑ 티타임 등 친목 활동에 함께할 의향</li>
+                <li>☑ 정원(14명)에 공석이 있어야 함</li>
+                <li>☑ 기존 열정 레벨 회원의 추천</li>
+              </ul>
+            </div>
+          </div>
+
+          {/* Step 3-5: 나머지 절차 */}
           {[
-            { step: 1, title: '게스트로 활동하기', desc: '당일 빈 자리가 있을 때 참여 가능' },
-            { step: 2, title: '추천 받기', desc: '공석이 생기면 추천 기회가 생길 수 있어요' },
             { step: 3, title: '회칙 동의 & 가입비 입금', desc: '회비 + 수모 금액 입금' },
             { step: 4, title: '카톡방 입장하기', desc: '입장 후 자기소개' },
             { step: 5, title: '수모 받고 토요일에 만나요!', desc: '추천인에게 수모 수령' },
@@ -206,7 +208,7 @@ export default function AboutPage() {
                   {item.step}
                 </div>
                 {index < arr.length - 1 && (
-                  <div className="w-0.5 h-full bg-primary-200 my-1" />
+                  <div className="w-0.5 flex-1 bg-primary-200 my-1" />
                 )}
               </div>
               <div className="flex-1 pb-4">
