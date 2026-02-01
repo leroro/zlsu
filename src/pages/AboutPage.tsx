@@ -286,11 +286,11 @@ export default function AboutPage() {
           {/* 게스트 관련 */}
           <div className="border-b border-gray-100 pb-4">
             <h3 className="font-semibold text-gray-900 mb-1">
-              Q. 수영 초보도 참여할 수 있나요?
+              Q. 수영 초보도 게스트로 참여할 수 있나요?
             </h3>
             <p className="text-gray-600 text-sm">
-              4개 영법을 모두 배우고, 자유형 50m를 일정한 페이스로 완주할 수 있어야 해요.
-              이 조건을 충족하면 게스트로 참여 가능해요.
+              4개 영법을 배우고, 자유형 50m를 일정한 페이스로 완주할 수 있어야 해요.
+              다른 회원들과 함께 레인을 돌 때 지장이 없어야 하기 때문이에요.
             </p>
           </div>
 
