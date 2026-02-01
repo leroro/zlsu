@@ -283,13 +283,24 @@ export default function AboutPage() {
         <h2 className="text-xl font-bold text-gray-900 mb-4">자주 묻는 질문</h2>
 
         <div className="space-y-4">
+          {/* 게스트 관련 */}
+          <div className="border-b border-gray-100 pb-4">
+            <h3 className="font-semibold text-gray-900 mb-1">
+              Q. 수영 초보도 참여할 수 있나요?
+            </h3>
+            <p className="text-gray-600 text-sm">
+              4개 영법을 모두 배우고, 자유형 50m를 일정한 페이스로 완주할 수 있어야 해요.
+              이 조건을 충족하면 게스트로 참여 가능해요.
+            </p>
+          </div>
+
           <div className="border-b border-gray-100 pb-4">
             <h3 className="font-semibold text-gray-900 mb-1">
               Q. 수영만 하고 싶어요. 가입해야 하나요?
             </h3>
             <p className="text-gray-600 text-sm">
               가입은 친목 활동까지 함께하실 분을 위한 거예요.
-              게스트는 당일 빈 자리가 있을 때만 참여 가능해요.
+              수영만 하시려면 게스트로 참여 가능하지만, 당일 빈 자리가 있을 때만 가능해요.
             </p>
           </div>
 
@@ -299,47 +310,28 @@ export default function AboutPage() {
             </h3>
             <p className="text-gray-600 text-sm">
               즐수팀 수모는 회원 전용이라 게스트는 구입이 어려워요.
-              가입하시면 필수로 구매하시게 되고, 연습 시 꼭 착용해야 해요.
             </p>
           </div>
 
-          <div className="border-b border-gray-100 pb-4">
-            <h3 className="font-semibold text-gray-900 mb-1">
-              Q. 수영 초보도 가입할 수 있나요?
-            </h3>
-            <p className="text-gray-600 text-sm">
-              4개 영법을 모두 배우고, 자유형 50m를 일정한 페이스로 완주할 수 있어야 해요.
-            </p>
-          </div>
-
+          {/* 가입 관련 */}
           <div className="border-b border-gray-100 pb-4">
             <h3 className="font-semibold text-gray-900 mb-1">
               Q. 가입하고 싶은데 추천은 어떻게 받나요?
             </h3>
             <p className="text-gray-600 text-sm">
-              게스트로 꾸준히 참여하고 인사를 나눠 보세요.
-              공석이 발생하면 자연스럽게 추천인이 생길 거에요.
+              게스트로 꾸준히 참여하며 인사를 나눠 보세요.
+              공석이 생기면 추천 기회가 생길 수 있어요.
             </p>
           </div>
 
+          {/* 회원 활동 관련 */}
           <div className="border-b border-gray-100 pb-4">
             <h3 className="font-semibold text-gray-900 mb-1">
               Q. 회비는 어디에 쓰이나요?
             </h3>
             <p className="text-gray-600 text-sm">
               대부분 수영 후 티타임 커피값으로 사용해요.
-              그 외 송년회 등 이벤트, 수모 제작 등 모임 운영에 활용돼요.
-              이벤트 비용이 부족할 때는 별도로 걷기도 해요.
-            </p>
-          </div>
-
-          <div className="border-b border-gray-100 pb-4">
-            <h3 className="font-semibold text-gray-900 mb-1">
-              Q. 티타임 불참시 회비를 안 내도 되나요?
-            </h3>
-            <p className="text-gray-600 text-sm">
-              아니에요, 회비는 참여 여부와 관계없이 납부해요.
-              그러니까 티타임에 자주 와주세요! ☕
+              그 외 이벤트, 수모 제작 등 모임 운영에 활용돼요.
             </p>
           </div>
 
@@ -353,21 +345,12 @@ export default function AboutPage() {
             </p>
           </div>
 
-          <div className="border-b border-gray-100 pb-4">
-            <h3 className="font-semibold text-gray-900 mb-1">
-              Q. 무단 불참하면 어떻게 되나요?
-            </h3>
-            <p className="text-gray-600 text-sm">
-              출석체크 미응답, 또는 출석하겠다고 하고 안 나오면 1만원 벌금이 있어요.
-            </p>
-          </div>
-
           <div>
             <h3 className="font-semibold text-gray-900 mb-1">
-              Q. 지각하면 어떻게 되나요?
+              Q. 벌금 제도가 있나요?
             </h3>
             <p className="text-gray-600 text-sm">
-              1분당 500원 벌금이 있어요 (최대 1만원).
+              무단불참 1만원, 지각 1분당 500원(최대 1만원)이 있어요.
               8시 정각 입수 기준이에요!
             </p>
           </div>
@@ -400,10 +383,14 @@ export default function AboutPage() {
       </section>
 
       {/* 플로팅 CTA 버튼 (모바일) */}
-      {isFloating && remainingSlots > 0 && (
-        <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-200 shadow-lg md:hidden z-50">
-          <Link to={applyUrl} className="block">
-            <Button size="lg" className="w-full">가입 신청하기</Button>
+      {remainingSlots > 0 && (
+        <div
+          className={`fixed bottom-0 left-0 right-0 p-4 md:hidden z-50 transition-transform duration-300 ease-out ${
+            isFloating ? 'translate-y-0' : 'translate-y-full'
+          }`}
+        >
+          <Link to={applyUrl} className="block max-w-md mx-auto">
+            <Button size="lg" className="w-full shadow-lg">가입 신청하기</Button>
           </Link>
         </div>
       )}
