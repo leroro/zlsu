@@ -17,16 +17,22 @@ export default function AboutPage() {
   const applyUrl = referrer ? `/apply?ref=${encodeURIComponent(referrer)}` : '/apply';
 
   // CTA 플로팅 상태
-  const [isFloating, setIsFloating] = useState(true);
+  const [isFloating, setIsFloating] = useState(false);
+  const joinInfoSectionRef = useRef<HTMLElement>(null);
   const ctaSectionRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     const handleScroll = () => {
-      if (!ctaSectionRef.current) return;
-      const rect = ctaSectionRef.current.getBoundingClientRect();
-      // CTA 섹션이 화면에 보이기 시작하면 플로팅 해제
-      const isAtBottom = rect.top < window.innerHeight;
-      setIsFloating(!isAtBottom);
+      if (!joinInfoSectionRef.current || !ctaSectionRef.current) return;
+
+      const joinInfoRect = joinInfoSectionRef.current.getBoundingClientRect();
+      const ctaRect = ctaSectionRef.current.getBoundingClientRect();
+
+      // 가입 안내 섹션 진입 시 플로팅 활성화, CTA 섹션 도달 시 해제
+      const passedJoinInfo = joinInfoRect.top < window.innerHeight * 0.8;
+      const reachedCta = ctaRect.top < window.innerHeight;
+
+      setIsFloating(passedJoinInfo && !reachedCta);
     };
 
     window.addEventListener('scroll', handleScroll);
@@ -221,7 +227,7 @@ export default function AboutPage() {
       </section>
 
       {/* 가입 안내 */}
-      <section className="bg-white md:rounded-lg md:shadow p-6 mb-4">
+      <section ref={joinInfoSectionRef} className="bg-white md:rounded-lg md:shadow p-6 mb-4">
         <h2 className="text-xl font-bold text-gray-900 mb-4">가입 안내</h2>
 
         <div className="grid grid-cols-2 gap-4 mb-6">
