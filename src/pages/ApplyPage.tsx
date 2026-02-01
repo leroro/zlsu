@@ -9,10 +9,10 @@ import Button from '../components/common/Button';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import { useAuth } from '../contexts/AuthContext';
 
-// 스텝 타입
+// 스태프 타입
 type Step = 1 | 2 | 3 | 4;
 
-// 스텝 인디케이터 컴포넌트
+// 스태프 인디케이터 컴포넌트
 function StepIndicator({ currentStep }: { currentStep: Step }) {
   const steps = [
     { step: 1, label: '추천인' },

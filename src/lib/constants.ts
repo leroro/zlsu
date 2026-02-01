@@ -93,7 +93,7 @@ export const RULES_VERSIONS = [
 
 // 약관 경로
 export const TERMS = {
-  RULES: '/rules/rules.md',  // 통합 회칙/운영규정
+  RULES: RULES_VERSIONS[0].path,  // 항상 최신 버전 자동 참조
   PRIVACY_POLICY: '/terms/privacy-policy.md',
 };
 
@@ -226,7 +226,7 @@ export const ACTIVITY_LEVEL_LABELS: Record<ActivityLevel, string> = {
   regular: '일반',
   passionate: '열정',
   core: '핵심',
-  staff: '스태프',
+  staff: '스텝',
 };
 
 // 활동 지수 아이콘
@@ -238,13 +238,13 @@ export const ACTIVITY_LEVEL_ICONS: Record<ActivityLevel, string> = {
   staff: '🏆',
 };
 
-// 활동 지수 기준 설명
+// 활동 지수 기준 설명 (최근 2개월 기준)
 export const ACTIVITY_LEVEL_DESCRIPTIONS: Record<ActivityLevel, string> = {
-  newbie: '가입 후 4회 미만 참여',
-  regular: '최근 2개월간 월 2회 이상 참여',
-  passionate: '최근 2개월간 월 3~4회 참여',
-  core: '최근 3개월간 월 3~4회 이상 꾸준히 참여 + 이벤트 참여 (번개, 대회 등)',
-  staff: '모임 운영 업무/기여',
+  newbie: '최근 2개월간 0~3회 참여',
+  regular: '최근 2개월간 4~5회 참여',
+  passionate: '최근 2개월간 6회 이상 참여',
+  core: '열정 레벨 + 이벤트 참여 (번개, 대회 등)',
+  staff: '재능기부',
 };
 
 // 추천 가능 활동 레벨 (열정 이상만 추천 가능)
