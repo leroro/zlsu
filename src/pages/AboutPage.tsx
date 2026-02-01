@@ -189,9 +189,9 @@ export default function AboutPage() {
                 <span className="text-xs text-gray-500">회원 전환</span>
               </div>
               <ul className="text-sm text-gray-600 space-y-1">
-                <li>☑ 티타임 등 친목 활동에 함께할 의향</li>
                 <li>☑ 정원(14명)에 공석이 있어야 함</li>
-                <li>☑ 기존 열정 레벨 회원의 추천</li>
+                <li>☑ 기존 열정 레벨 회원의 추천 필요</li>
+                <li>☑ 티타임 등 친목 활동에 참여 의향</li>
               </ul>
             </div>
           </div>
@@ -200,7 +200,7 @@ export default function AboutPage() {
           {[
             { step: 3, title: '회칙 동의 & 가입비 입금', desc: '회비 + 수모 금액 입금' },
             { step: 4, title: '카톡방 입장하기', desc: '입장 후 자기소개' },
-            { step: 5, title: '수모 받고 토요일에 만나요!', desc: '추천인에게 수모 수령' },
+            { step: 5, title: '수모 받고 토요일에 만나요!', desc: '수영 후 티타임에서 인사' },
           ].map((item, index, arr) => (
             <div key={item.step} className="flex gap-4">
               <div className="flex flex-col items-center">
