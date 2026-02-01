@@ -280,6 +280,14 @@ export default function AboutPage() {
               <p className="text-sm text-gray-600">기존 회원(열정 레벨 이상)의 추천 필수</p>
             </div>
           </div>
+
+          <div className="flex items-start gap-3 p-3 bg-blue-50 rounded-lg">
+            <span className="text-xl">☕</span>
+            <div>
+              <h3 className="font-semibold text-gray-900">친목 활동 참여 의향</h3>
+              <p className="text-sm text-gray-600">티타임, 각종 이벤트 등 친목 활동에 함께할 의향</p>
+            </div>
+          </div>
         </div>
 
         <p className="text-sm text-gray-500 bg-gray-50 rounded-lg p-3">
@@ -317,7 +325,7 @@ export default function AboutPage() {
               Q. 무단 불참하면 어떻게 되나요?
             </h3>
             <p className="text-gray-600 text-sm">
-              사전에 불참 표시 없이 결석하면 1만원 벌금이 있어요.
+              출석체크 미응답 시 1만원 벌금이 있어요.
             </p>
           </div>
 
@@ -326,8 +334,8 @@ export default function AboutPage() {
               Q. 못 가는 날은 어떻게 하나요?
             </h3>
             <p className="text-gray-600 text-sm">
-              토요일 새벽 4시까지 카톡방의 <strong>달력(캘린더)</strong>에서 불참 표시하면 돼요.
-              채팅으로만 말씀하시면 인원 파악이 어려워요!
+              매주 금요일 카톡방 <strong>달력(일정)</strong>에서 출석체크해야 해요.
+              토요일 새벽 4시까지 미응답 시 무단불참 처리돼요.
             </p>
           </div>
 

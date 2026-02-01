@@ -51,7 +51,7 @@ export default function RulesPage() {
 
   return (
     <div className="bg-white md:rounded-lg md:shadow p-6">
-      <div className="prose prose-gray max-w-none prose-h1:text-2xl prose-h1:font-bold prose-h1:mb-4 prose-h2:text-xl prose-h2:font-semibold prose-h2:mt-8 prose-h2:mb-2 prose-h2:bg-blue-50 prose-h2:px-3 prose-h2:py-1.5 prose-h2:rounded-md prose-h2:-mx-1 prose-h3:text-base prose-h3:font-medium prose-h3:mt-3 prose-h3:mb-1 prose-p:text-gray-700 prose-p:my-0.5 prose-li:text-gray-700 prose-li:my-0 prose-ul:my-0.5 prose-ol:my-0.5 prose-strong:text-gray-900 prose-table:text-sm prose-hr:hidden">
+      <div className="prose prose-gray max-w-none prose-h1:text-2xl prose-h1:font-bold prose-h1:mb-4 prose-h2:text-xl prose-h2:font-semibold prose-h2:mt-8 prose-h2:mb-2 prose-h2:bg-blue-50 prose-h2:px-3 prose-h2:py-1.5 prose-h2:rounded-md prose-h2:-mx-1 prose-h3:text-lg prose-h3:font-semibold prose-h3:mt-4 prose-h3:mb-1 prose-h3:text-blue-800 prose-h3:border-l-4 prose-h3:border-blue-400 prose-h3:pl-2 prose-h4:text-base prose-h4:font-semibold prose-h4:mt-3 prose-h4:mb-1 prose-h4:text-gray-800 prose-p:text-gray-700 prose-p:my-0.5 prose-li:text-gray-700 prose-li:my-0 prose-ul:my-0.5 prose-ol:my-0.5 prose-strong:text-gray-900 prose-table:text-sm prose-hr:hidden">
         <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
       </div>
     </div>
