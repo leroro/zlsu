@@ -347,11 +347,11 @@ export default function AboutPage() {
 
           <div>
             <h3 className="font-semibold text-gray-900 mb-1">
-              Q. 벌금 제도가 있나요?
+              Q. 벌금이 있다던데, 어떤 경우에 내나요?
             </h3>
             <p className="text-gray-600 text-sm">
-              무단불참 1만원, 지각 1분당 500원(최대 1만원)이 있어요.
-              8시 정각 입수 기준이에요!
+              8시 정각 입수 기준으로, 지각 시 1분당 500원(최대 1만원)이에요.
+              무단불참은 1만원이에요.
             </p>
           </div>
         </div>
