@@ -24,7 +24,7 @@ export function resetToMockData(): void {
 }
 
 // 데이터 버전 (담당 역할 옵션 변경)
-const DATA_VERSION = 10;
+const DATA_VERSION = 12;
 const DATA_VERSION_KEY = 'zlsu_data_version';
 
 // 앱 초기화 - 데이터가 없거나 버전이 다르면 mock 데이터로 초기화
@@ -39,6 +39,7 @@ export function initializeAppData(): void {
     localStorage.setItem(STORAGE_KEYS.STATE_CHANGES, JSON.stringify(initialStateChanges));
     localStorage.removeItem(STORAGE_KEYS.WITHDRAWAL_REQUESTS);
     localStorage.removeItem(STORAGE_KEYS.CURRENT_USER);
+    localStorage.removeItem(STORAGE_KEYS.SETTINGS);  // 설정도 리셋 (maxCapacity 등)
     localStorage.setItem(DATA_VERSION_KEY, String(DATA_VERSION));
     return;
   }
@@ -59,7 +60,7 @@ export function initializeAppData(): void {
 
 // 기본 설정
 const DEFAULT_SETTINGS: SystemSettings = {
-  maxCapacity: 16, // 활동 회원 정원
+  maxCapacity: 14, // 연습 정원 (코치님 제외)
   weeklyCapacity: 14, // 주간 참석 정원 (레인 수용 인원)
   includeInactiveInCapacity: false, // 기본값: 활동 회원만 정원에 포함
   kakaoInviteLink: 'https://invite.kakao.com/tc/yOTCtJKzHs', // 카카오톡 단톡방 초대 링크

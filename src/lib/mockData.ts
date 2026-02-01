@@ -387,28 +387,29 @@ export const initialMembers: Member[] = [
   },
 
   // ============ 신규 회원 테스트 (환영 툴팁) ============
-  {
-    id: 'newmember1',
-    email: 'newmember@test.com',
-    password: 'test123',
-    name: '김신규',
-    phone: '010-8888-0001',
-    gender: 'male',
-    birthDate: '1990-01-15',
-    referrer: '한선우',
-    swimmingAbility: { freestyle: true, backstroke: false, breaststroke: true, butterfly: false },
-    swimmingLevel: 'beginner',
-    motivation: '수영 동호회에서 함께 운동하고 싶습니다.',
-    status: 'active',
-    role: 'member',
-    activityLevel: 'newbie',
-    joinedAt: '2026-01-23',
-    updatedAt: '2026-01-23',
-    referrerApproval: { status: 'approved', processedAt: '2026-01-22', agreedToSuitability: true, agreedToMentoring: true, agreedToProvideCap: true },
-    adminApproval: { status: 'approved', processedAt: '2026-01-23', processedBy: '임미선' },
-    hasJoinedKakao: false,  // 카톡방 미입장 → 환영 툴팁 표시
-    hasCompletedOnboarding: false,
-  },
+  // 2026-02-01: 정원 13/14 테스트를 위해 비활성화
+  // {
+  //   id: 'newmember1',
+  //   email: 'newmember@test.com',
+  //   password: 'test123',
+  //   name: '김신규',
+  //   phone: '010-8888-0001',
+  //   gender: 'male',
+  //   birthDate: '1990-01-15',
+  //   referrer: '한선우',
+  //   swimmingAbility: { freestyle: true, backstroke: false, breaststroke: true, butterfly: false },
+  //   swimmingLevel: 'beginner',
+  //   motivation: '수영 동호회에서 함께 운동하고 싶습니다.',
+  //   status: 'active',
+  //   role: 'member',
+  //   activityLevel: 'newbie',
+  //   joinedAt: '2026-01-23',
+  //   updatedAt: '2026-01-23',
+  //   referrerApproval: { status: 'approved', processedAt: '2026-01-22', agreedToSuitability: true, agreedToMentoring: true, agreedToProvideCap: true },
+  //   adminApproval: { status: 'approved', processedAt: '2026-01-23', processedBy: '임미선' },
+  //   hasJoinedKakao: false,  // 카톡방 미입장 → 환영 툴팁 표시
+  //   hasCompletedOnboarding: false,
+  // },
 ];
 
 // 초기 가입 신청 데이터
