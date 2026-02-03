@@ -290,6 +290,25 @@ export const initialMembers: Member[] = [
     joinedAt: '2025-03-15',
     updatedAt: '2026-01-19',  // 최근 휴면 전환
   },
+  // 신규 가입 완료 회원
+  {
+    id: '17',
+    email: 'najunha@test.com',
+    password: 'test123',
+    name: '나준하',
+    phone: '010-1017-0017',
+    gender: 'male',
+    birthDate: '1990-04-12',
+    swimmingAbility: { freestyle: true, backstroke: true, breaststroke: true, butterfly: false },
+    swimmingLevel: 'intermediate',
+    motivation: '수영을 즐겁게 하고 싶어서 가입합니다.',
+    status: 'active',
+    role: 'member',
+    activityLevel: 'newbie',
+    joinedAt: '2026-02-03',
+    updatedAt: '2026-02-03',
+  },
+
   // ============ 이중 승인 테스트 회원 ============
 
   // 테스트 케이스 1: 추천인 승인 대기 중
