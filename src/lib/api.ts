@@ -23,8 +23,8 @@ export function resetToMockData(): void {
   localStorage.removeItem(STORAGE_KEYS.SETTINGS);
 }
 
-// 데이터 버전 (담당 역할 옵션 변경)
-const DATA_VERSION = 12;
+// 데이터 버전 (나준하 회원 추가 - 정원 14/14)
+const DATA_VERSION = 13;
 const DATA_VERSION_KEY = 'zlsu_data_version';
 
 // 앱 초기화 - 데이터가 없거나 버전이 다르면 mock 데이터로 초기화
