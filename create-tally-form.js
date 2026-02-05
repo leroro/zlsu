@@ -12,17 +12,21 @@
  *   - Node.js 18 이상 (native fetch 사용)
  *   - Tally API 키 (Settings → API keys → Create API key)
  *
- * API 문서:
- *   - https://developers.tally.so/api-reference/introduction
- *   - https://developers.tally.so/api-reference/endpoint/forms/post
+ * API 규칙 (실전 검증 기반):
+ *   - 모든 블록의 groupType === 해당 블록의 type
+ *   - 질문 제목(TITLE)의 groupUuid → 해당 입력 블록의 uuid 참조
+ *   - LINEAR_SCALE payload: start/end/step/hasLeftLabel/leftLabel/hasRightLabel/rightLabel
+ *     (❌ minValue/maxValue/minLabel/maxLabel → tally-js 타입 정의 오류)
+ *   - MULTIPLE_CHOICE_OPTION: payload { index, text, isFirst, isLast }
+ *   - RATING: payload { stars } (❌ maxValue)
  *
- * 블록 구조 규칙 (Tally API 실제 검증 기반):
- *   - 모든 블록의 groupType === 해당 블록의 type (예: LINEAR_SCALE → groupType: "LINEAR_SCALE")
- *   - 질문 제목(TITLE)의 groupUuid → 해당 입력 블록(LINEAR_SCALE/TEXTAREA)의 uuid 참조
- *   - LINEAR_SCALE payload: { isRequired } 만 허용 (minValue/maxValue/labels는 Tally 에디터에서 설정)
+ * 환경 참고:
+ *   - Node.js fetch가 DNS 문제(EAI_AGAIN)를 일으킬 수 있음
+ *   - 그 경우: node create-tally-form.js --json > payload.json && curl -X POST ...
  */
 
 import crypto from 'crypto';
+import { writeFileSync } from 'fs';
 
 // ─── 설정 ─────────────────────────────────────────────
 
@@ -95,11 +99,18 @@ function dividerBlock() {
 }
 
 /**
- * 5점 척도 문항 (LINEAR_SCALE)
- * TITLE의 groupUuid가 LINEAR_SCALE의 uuid를 참조하여 질문 그룹을 형성
- * 척도 기본값: 1~5 (Tally 에디터에서 라벨 수정 가능)
+ * 척도 문항 (LINEAR_SCALE)
+ * 올바른 필드: start, end, step, hasLeftLabel, leftLabel, hasRightLabel, rightLabel
+ * ❌ minValue/maxValue/minLabel/maxLabel (tally-js 타입 정의 오류)
  */
-function linearScaleQuestion(questionHtml, { isRequired = true } = {}) {
+function linearScaleQuestion(questionHtml, {
+  isRequired = true,
+  start = 1,
+  end = 10,
+  step = 1,
+  leftLabel = '전혀 아니다',
+  rightLabel = '매우 그렇다',
+} = {}) {
   const scaleId = uuid();
   const titleId = uuid();
   return [
@@ -115,14 +126,22 @@ function linearScaleQuestion(questionHtml, { isRequired = true } = {}) {
       type: 'LINEAR_SCALE',
       groupUuid: scaleId,
       groupType: 'LINEAR_SCALE',
-      payload: { isRequired },
+      payload: {
+        isRequired,
+        start,
+        end,
+        step,
+        hasLeftLabel: true,
+        leftLabel,
+        hasRightLabel: true,
+        rightLabel,
+      },
     },
   ];
 }
 
 /**
  * 서술형 문항 (TEXTAREA)
- * TITLE의 groupUuid가 TEXTAREA의 uuid를 참조하여 질문 그룹을 형성
  */
 function textareaQuestion(questionHtml, { isRequired = false } = {}) {
   const textareaId = uuid();
@@ -145,6 +164,36 @@ function textareaQuestion(questionHtml, { isRequired = false } = {}) {
   ];
 }
 
+/**
+ * 단일 선택 문항 (MULTIPLE_CHOICE)
+ * options: string[] — 선택지 라벨 배열
+ */
+function multipleChoiceQuestion(questionHtml, options) {
+  const groupId = uuid();
+  const titleId = uuid();
+  return [
+    {
+      uuid: titleId,
+      type: 'TITLE',
+      groupUuid: groupId,
+      groupType: 'TITLE',
+      payload: { html: questionHtml },
+    },
+    ...options.map((text, i) => ({
+      uuid: uuid(),
+      type: 'MULTIPLE_CHOICE_OPTION',
+      groupUuid: groupId,
+      groupType: 'MULTIPLE_CHOICE',
+      payload: {
+        index: i,
+        text,
+        isFirst: i === 0,
+        isLast: i === options.length - 1,
+      },
+    })),
+  ];
+}
+
 function thankYouPageBlock(html) {
   const id = uuid();
   return {
@@ -164,8 +213,14 @@ const blocks = [
 
   // 익명 안내 + 소요시간
   textBlock(
-    '<p>본 설문은 <strong>익명</strong>으로 진행됩니다. 응답 내용은 개인 식별 없이 종합 분석에만 활용됩니다.</p><p>예상 소요시간: <strong>2~3분</strong></p>'
+    '<p>본 설문은 익명으로 진행됩니다. 응답 내용은 개인 식별 없이 종합 분석에만 활용됩니다.</p><p>예상 소요시간: 2~3분</p>'
   ),
+
+  // 면담자 선택 (단일 선택)
+  ...multipleChoiceQuestion('면담자를 선택해 주세요', [
+    '임미선 대표',
+    '이현우 이사',
+  ]),
 
   // ── 섹션 1: 면담의 명확성 ──────────────────────────
   dividerBlock(),
@@ -237,6 +292,22 @@ const payload = {
   blocks,
 };
 
+// ─── JSON 출력 모드 ─────────────────────────────────
+
+if (process.argv.includes('--json')) {
+  const output = JSON.stringify(payload, null, 2);
+  writeFileSync('/tmp/tally-payload.json', output);
+  console.log('Payload saved to /tmp/tally-payload.json');
+  console.log(`Total blocks: ${blocks.length}`);
+  console.log('');
+  console.log('curl로 전송:');
+  console.log(`  curl -X POST "${TALLY_API_BASE}/forms" \\`);
+  console.log(`    -H "Authorization: Bearer $TALLY_API_KEY" \\`);
+  console.log('    -H "Content-Type: application/json" \\');
+  console.log('    -d @/tmp/tally-payload.json');
+  process.exit(0);
+}
+
 // ─── 오류 처리 ──────────────────────────────────────
 
 function handleError(status, data) {
@@ -249,39 +320,26 @@ function handleError(status, data) {
     case 400:
       console.error('[400 Bad Request]');
       console.error('  - JSON 형식이 올바른지 확인');
-      console.error('  - Content-Type 헤더가 application/json인지 확인');
-      console.error('  - 필수 필드(blocks, status)가 포함되었는지 확인');
       console.error('  - 블록의 groupType이 해당 블록 type과 일치하는지 확인');
+      console.error('  - LINEAR_SCALE: start/end/step 사용 (❌ minValue/maxValue)');
+      console.error('  - MULTIPLE_CHOICE_OPTION: isFirst/isLast 포함 확인');
       break;
     case 401:
       console.error('[401 Unauthorized]');
       console.error('  - TALLY_API_KEY 값이 올바른지 확인');
-      console.error('  - API 키가 만료되었거나 삭제되었는지 확인');
-      console.error('  - 키 형식: tly-xxxx (Bearer 접두사는 코드에서 자동 추가)');
-      console.error('  - 발급: Tally 대시보드 -> Settings -> API keys');
+      console.error('  - 키 형식: tly-xxxx');
       break;
     case 403:
       console.error('[403 Forbidden]');
-      console.error('  - API 키 소유 계정에 폼 생성 권한이 있는지 확인');
-      console.error('  - Pro 구독이 필요한 기능을 사용 중인지 확인');
-      console.error('  - 조직에서 해당 사용자가 제거되지 않았는지 확인');
-      break;
-    case 422:
-      console.error('[422 Unprocessable Entity]');
-      console.error('  - blocks 배열이 비어있지 않은지 확인');
-      console.error('  - 각 블록의 uuid가 유효한 UUID v4 형식인지 확인');
-      console.error('  - status 값이 BLANK/DRAFT/PUBLISHED/DELETED 중 하나인지 확인');
-      console.error('  - 블록 type이 지원되는 타입인지 확인');
+      console.error('  - API 키 권한 확인');
       break;
     case 429:
       console.error('[429 Too Many Requests]');
       console.error('  - 분당 100회 요청 제한 초과');
-      console.error('  - 잠시 후 다시 시도');
       break;
     default:
       console.error(`[HTTP ${status}]`);
       console.error('  - 네트워크 연결 상태 확인');
-      console.error('  - Tally 서비스 상태 확인');
       break;
   }
 }
@@ -325,6 +383,15 @@ async function createForm() {
 }
 
 createForm().catch((err) => {
-  console.error('예기치 않은 오류:', err.message);
+  if (err.cause?.code === 'EAI_AGAIN') {
+    console.error('DNS 해석 실패. --json 모드로 payload를 생성 후 curl로 전송하세요:');
+    console.error('  node create-tally-form.js --json');
+    console.error('  curl -X POST "https://api.tally.so/forms" \\');
+    console.error('    -H "Authorization: Bearer $TALLY_API_KEY" \\');
+    console.error('    -H "Content-Type: application/json" \\');
+    console.error('    -d @/tmp/tally-payload.json');
+  } else {
+    console.error('예기치 않은 오류:', err.message);
+  }
   process.exit(1);
 });
