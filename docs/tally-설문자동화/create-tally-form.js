@@ -143,7 +143,7 @@ function linearScaleQuestion(questionHtml, {
 /**
  * 서술형 문항 (TEXTAREA)
  */
-function textareaQuestion(questionHtml, { isRequired = false } = {}) {
+function textareaQuestion(questionHtml, { isRequired = true } = {}) {
   const textareaId = uuid();
   const titleId = uuid();
   return [
@@ -213,7 +213,7 @@ const blocks = [
 
   // 익명 안내 + 소요시간
   textBlock(
-    '<p>본 설문은 익명으로 진행됩니다. 응답 내용은 개인 식별 없이 종합 분석에만 활용됩니다.</p><p>예상 소요시간: 2~3분</p>'
+    '<p>안녕하세요. 이번 성과평가 면담에 대한 솔직한 의견을 듣고자 합니다.</p><p>모든 응답은 익명으로 처리되며, 개인이 특정되지 않습니다. 편하게 답변해 주세요.</p><p>소요시간은 약 2~3분입니다.</p>'
   ),
 
   // 면담자 선택 (단일 선택)
