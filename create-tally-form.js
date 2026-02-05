@@ -15,9 +15,14 @@
  * API 문서:
  *   - https://developers.tally.so/api-reference/introduction
  *   - https://developers.tally.so/api-reference/endpoint/forms/post
+ *
+ * 블록 구조 규칙 (Tally API 실제 검증 기반):
+ *   - 모든 블록의 groupType === 해당 블록의 type (예: LINEAR_SCALE → groupType: "LINEAR_SCALE")
+ *   - 질문 제목(TITLE)의 groupUuid → 해당 입력 블록(LINEAR_SCALE/TEXTAREA)의 uuid 참조
+ *   - LINEAR_SCALE payload: { isRequired } 만 허용 (minValue/maxValue/labels는 Tally 에디터에서 설정)
  */
 
-const crypto = require('crypto');
+import crypto from 'crypto';
 
 // ─── 설정 ─────────────────────────────────────────────
 
@@ -41,11 +46,6 @@ if (!TALLY_API_KEY) {
 function uuid() {
   return crypto.randomUUID();
 }
-
-// ─── 5점 척도 공통 라벨 ──────────────────────────────
-
-const SCALE_MIN_LABEL = '전혀 아니다';
-const SCALE_MAX_LABEL = '매우 그렇다';
 
 // ─── 블록 생성 헬퍼 ─────────────────────────────────
 
@@ -96,56 +96,51 @@ function dividerBlock() {
 
 /**
  * 5점 척도 문항 (LINEAR_SCALE)
- * TITLE + LINEAR_SCALE 블록을 같은 groupUuid로 묶어 하나의 질문 그룹을 구성
+ * TITLE의 groupUuid가 LINEAR_SCALE의 uuid를 참조하여 질문 그룹을 형성
+ * 척도 기본값: 1~5 (Tally 에디터에서 라벨 수정 가능)
  */
 function linearScaleQuestion(questionHtml, { isRequired = true } = {}) {
-  const groupId = uuid();
+  const scaleId = uuid();
+  const titleId = uuid();
   return [
     {
-      uuid: uuid(),
+      uuid: titleId,
       type: 'TITLE',
-      groupUuid: groupId,
-      groupType: 'QUESTION',
+      groupUuid: scaleId,
+      groupType: 'TITLE',
       payload: { html: questionHtml },
     },
     {
-      uuid: uuid(),
+      uuid: scaleId,
       type: 'LINEAR_SCALE',
-      groupUuid: groupId,
-      groupType: 'QUESTION',
-      payload: {
-        minValue: 1,
-        maxValue: 5,
-        minLabel: SCALE_MIN_LABEL,
-        maxLabel: SCALE_MAX_LABEL,
-        isRequired,
-      },
+      groupUuid: scaleId,
+      groupType: 'LINEAR_SCALE',
+      payload: { isRequired },
     },
   ];
 }
 
 /**
  * 서술형 문항 (TEXTAREA)
- * TITLE + TEXTAREA 블록을 같은 groupUuid로 묶어 하나의 질문 그룹을 구성
+ * TITLE의 groupUuid가 TEXTAREA의 uuid를 참조하여 질문 그룹을 형성
  */
 function textareaQuestion(questionHtml, { isRequired = false } = {}) {
-  const groupId = uuid();
+  const textareaId = uuid();
+  const titleId = uuid();
   return [
     {
-      uuid: uuid(),
+      uuid: titleId,
       type: 'TITLE',
-      groupUuid: groupId,
-      groupType: 'QUESTION',
+      groupUuid: textareaId,
+      groupType: 'TITLE',
       payload: { html: questionHtml },
     },
     {
-      uuid: uuid(),
+      uuid: textareaId,
       type: 'TEXTAREA',
-      groupUuid: groupId,
-      groupType: 'QUESTION',
-      payload: {
-        isRequired,
-      },
+      groupUuid: textareaId,
+      groupType: 'TEXTAREA',
+      payload: { isRequired },
     },
   ];
 }
@@ -256,6 +251,7 @@ function handleError(status, data) {
       console.error('  - JSON 형식이 올바른지 확인');
       console.error('  - Content-Type 헤더가 application/json인지 확인');
       console.error('  - 필수 필드(blocks, status)가 포함되었는지 확인');
+      console.error('  - 블록의 groupType이 해당 블록 type과 일치하는지 확인');
       break;
     case 401:
       console.error('[401 Unauthorized]');
@@ -276,7 +272,6 @@ function handleError(status, data) {
       console.error('  - 각 블록의 uuid가 유효한 UUID v4 형식인지 확인');
       console.error('  - status 값이 BLANK/DRAFT/PUBLISHED/DELETED 중 하나인지 확인');
       console.error('  - 블록 type이 지원되는 타입인지 확인');
-      console.error('  - payload 필수 필드(html, minValue, maxValue 등)가 누락되지 않았는지 확인');
       break;
     case 429:
       console.error('[429 Too Many Requests]');
@@ -295,12 +290,6 @@ function handleError(status, data) {
 
 async function createForm() {
   console.log('Tally API 폼 생성 요청 시작...');
-  console.log('');
-
-  // 페이로드 출력
-  console.log('=== REQUEST PAYLOAD ===');
-  console.log(JSON.stringify(payload, null, 2));
-  console.log('=======================');
   console.log('');
 
   const response = await fetch(`${TALLY_API_BASE}/forms`, {
