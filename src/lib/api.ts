@@ -23,8 +23,8 @@ export function resetToMockData(): void {
   localStorage.removeItem(STORAGE_KEYS.SETTINGS);
 }
 
-// 데이터 버전 (나준하 회원 추가 - 정원 14/14)
-const DATA_VERSION = 13;
+// 데이터 버전 (정원 임시 확장 20명 - 가입 테스트용)
+const DATA_VERSION = 14;
 const DATA_VERSION_KEY = 'zlsu_data_version';
 
 // 앱 초기화 - 데이터가 없거나 버전이 다르면 mock 데이터로 초기화
@@ -60,7 +60,7 @@ export function initializeAppData(): void {
 
 // 기본 설정
 const DEFAULT_SETTINGS: SystemSettings = {
-  maxCapacity: 14, // 연습 정원 (코치님 제외)
+  maxCapacity: 20, // 연습 정원 (TODO: 테스트 후 14로 복원)
   weeklyCapacity: 14, // 주간 참석 정원 (레인 수용 인원)
   includeInactiveInCapacity: false, // 기본값: 활동 회원만 정원에 포함
   kakaoInviteLink: 'https://invite.kakao.com/tc/yOTCtJKzHs', // 카카오톡 단톡방 초대 링크
