@@ -93,7 +93,7 @@ export default function InfoPage() {
                   <br />
                   다양한 연령대, 다양한 실력의 회원들이 편하게 배우고 즐기는 친목 모임이에요.
                   <br />
-                  수영 후에는 메가커피에서 티타임도 해요. (자율 참석)
+                  수영 후에는 근처 카페에서 티타임도 해요. (자율 참석)
                 </p>
               </div>
             </div>
@@ -234,15 +234,15 @@ export default function InfoPage() {
         <section ref={joinInfoSectionRef} className="bg-white md:rounded-lg md:shadow p-6 mb-4">
           <h2 className="text-xl font-bold text-gray-900 mb-4">가입 안내</h2>
 
-          <div className="grid grid-cols-2 gap-4 mb-6">
+          <div className="grid grid-cols-2 gap-4 mb-4">
             <div className="bg-blue-50 rounded-lg p-4 text-center">
               <p className="text-sm text-gray-600 mb-1">월 회비</p>
               <p className="text-2xl font-bold text-blue-600">2만원</p>
               <p className="text-xs text-gray-500">매월 1일 납부</p>
             </div>
-            <div className="bg-green-50 rounded-lg p-4 text-center">
+            <div className={`${remainingSlots > 0 ? 'bg-green-50' : 'bg-gray-100'} rounded-lg p-4 text-center`}>
               <p className="text-sm text-gray-600 mb-1">정원 현황</p>
-              <p className="text-2xl font-bold text-green-600">
+              <p className={`text-2xl font-bold ${remainingSlots > 0 ? 'text-green-600' : 'text-gray-500'}`}>
                 {stats.capacityCount}/{settings.maxCapacity}자리
               </p>
               <p className="text-xs text-gray-500">
@@ -251,62 +251,76 @@ export default function InfoPage() {
             </div>
           </div>
 
-          <div className="bg-gray-50 rounded-lg p-4 mb-4">
-            <h3 className="font-semibold text-gray-900 mb-2">첫 가입 시 납부 금액</h3>
-            <p className="text-gray-600 text-sm mb-1">
-              수모 종류에 따라 금액이 달라요.
+          {remainingSlots <= 0 && (
+            <p className="text-sm text-gray-500 mb-6 text-center">
+              현재 정원이 마감되어 회원을 모집하고 있지 않아요.
             </p>
-            <ul className="text-sm text-gray-600 space-y-1">
-              <li>• 메시 수모 선택 시: 회비 2만 + 수모 2만 = <span className="font-bold text-primary-600">총 4만원</span></li>
-              <li>• 실리콘 수모 선택 시: 회비 2만 + 수모 1만 = <span className="font-bold text-primary-600">총 3만원</span></li>
-            </ul>
-            <p className="text-xs text-gray-500 mt-2">
-              * 메시 수모 2장 구매 시: 회비 2만 + 수모 3만 = 총 5만원
+          )}
+
+          {/* 즐수팀 수모 안내 */}
+          <div className="mb-4">
+            <h3 className="font-semibold text-gray-900 mb-1">우리 팀 수모 안내</h3>
+            <p className="text-sm text-gray-500 mb-3">
+              회원은 즐수팀 수모를 꼭 착용해야 해요. 가입 시 아래 세 가지 중 하나를 선택하여 구매할 수 있어요.
             </p>
+
+            <div className="space-y-3">
+              {/* 메쉬 수모 */}
+              <div className="border border-gray-200 rounded-xl overflow-hidden">
+                <div className="px-4 py-3 bg-gray-50 flex items-center justify-between">
+                  <h4 className="font-bold text-gray-900">메쉬 소재 수모</h4>
+                  <span className="text-sm text-gray-600">1장 2만원 / 2장 2.5만원</span>
+                </div>
+                <div className="aspect-[2/1]">
+                  <img
+                    src={asset('images/swim-cap.jpg')}
+                    alt="즐수팀 메쉬 수모"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="px-4 py-2 text-xs text-gray-500 space-y-0.5">
+                  <p>디자인이 유니크하고 통기성이 좋으며 착용감이 편해요. 사용하다 보면 물빠짐이 있거나 늘어날 수 있어 2장 구매를 추천해요.</p>
+                </div>
+              </div>
+
+              {/* 실리콘 수모 */}
+              <div className="border border-gray-200 rounded-xl overflow-hidden">
+                <div className="px-4 py-3 bg-gray-50 flex items-center justify-between">
+                  <h4 className="font-bold text-gray-900">실리콘 소재 수모</h4>
+                  <span className="text-sm text-gray-600">1장 1만원</span>
+                </div>
+                <div className="aspect-[2/1]">
+                  <img
+                    src={asset('images/swim-cap-silicone.jpg')}
+                    alt="즐수팀 실리콘 수모"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="px-4 py-2 text-xs text-gray-500">
+                  <p>일반적인 수모에요. 방수가 잘 되고 가격이 저렴해요.</p>
+                </div>
+              </div>
+            </div>
           </div>
 
-          {/* 수모 안내 */}
-          <div className="border-t border-gray-100 pt-4">
-            <h3 className="font-semibold text-gray-900 mb-1">즐수팀 수모</h3>
-            <p className="text-sm text-gray-500 mb-3">
-              즐수팀 회원임을 나타내는 수모예요. 수영장에서 서로를 쉽게 알아볼 수 있어요!
-              <br />
-              메시 또는 실리콘 중 선택하여 구매할 수 있어요.
-            </p>
-
-            {/* 메시 수모 */}
-            <div className="mb-4">
-              <div className="aspect-[2/1] bg-gray-200 rounded-lg overflow-hidden mb-2">
-                <img
-                  src={asset('images/swim-cap.jpg')}
-                  alt="즐수팀 메시 수모"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <div className="text-sm text-gray-600 flex flex-wrap gap-x-4 gap-y-1">
-                <span className="font-medium text-gray-800">메시 수모</span>
-                <span>• 1장 2만원 / 2장 3만원</span>
-              </div>
-            </div>
-
-            {/* 실리콘 수모 */}
-            <div className="mb-3">
-              <div className="aspect-[2/1] bg-gray-200 rounded-lg overflow-hidden mb-2">
-                <img
-                  src={asset('images/swim-cap-silicone.jpg')}
-                  alt="즐수팀 실리콘 수모"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <div className="text-sm text-gray-600 flex flex-wrap gap-x-4 gap-y-1">
-                <span className="font-medium text-gray-800">실리콘 수모</span>
-                <span>• 1장 1만원</span>
-              </div>
-            </div>
-
-            <p className="text-xs text-gray-500 bg-gray-50 rounded-lg p-2">
-              💡 둘 중 하나는 필수 구매 및 착용이에요. 중복 구매도 가능해요.
-            </p>
+          {/* 첫 가입 시 납부 금액 */}
+          <div className="bg-gray-50 rounded-lg p-4">
+            <h3 className="font-semibold text-gray-900 mb-2">첫 가입 시 납부 금액</h3>
+            <p className="text-sm text-gray-500 mb-2">회비 2만원 + 수모 금액</p>
+            <ul className="text-sm text-gray-700 space-y-1">
+              <li className="flex justify-between">
+                <span>메쉬 수모 1장 선택 시</span>
+                <span className="font-bold text-primary-600">총 4만원</span>
+              </li>
+              <li className="flex justify-between">
+                <span>메쉬 수모 2장 선택 시</span>
+                <span className="font-bold text-primary-600">총 4만5천원</span>
+              </li>
+              <li className="flex justify-between">
+                <span>실리콘 수모 선택 시</span>
+                <span className="font-bold text-primary-600">총 3만원</span>
+              </li>
+            </ul>
           </div>
         </section>
 
@@ -384,6 +398,7 @@ export default function InfoPage() {
               <p className="text-gray-600 text-sm">
                 8시 정각 입수 기준으로, 지각 시 1분당 500원(최대 1만원)이에요.
                 무단불참은 1만원이에요.
+                수모 미착용 시 1,000원이에요.
               </p>
             </div>
           </div>
