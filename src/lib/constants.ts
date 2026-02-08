@@ -1,7 +1,7 @@
 import { MemberStatus, MemberRole, ApplicationStatus, StateChangeStatus, WithdrawalStatus, Gender, SwimmingLevel, CompetitionInterest, CompetitionHistory, ActivityLevel } from './types';
 
-// 정원 (TODO: 테스트 후 14로 복원)
-export const MAX_CAPACITY = 20;
+// 정원: 프로덕션(GitHub Pages)=14(실제), 개발=20(테스트용)
+export const MAX_CAPACITY = import.meta.env.PROD ? 14 : 20;
 
 // 상태 라벨
 export const STATUS_LABELS: Record<MemberStatus, string> = {

@@ -1,5 +1,6 @@
 import { Member, Application, StateChange, CurrentUser, MemberStatus, ApplicationStatus, StateChangeStatus, WithdrawalRequest, WithdrawalStatus, SystemSettings, ChecklistItem, StatusChangeHistory, StatusChangeType, ReferrerApproval, AdminApproval } from './types';
 import { initialMembers, initialApplications, initialStateChanges, initialStatusChangeHistory } from './mockData';
+import { MAX_CAPACITY } from './constants';
 
 // 로컬 스토리지 키
 const STORAGE_KEYS = {
@@ -60,7 +61,7 @@ export function initializeAppData(): void {
 
 // 기본 설정
 const DEFAULT_SETTINGS: SystemSettings = {
-  maxCapacity: 20, // 연습 정원 (TODO: 테스트 후 14로 복원)
+  maxCapacity: MAX_CAPACITY, // 프로덕션=14, 개발=20
   weeklyCapacity: 14, // 주간 참석 정원 (레인 수용 인원)
   includeInactiveInCapacity: false, // 기본값: 활동 회원만 정원에 포함
   kakaoInviteLink: 'https://invite.kakao.com/tc/yOTCtJKzHs', // 카카오톡 단톡방 초대 링크
