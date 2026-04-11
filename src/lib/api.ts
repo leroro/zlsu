@@ -24,8 +24,8 @@ export function resetToMockData(): void {
   localStorage.removeItem(STORAGE_KEYS.SETTINGS);
 }
 
-// 데이터 버전 (정원 임시 확장 20명 - 가입 테스트용)
-const DATA_VERSION = 14;
+// 데이터 버전 (임미선 휴면 처리)
+const DATA_VERSION = 15;
 const DATA_VERSION_KEY = 'zlsu_data_version';
 
 // 앱 초기화 - 데이터가 없거나 버전이 다르면 mock 데이터로 초기화
