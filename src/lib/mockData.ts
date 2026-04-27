@@ -151,7 +151,7 @@ export const initialMembers: Member[] = [
     swimmingAbility: { freestyle: true, backstroke: true, breaststroke: true, butterfly: false },
     swimmingLevel: 'advanced',
     motivation: '수영을 좋아하고 함께 운동할 동료를 찾고 있었어요!',
-    status: 'active',
+    status: 'inactive',
     role: 'member',
     activityLevel: 'staff',
     joinedAt: '2023-04-15',
