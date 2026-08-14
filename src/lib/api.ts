@@ -567,8 +567,8 @@ const DEFAULT_CHECKLIST_ITEMS: ChecklistItem[] = [
   // [3. 가입 비용]
   {
     id: 'joinFee',
-    label: '첫 달 4만원 납부',
-    description: '가입 승인 후 첫 달 회비 4만원을 납부하겠습니다. (회비 2만 + 수모 2만)',
+    label: '첫 달 회비 2만원 + 수모 금액 납부',
+    description: '가입 승인 후 첫 달에 회비 2만원과 선택한 수모 금액을 납부하겠습니다. (수모 선택에 따라 총 3만~4만5천원)',
     isActive: true,
     order: 3,
   },
@@ -606,7 +606,7 @@ const DEFAULT_CHECKLIST_ITEMS: ChecklistItem[] = [
 ];
 
 // 체크리스트 버전 (항목 변경 시 증가시키면 자동 초기화됨)
-const CHECKLIST_VERSION = 12;
+const CHECKLIST_VERSION = 13;
 
 export function getChecklistItems(): ChecklistItem[] {
   const versionKey = 'zlsu_checklist_version';

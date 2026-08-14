@@ -183,10 +183,10 @@ export default function PreviewAboutPage() {
           <div className="bg-gray-50 rounded-lg p-4 mb-4">
             <h3 className="font-semibold text-gray-900 mb-2">첫 가입 시 납부 금액</h3>
             <p className="text-gray-600 text-sm">
-              첫 달 회비 2만원 + 수모 2만원 = <span className="font-bold text-primary-600">총 4만원</span>
+              첫 달 회비 2만원 + 수모 금액 = <span className="font-bold text-primary-600">총 3만~4만5천원</span>
             </p>
             <p className="text-xs text-gray-500 mt-1">
-              * 수모 2장 구매 시 총 5만원 (회비 2만 + 수모 3만)
+              * 실리콘 1장 3만원 / 메쉬 1장 4만원 / 메쉬 2장 4만5천원 (회비 2만 포함)
             </p>
           </div>
 

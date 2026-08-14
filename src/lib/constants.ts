@@ -86,7 +86,8 @@ export const WITHDRAWAL_STATUS_COLORS: Record<WithdrawalStatus, string> = {
 
 // 회칙 버전
 export const RULES_VERSIONS = [
-  { version: 'v2.0', label: '현재 회칙 (v2.0)', path: '/rules/v2.0.md' },
+  { version: 'v2.1', label: '현재 회칙 (v2.1)', path: '/rules/v2.1.md' },
+  { version: 'v2.0', label: '이전 회칙 (v2.0)', path: '/rules/v2.0.md' },
   { version: 'v1.1', label: '이전 회칙 (v1.1)', path: '/rules/v1.1.md' },
   { version: 'v1.0', label: '초기 회칙 (v1.0)', path: '/rules/v1.0.md' },
 ];
