@@ -1,5 +1,4 @@
 import { forwardRef } from 'react';
-import { getActiveAndInactiveMemberCount, getSettings } from '../../lib/api';
 import { asset } from '../../lib/assets';
 
 interface AboutContentProps {
@@ -13,10 +12,6 @@ interface AboutContentProps {
  */
 const AboutContent = forwardRef<HTMLElement, AboutContentProps>(
   function AboutContent({ joinInfoSectionRef }) {
-    const stats = getActiveAndInactiveMemberCount();
-    const settings = getSettings();
-    const remainingSlots = settings.maxCapacity - stats.capacityCount;
-
     return (
       <>
         {/* 히어로 섹션 */}
@@ -151,7 +146,7 @@ const AboutContent = forwardRef<HTMLElement, AboutContentProps>(
                   <span className="text-xs text-gray-500">가입 전 체험</span>
                 </div>
                 <ul className="text-sm text-gray-600 space-y-1 mb-2">
-                  <li>• 당일 빈 자리가 있을 때 참여 가능</li>
+                  <li>• 당일 연습 인원(14명)에 여유가 있을 때 참여 가능</li>
                   <li>• 4개 영법을 모두 배운 사람</li>
                   <li>• 자유형 50m 페이스 유지하며 완주 가능</li>
                 </ul>
@@ -171,8 +166,8 @@ const AboutContent = forwardRef<HTMLElement, AboutContentProps>(
                   <span className="text-xs text-gray-500">회원 전환</span>
                 </div>
                 <ul className="text-sm text-gray-600 space-y-1">
-                  <li>☑ 정원(14명)에 공석이 있어야 함</li>
                   <li>☑ 기존 열정 레벨 회원의 추천 필요</li>
+                  <li>☑ 기존 회원들의 찬성 확인</li>
                   <li>☑ 티타임 등 친목 활동에 참여 의향</li>
                 </ul>
               </div>
@@ -212,22 +207,12 @@ const AboutContent = forwardRef<HTMLElement, AboutContentProps>(
               <p className="text-2xl font-bold text-blue-600">2만원</p>
               <p className="text-xs text-gray-500">매월 1일 납부</p>
             </div>
-            <div className={`${remainingSlots > 0 ? 'bg-green-50' : 'bg-gray-100'} rounded-lg p-4 text-center`}>
-              <p className="text-sm text-gray-600 mb-1">정원 현황</p>
-              <p className={`text-2xl font-bold ${remainingSlots > 0 ? 'text-green-600' : 'text-gray-500'}`}>
-                {stats.capacityCount}/{settings.maxCapacity}자리
-              </p>
-              <p className="text-xs text-gray-500">
-                {remainingSlots > 0 ? `공석 ${remainingSlots}자리` : '정원 마감'}
-              </p>
+            <div className="bg-green-50 rounded-lg p-4 text-center">
+              <p className="text-sm text-gray-600 mb-1">연습 정원</p>
+              <p className="text-2xl font-bold text-green-600">14명</p>
+              <p className="text-xs text-gray-500">매주 당일 선착순</p>
             </div>
           </div>
-
-          {remainingSlots <= 0 && (
-            <p className="text-sm text-gray-500 mb-6 text-center">
-              지금은 정원이 마감되어 회원을 모집하고 있지 않아요.
-            </p>
-          )}
 
           {/* 즐수팀 수모 안내 */}
           <div className="mb-4">
@@ -317,7 +302,8 @@ const AboutContent = forwardRef<HTMLElement, AboutContentProps>(
               </h3>
               <p className="text-gray-600 text-sm">
                 가입은 친목 활동까지 함께하실 분을 위한 거예요.
-                수영만 하시려면 게스트로 참여 가능하지만, 당일 빈 자리가 있을 때만 가능해요.
+                수영만 하시려면 게스트로 참여할 수 있어요.
+                다만 당일 연습 인원(14명)이 가득 차면 활동 회원이 우선이라, 다른 레인에서 자유 수영으로 함께해요.
               </p>
             </div>
 
@@ -336,7 +322,7 @@ const AboutContent = forwardRef<HTMLElement, AboutContentProps>(
               </h3>
               <p className="text-gray-600 text-sm">
                 게스트로 꾸준히 참여하며 인사를 나눠 보세요.
-                공석이 생기면 추천 기회가 생길 수 있어요.
+                친해진 회원이 추천해 주면 가입 절차가 시작돼요.
               </p>
             </div>
 

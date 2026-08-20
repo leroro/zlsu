@@ -309,7 +309,7 @@ export default function HomePage() {
                 <span>💰</span> 회비 납부 계좌 (모임통장)
               </h2>
               <div className="text-sm text-blue-800 space-y-2">
-                <p>가입비 : 회비 2만원 + 수모 2만원 = <span className="font-bold">총 4만원</span></p>
+                <p>가입비 : 회비 2만원 + 수모 금액 <span className="font-bold">(수모 선택에 따라 총 3만~4만5천원)</span></p>
                 <div className="bg-white rounded-lg p-3 mt-3">
                   <p className="text-gray-600 text-xs mb-1">{BANK_ACCOUNT.bank}</p>
                   <p className="font-mono font-bold text-lg text-gray-900">{BANK_ACCOUNT.accountNumber}</p>
