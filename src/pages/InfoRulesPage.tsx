@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { RULES_VERSIONS } from '../lib/constants';
@@ -9,25 +9,40 @@ import Button from '../components/common/Button';
  * 외부 공유용 회칙 페이지
  * - InfoPage에서 연결되는 회칙 상세 페이지
  * - 헤더 없음, 미리보기 배너 없음
+ * - /info/rules: 항상 최신 버전 / /info/rules/:version: 지난 회칙 아카이브
  */
 export default function InfoRulesPage() {
+  const { version } = useParams();
   const [content, setContent] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
 
+  // 버전 파라미터가 없으면 최신 버전, 있으면 해당 아카이브 버전
+  const rulesVersion = version
+    ? RULES_VERSIONS.find((v) => v.version === version)
+    : RULES_VERSIONS[0];
+  const isArchived = !!version && rulesVersion !== RULES_VERSIONS[0];
+
   useEffect(() => {
-    document.title = '회칙 - 즐수팀';
-  }, []);
+    document.title = rulesVersion && isArchived
+      ? `회칙 ${rulesVersion.version} - 즐수팀`
+      : '회칙 - 즐수팀';
+  }, [rulesVersion, isArchived]);
 
   useEffect(() => {
     const loadRules = async () => {
       setIsLoading(true);
       setError('');
 
+      if (!rulesVersion) {
+        setError('존재하지 않는 회칙 버전이에요.');
+        setIsLoading(false);
+        return;
+      }
+
       try {
         const basePath = import.meta.env.BASE_URL;
-        // 항상 최신 버전(v2.0) 로드
-        const response = await fetch(`${basePath}${RULES_VERSIONS[0].path.slice(1)}`);
+        const response = await fetch(`${basePath}${rulesVersion.path.slice(1)}`);
         if (!response.ok) {
           throw new Error('회칙을 불러올 수 없습니다.');
         }
@@ -41,7 +56,7 @@ export default function InfoRulesPage() {
     };
 
     loadRules();
-  }, []);
+  }, [version]);
 
   if (isLoading) {
     return (
@@ -79,14 +94,29 @@ export default function InfoRulesPage() {
         {/* 하단 네비게이션 */}
         <div className="bg-white md:rounded-lg md:shadow p-6 mt-4">
           <div className="text-center">
-            <p className="text-gray-500 text-sm mb-4">
-              회칙을 모두 읽으셨나요?
-            </p>
-            <Link to="/info">
-              <Button variant="secondary" size="lg" className="w-full sm:w-auto">
-                모임 소개로 돌아가기
-              </Button>
-            </Link>
+            {isArchived ? (
+              <>
+                <p className="text-gray-500 text-sm mb-4">
+                  지금 보신 문서는 지난 회칙이에요.
+                </p>
+                <Link to="/info/rules">
+                  <Button size="lg" className="w-full sm:w-auto">
+                    현행 회칙 보기
+                  </Button>
+                </Link>
+              </>
+            ) : (
+              <>
+                <p className="text-gray-500 text-sm mb-4">
+                  회칙을 모두 읽으셨나요?
+                </p>
+                <Link to="/info">
+                  <Button variant="secondary" size="lg" className="w-full sm:w-auto">
+                    모임 소개로 돌아가기
+                  </Button>
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </div>

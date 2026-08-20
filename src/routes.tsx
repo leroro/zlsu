@@ -164,6 +164,7 @@ export const router = createHashRouter([
     // 외부 공유용 안내 페이지 (헤더 없이)
     { path: 'info', element: <InfoPage /> },
     { path: 'info/rules', element: <InfoRulesPage /> },
+    { path: 'info/rules/:version', element: <InfoRulesPage /> },
     // 미리보기 페이지 (헤더 없이, 컨펌용 임시)
     { path: 'preview/about', element: <PreviewAboutPage /> },
     { path: 'preview/guide', element: <PreviewGuidePage /> },
